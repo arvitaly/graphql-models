@@ -40,11 +40,17 @@ Util for generate GraphQL-types from abstract models.
     type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 
 string -> GraphQLString
+
 integer -> GraphQLInt
+
 float -> GraphQLFloat
+
 boolean -> GraphQLBool
+
 date -> GraphQLString
+
 model -> new GraphQLObjectType(...)
+
 collection -> new GraphQLList(new GraphQLObjectType(...))
 
 # Tests
