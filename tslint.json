@@ -1,0 +1,6 @@
+{
+    "extends": "tslint:latest",
+    "rules": {
+        "adjacent-overload-signatures": false
+    }
+}
