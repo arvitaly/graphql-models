@@ -8,8 +8,9 @@ import {
     GraphQLObjectType,
     GraphQLString,
 } from "graphql";
-import AttributeTypes from "./AttributeTypes";
+import { default as AttrTypes } from "./AttributeTypes";
 import { Attribute, AttributeType, CollectionAttribute, GraphQLTypes, Model, ModelAttribute } from "./typings";
+export const AttributeTypes = AttrTypes;
 class Collector {
     protected types: { [typeName: string]: GraphQLObjectType } = {};
     constructor(protected models: Model[]) { }
@@ -72,3 +73,4 @@ export default (models: Model[]): GraphQLTypes => {
     const collector = new Collector(models);
     return collector.getTypes();
 };
+export type AttributeType = AttributeType;

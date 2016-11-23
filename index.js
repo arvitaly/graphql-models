@@ -1,6 +1,7 @@
 "use strict";
 const graphql_1 = require("graphql");
 const AttributeTypes_1 = require("./AttributeTypes");
+exports.AttributeTypes = AttributeTypes_1.default;
 class Collector {
     constructor(models) {
         this.models = models;
@@ -18,23 +19,23 @@ class Collector {
         model.attributes.map((attr) => {
             let graphQLType;
             switch (attr.type) {
-                case AttributeTypes_1.default.Date:
-                case AttributeTypes_1.default.String:
+                case exports.AttributeTypes.Date:
+                case exports.AttributeTypes.String:
                     graphQLType = graphql_1.GraphQLString;
                     break;
-                case AttributeTypes_1.default.Float:
+                case exports.AttributeTypes.Float:
                     graphQLType = graphql_1.GraphQLFloat;
                     break;
-                case AttributeTypes_1.default.Integer:
+                case exports.AttributeTypes.Integer:
                     graphQLType = graphql_1.GraphQLInt;
                     break;
-                case AttributeTypes_1.default.Boolean:
+                case exports.AttributeTypes.Boolean:
                     graphQLType = graphql_1.GraphQLBoolean;
                     break;
-                case AttributeTypes_1.default.Model:
+                case exports.AttributeTypes.Model:
                     graphQLType = this.getType(attr.modelId);
                     break;
-                case AttributeTypes_1.default.Collection:
+                case exports.AttributeTypes.Collection:
                     graphQLType = this.getType(attr.modelId);
                     graphQLType = new graphql_1.GraphQLList(graphQLType);
                     break;
