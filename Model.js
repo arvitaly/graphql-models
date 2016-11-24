@@ -85,7 +85,7 @@ class Model {
     getConnectionType() {
         if (!this.connectionType) {
             this.connectionType = graphql_relay_1.connectionDefinitions({
-                nodeType: this.getBaseType()
+                nodeType: this.getBaseType(),
             }).connectionType;
         }
         return this.connectionType;
@@ -163,8 +163,10 @@ class Model {
         return queries;
     }
     getDeleteMutation() {
+        // TODO
     }
     getUpdateMutation() {
+        // TODO 
     }
     getCreateMutation() {
         graphql_relay_1.mutationWithClientMutationId({
@@ -177,6 +179,7 @@ class Model {
         });
     }
     getMutations() {
+        // TODO
     }
     generateBaseType() {
         let fields = {};

@@ -109,7 +109,7 @@ class Model {
     public getConnectionType() {
         if (!this.connectionType) {
             this.connectionType = connectionDefinitions({
-                nodeType: this.getBaseType()
+                nodeType: this.getBaseType(),
             }).connectionType;
         }
         return this.connectionType;
@@ -186,10 +186,10 @@ class Model {
         return queries;
     }
     public getDeleteMutation() {
-
+        // TODO
     }
     public getUpdateMutation() {
-
+        // TODO 
     }
     public getCreateMutation() {
         mutationWithClientMutationId({
@@ -199,10 +199,10 @@ class Model {
             mutateAndGetPayload: () => {
                 return null;
             },
-        })
+        });
     }
     public getMutations() {
-
+        // TODO
     }
     protected generateBaseType(): GraphQLObjectType {
         let fields: GraphQLFieldConfigMap<any> = {};

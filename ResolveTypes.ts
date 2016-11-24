@@ -7,5 +7,5 @@ const ResolveTypes = {
     MutationDelete: "mutationDelete" as "mutationDelete",
     SubscriptionOne: "subscriptionOne" as "subscriptionOne",
     SubscriptionConnection: "subscriptionConnection" as "subscriptionConnection",
-}
+};
 export default ResolveTypes;

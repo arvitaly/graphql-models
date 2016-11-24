@@ -9,7 +9,7 @@ class Generator {
         });
     }
     get(id) {
-        const model = this.models.find(m => m.id === id);
+        const model = this.models.find((m) => m.id === id);
         if (!model) {
             throw new Error("Not found model with id " + id);
         }

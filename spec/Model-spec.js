@@ -96,8 +96,9 @@ describe("Model spec", () => {
         it("args for one", () => {
             const argsForOne = animalModel.getOneArgs();
             const expectedArgsForOne = {};
-            expectedArgsForOne[animalModel.getPrimaryKeyAttribute().name] =
-                { type: new graphql_1.GraphQLNonNull(Model_1.scalarTypeToGraphQL(animalModel.getPrimaryKeyAttribute().type)) };
+            expectedArgsForOne[animalModel.getPrimaryKeyAttribute().name] = {
+                type: new graphql_1.GraphQLNonNull(Model_1.scalarTypeToGraphQL(animalModel.getPrimaryKeyAttribute().type)),
+            };
             expect(argsForOne).toEqual(expectedArgsForOne);
         });
         it("args for connection", () => {

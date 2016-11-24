@@ -14,8 +14,10 @@ class Schema {
         return queries;
     }
     getMutations() {
+        // TDO
     }
     getSubscriptions() {
+        // TODO
     }
     getQueryViewerType() {
         const queryViewer = new graphql_1.GraphQLObjectType({

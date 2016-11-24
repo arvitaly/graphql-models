@@ -26,11 +26,11 @@ describe("Schema spec", () => {
                 viewer: {
                     type: obj1,
                     resolve: jasmine.any(Function) as any,
-                }
-            }
+                },
+            },
         });
         expect(queryType).toEqual(expectedQueryType, fail(queryType, expectedQueryType));
-    })
+    });
     it("getGraphQLSchema", () => {
         const getQueryTypeSpy = spyOn(schema, "getQueryType").and.returnValue(obj1);
         const graphQLSchema = schema.getGraphQLSchema();

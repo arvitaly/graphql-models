@@ -7,7 +7,7 @@ export const postModel: ModelConfig = {
         name: "id",
         type: AttributeTypes.Integer,
         primaryKey: true,
-    },{
+    }, {
         name: "owner",
         type: AttributeTypes.Model,
         model: "user",

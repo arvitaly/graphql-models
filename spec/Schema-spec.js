@@ -27,8 +27,8 @@ describe("Schema spec", () => {
                 viewer: {
                     type: obj1,
                     resolve: jasmine.any(Function),
-                }
-            }
+                },
+            },
         });
         expect(queryType).toEqual(expectedQueryType, fail_1.default(queryType, expectedQueryType));
     });

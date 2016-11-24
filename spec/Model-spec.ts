@@ -114,8 +114,9 @@ describe("Model spec", () => {
         it("args for one", () => {
             const argsForOne = animalModel.getOneArgs();
             const expectedArgsForOne = {};
-            expectedArgsForOne[animalModel.getPrimaryKeyAttribute().name] =
-                { type: new GraphQLNonNull(scalarTypeToGraphQL(animalModel.getPrimaryKeyAttribute().type)) };
+            expectedArgsForOne[animalModel.getPrimaryKeyAttribute().name] = {
+                type: new GraphQLNonNull(scalarTypeToGraphQL(animalModel.getPrimaryKeyAttribute().type)),
+            };
             expect(argsForOne).toEqual(expectedArgsForOne);
         });
         it("args for connection", () => {
@@ -142,7 +143,7 @@ describe("Model spec", () => {
             fields: where,
         });
         expect(whereInputType).toEqual(expectedWhereInputType, fail(whereInputType, expectedWhereInputType));
-    })
+    });
     describe("Queries", () => {
         let resolveFn: jasmine.Spy;
         beforeEach(() => {
@@ -191,4 +192,3 @@ describe("Model spec", () => {
         });
     });
 });
-
