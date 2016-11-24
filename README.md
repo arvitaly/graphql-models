@@ -12,11 +12,11 @@ Util for generate GraphQL-types from abstract models.
 
 # Usage
 
-    import generate, {AttributeTypes} from "graphql-models";
+    import {AttributeTypes, Collector} from "graphql-models";
     
     const model1 = {
         id: "model1",
-        name: "Model1",
+        name: "model1",
         attributes: [{
             name: "title",
             type: AttributeTypes.String
@@ -31,7 +31,8 @@ Util for generate GraphQL-types from abstract models.
         }]
     }
 
-    generate([model1, model2]);
+    const collector = new Collector([model1, model2]);
+    collector.getModel("model1").getBaseType(); // GraphQLObjectType
 
 # API
 
