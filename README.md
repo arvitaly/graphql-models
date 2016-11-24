@@ -12,7 +12,7 @@ Util for generate GraphQL-types from abstract models.
 
 # Example
 
-    import {graphql}
+    import {graphql} from "graphql";
     import {AttributeTypes, Collection, ResolveTypes, Schema} from "graphql-models";
     
     const animalModel = {
