@@ -4,33 +4,39 @@ import { ModelConfig } from "./../../typings";
 export const postModel: ModelConfig = {
     id: "post",
     attributes: [{
-        name: "id",
-        type: AttributeTypes.Integer,
-    }, {
         name: "owner",
         type: AttributeTypes.Model,
-        modelId: "user",
+        model: "user",
     }, {
         name: "animals",
         type: AttributeTypes.Collection,
-        modelId: "animal",
+        model: "animal",
     }],
 };
 export const userModel: ModelConfig = {
     id: "user",
     name: "user",
     attributes: [{
+        name: "key",
+        type: AttributeTypes.Float,
+        primaryKey: true,
+    }, {
         name: "name",
         type: AttributeTypes.String,
+        required: true,
     }, {
         name: "pets",
         type: AttributeTypes.Collection,
-        modelId: "animal",
+        model: "animal",
     }],
 };
 export const animalModel: ModelConfig = {
     id: "animal",
     attributes: [{
+        name: "id",
+        type: AttributeTypes.Integer,
+        primaryKey: true,
+    }, {
         type: AttributeTypes.String,
         name: "name",
     }, {

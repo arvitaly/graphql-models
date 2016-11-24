@@ -4,33 +4,39 @@ const Collector_1 = require("./../../Collector");
 exports.postModel = {
     id: "post",
     attributes: [{
-            name: "id",
-            type: AttributeTypes_1.default.Integer,
-        }, {
             name: "owner",
             type: AttributeTypes_1.default.Model,
-            modelId: "user",
+            model: "user",
         }, {
             name: "animals",
             type: AttributeTypes_1.default.Collection,
-            modelId: "animal",
+            model: "animal",
         }],
 };
 exports.userModel = {
     id: "user",
     name: "user",
     attributes: [{
+            name: "key",
+            type: AttributeTypes_1.default.Float,
+            primaryKey: true,
+        }, {
             name: "name",
             type: AttributeTypes_1.default.String,
+            required: true,
         }, {
             name: "pets",
             type: AttributeTypes_1.default.Collection,
-            modelId: "animal",
+            model: "animal",
         }],
 };
 exports.animalModel = {
     id: "animal",
     attributes: [{
+            name: "id",
+            type: AttributeTypes_1.default.Integer,
+            primaryKey: true,
+        }, {
             type: AttributeTypes_1.default.String,
             name: "name",
         }, {

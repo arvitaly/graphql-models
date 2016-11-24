@@ -5,12 +5,18 @@ class Model {
     constructor(config, collector) {
         this.config = config;
         this.collector = collector;
-        this.name = this.config.name || this.config.id.charAt(0).toUpperCase() + this.config.id.substr(1);
+        this.name = this.config.name || capitalize(this.config.id);
         let idAttr;
         this.attributes = this.config.attributes.map((attrConfig) => {
+            if (attrConfig.type === AttributeTypes_1.default.Model || attrConfig.type === AttributeTypes_1.default.Collection) {
+                if (!attrConfig.model) {
+                    throw new Error("For attribute with type " + attrConfig.type + " should be set model");
+                }
+            }
             const attr = {
                 name: attrConfig.name,
                 type: attrConfig.type,
+                model: attrConfig.model,
                 required: typeof (attrConfig.required) !== "undefined" ? attrConfig.required : false,
             };
             if (attrConfig.primaryKey === true) {
@@ -23,14 +29,14 @@ class Model {
                 if (idAttr) {
                     this.primaryKeyAttribute = idAttr;
                 }
-                else {
-                    throw new Error("Not found primary key attribute");
-                }
             }
             return attr;
         });
     }
-    getPrimaryKey() {
+    getPrimaryKeyAttribute() {
+        if (!this.primaryKeyAttribute) {
+            throw new Error("Not found primary key attribute for model " + this.name + " for relation");
+        }
         return this.primaryKeyAttribute;
     }
     getCreationType() {
@@ -50,20 +56,26 @@ class Model {
         this.attributes.map((attr) => {
             let graphQLType;
             if (attr.type === AttributeTypes_1.default.Model) {
-                graphQLType = this.collector.getModel(attr.modelId).getBaseType();
+                const childModel = this.collector.getModel(attr.model);
+                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                fields["create" + capitalize(attr.name)] = { type: childModel.getCreationType() };
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
-                graphQLType = this.collector.getModel(attr.modelId).getBaseType();
+                const childModel = this.collector.getModel(attr.model);
+                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
                 graphQLType = new graphql_1.GraphQLList(graphQLType);
+                fields["create" + capitalize(attr.name)] = {
+                    type: new graphql_1.GraphQLList(childModel.getCreationType()),
+                };
             }
             else {
                 graphQLType = scalarTypeToGraphQL(attr.type);
-                fields[attr.name] = { type: attr.required ? new graphql_1.GraphQLNonNull(graphQLType) : graphQLType };
             }
+            fields[attr.name] = { type: attr.required ? new graphql_1.GraphQLNonNull(graphQLType) : graphQLType };
         });
         return new graphql_1.GraphQLInputObjectType({
-            name: this.name + "Creation",
-            fields: {},
+            name: "Create" + this.name + "Input",
+            fields,
         });
     }
     generateBaseType() {
@@ -71,10 +83,10 @@ class Model {
         this.attributes.map((attr) => {
             let graphQLType;
             if (attr.type === AttributeTypes_1.default.Model) {
-                graphQLType = this.collector.getModel(attr.modelId).getBaseType();
+                graphQLType = this.collector.getModel(attr.model).getBaseType();
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
-                graphQLType = this.collector.getModel(attr.modelId).getBaseType();
+                graphQLType = this.collector.getModel(attr.model).getBaseType();
                 graphQLType = new graphql_1.GraphQLList(graphQLType);
             }
             else {
@@ -83,7 +95,7 @@ class Model {
             fields[attr.name] = { type: graphQLType };
         });
         return new graphql_1.GraphQLObjectType({
-            name: this.name + "Type",
+            name: this.name,
             fields,
         });
     }
@@ -110,5 +122,9 @@ function scalarTypeToGraphQL(type) {
     return graphQLType;
 }
 exports.scalarTypeToGraphQL = scalarTypeToGraphQL;
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.substr(1);
+}
+exports.capitalize = capitalize;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Model;

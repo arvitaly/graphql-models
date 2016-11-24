@@ -28,15 +28,16 @@ export interface DateAttribute extends BaseAttribute {
 }
 export interface ModelAttribute extends BaseAttribute {
     type: "model";
-    modelId: string;
+    model: string;
 }
 export interface CollectionAttribute extends BaseAttribute {
     type: "collection";
-    modelId: string;
+    model: string;
 }
 export type AttributeConfig = BaseAttribute | StringAttribute | IntegerAttribute | FloatAttribute | BooleandAttribute | DateAttribute | ModelAttribute | CollectionAttribute;
 export type Attribute = AttributeConfig & {
     required: boolean;
+    model?: string;
 }
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
