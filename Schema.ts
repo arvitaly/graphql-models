@@ -19,36 +19,43 @@ class Schema {
     public getSubscriptions() {
 
     }
-    public getGraphQLSchema() {
+    public getQueryViewerType() {
         const queryViewer = new GraphQLObjectType({
             name: "QueryViewer",
-            fields: queriesToMap(this.getQueries()),
-        })
-        return new GraphQLSchema({
-            query: new GraphQLObjectType({
-                name: "Query",
-                fields: {
-                    viewer: {
-                        type: queryViewer, resolve: (source, args, context, info) => {
-                            return this.resolveFn({
-                                type: ResolveTypes.Viewer,
-                                source,
-                                args,
-                                context,
-                                info,
-                            });
-                        },
+            fields: this.queriesToMap(),
+        });
+        return queryViewer;
+    }
+    public getQueryType() {
+        return new GraphQLObjectType({
+            name: "Query",
+            fields: {
+                viewer: {
+                    type: this.getQueryViewerType(),
+                    resolve: (source, args, context, info) => {
+                        return this.resolveFn({
+                            type: ResolveTypes.Viewer,
+                            source,
+                            args,
+                            context,
+                            info,
+                        });
                     },
                 },
-            }),
+            },
+        })
+    }
+    public getGraphQLSchema() {
+        return new GraphQLSchema({
+            query: this.getQueryType(),
         });
     }
-}
-export function queriesToMap(queries: Queries): GraphQLFieldConfigMap<any> {
-    let out: GraphQLFieldConfigMap<any> = {};
-    queries.map((q) => {
-        out[q.name] = q.field;
-    });
-    return out;
+    protected queriesToMap(): GraphQLFieldConfigMap<any> {
+        let out: GraphQLFieldConfigMap<any> = {};
+        this.getQueries().map((q) => {
+            out[q.name] = q.field;
+        });
+        return out;
+    }
 }
 export default Schema;

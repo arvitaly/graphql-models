@@ -17,38 +17,44 @@ class Schema {
     }
     getSubscriptions() {
     }
-    getGraphQLSchema() {
+    getQueryViewerType() {
         const queryViewer = new graphql_1.GraphQLObjectType({
             name: "QueryViewer",
-            fields: queriesToMap(this.getQueries()),
+            fields: this.queriesToMap(),
         });
-        return new graphql_1.GraphQLSchema({
-            query: new graphql_1.GraphQLObjectType({
-                name: "Query",
-                fields: {
-                    viewer: {
-                        type: queryViewer, resolve: (source, args, context, info) => {
-                            return this.resolveFn({
-                                type: ResolveTypes_1.default.Viewer,
-                                source,
-                                args,
-                                context,
-                                info,
-                            });
-                        },
+        return queryViewer;
+    }
+    getQueryType() {
+        return new graphql_1.GraphQLObjectType({
+            name: "Query",
+            fields: {
+                viewer: {
+                    type: this.getQueryViewerType(),
+                    resolve: (source, args, context, info) => {
+                        return this.resolveFn({
+                            type: ResolveTypes_1.default.Viewer,
+                            source,
+                            args,
+                            context,
+                            info,
+                        });
                     },
                 },
-            }),
+            },
         });
     }
+    getGraphQLSchema() {
+        return new graphql_1.GraphQLSchema({
+            query: this.getQueryType(),
+        });
+    }
+    queriesToMap() {
+        let out = {};
+        this.getQueries().map((q) => {
+            out[q.name] = q.field;
+        });
+        return out;
+    }
 }
-function queriesToMap(queries) {
-    let out = {};
-    queries.map((q) => {
-        out[q.name] = q.field;
-    });
-    return out;
-}
-exports.queriesToMap = queriesToMap;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Schema;

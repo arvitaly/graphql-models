@@ -74,6 +74,8 @@ Util for generate GraphQL-types from abstract models.
         });
 
 
+For more examples, look https://github.com/arvitaly/graphql-models/blob/master/spec/Functional-spec.ts
+
 # API
 
 ## Suported attribute type
