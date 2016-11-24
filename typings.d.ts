@@ -42,10 +42,10 @@ export type Attribute = AttributeConfig & {
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
 }
-export type ResolveType = "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
+export type ResolveType = "viewer" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
 export type ResolveOpts = {
     type: ResolveType;
-    model: string;
+    model?: string;
     parentModel?: string;
     source: any;
     args: { [argName: string]: any };

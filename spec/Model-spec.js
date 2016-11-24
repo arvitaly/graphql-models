@@ -1,8 +1,13 @@
 "use strict";
 const graphql_1 = require("graphql");
+const graphql_relay_1 = require("graphql-relay");
+const AttributeTypes_1 = require("./../AttributeTypes");
+const Model_1 = require("./../Model");
 const ResolveTypes_1 = require("./../ResolveTypes");
+const fail_1 = require("./fail");
 const collection1_1 = require("./fixtures/collection1");
 const animalModel = collection1_1.default.get("animal");
+const postModel = collection1_1.default.get("post");
 describe("Model spec", () => {
     describe("base type", () => {
         const expectedAnimalType = new graphql_1.GraphQLObjectType({
@@ -25,7 +30,7 @@ describe("Model spec", () => {
             },
         });
         it("when generate base type with scalar attributes, should return equals", () => {
-            const animalModelBaseType = collection1_1.default.get("animal").getBaseType();
+            const animalModelBaseType = animalModel.getBaseType();
             expect(animalModelBaseType).toEqual(expectedAnimalType, "Animal-model not equal, expected " +
                 JSON.stringify(animalModelBaseType.getFields()) + " to equal " +
                 JSON.stringify(expectedAnimalType.getFields()));
@@ -67,6 +72,7 @@ describe("Model spec", () => {
         const expectedPostCreationType = new graphql_1.GraphQLInputObjectType({
             name: "CreatePostInput",
             fields: {
+                id: { type: graphql_1.GraphQLInt },
                 owner: { type: graphql_1.GraphQLFloat },
                 createOwner: { type: expectedUserCreationType },
                 animals: { type: new graphql_1.GraphQLList(graphql_1.GraphQLInt) },
@@ -75,23 +81,60 @@ describe("Model spec", () => {
         });
         it("animal creation type", () => {
             const animalCreationType = collection1_1.default.get("animal").getCreationType();
-            expect(animalCreationType).toEqual(expectedAnimalCreationType, fail(animalCreationType, expectedAnimalCreationType));
+            expect(animalCreationType).toEqual(expectedAnimalCreationType, fail_1.default(animalCreationType, expectedAnimalCreationType));
         });
         it("user creation type", () => {
             const userCreationType = collection1_1.default.get("user").getCreationType();
-            expect(userCreationType).toEqual(expectedUserCreationType, fail(userCreationType, expectedUserCreationType));
+            expect(userCreationType).toEqual(expectedUserCreationType, fail_1.default(userCreationType, expectedUserCreationType));
         });
         it("post creation type", () => {
             const postCreationType = collection1_1.default.get("post").getCreationType();
-            expect(postCreationType).toEqual(expectedPostCreationType, fail(postCreationType, expectedPostCreationType));
+            expect(postCreationType).toEqual(expectedPostCreationType, fail_1.default(postCreationType, expectedPostCreationType));
         });
     });
+    describe("Args", () => {
+        it("args for one", () => {
+            const argsForOne = animalModel.getOneArgs();
+            const expectedArgsForOne = {};
+            expectedArgsForOne[animalModel.getPrimaryKeyAttribute().name] =
+                { type: new graphql_1.GraphQLNonNull(Model_1.scalarTypeToGraphQL(animalModel.getPrimaryKeyAttribute().type)) };
+            expect(argsForOne).toEqual(expectedArgsForOne);
+        });
+        it("args for connection", () => {
+            const argsForConnection = animalModel.getConnectionArgs();
+            const expectedArgsForConnection = graphql_relay_1.connectionArgs;
+            expectedArgsForConnection[Model_1.whereArgName] = { type: animalModel.getWhereInputType() };
+            expect(argsForConnection).toEqual(expectedArgsForConnection);
+        });
+    });
+    it("WhereInput type", () => {
+        const whereInputType = postModel.getWhereInputType();
+        let where = {};
+        postModel.attributes.map((attr) => {
+            let type;
+            if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
+                type = collection1_1.default.get(attr.model).getPrimaryKeyAttribute().type;
+            }
+            else {
+                type = attr.type;
+            }
+            where[attr.name] = { type: Model_1.scalarTypeToGraphQL(type) };
+        });
+        const expectedWhereInputType = new graphql_1.GraphQLInputObjectType({
+            name: postModel.name + "WhereInput",
+            fields: where,
+        });
+        expect(whereInputType).toEqual(expectedWhereInputType, fail_1.default(whereInputType, expectedWhereInputType));
+    });
     describe("Queries", () => {
-        it("Single query", () => {
-            const resolveFn = jasmine.createSpy("");
-            const animalSingleQuery = animalModel.getSingleQuery(resolveFn);
+        let resolveFn;
+        beforeEach(() => {
+            resolveFn = jasmine.createSpy("");
+        });
+        it("Query one", () => {
+            const animalSingleQuery = animalModel.getQueryOne(resolveFn);
             const expectedAnimalSingleQuery = {
-                args: animalModel.getArgsForOne(),
+                args: animalModel.getOneArgs(),
                 type: animalModel.getBaseType(),
                 resolve: jasmine.any(Function),
             };
@@ -106,16 +149,28 @@ describe("Model spec", () => {
                         info: "f4",
                     }]]);
         });
+        it("Query connection", () => {
+            const queryConnection = animalModel.getConnectionQuery(resolveFn);
+            const expectedQueryConnection = {
+                args: animalModel.getConnectionArgs(),
+                type: animalModel.getConnectionType(),
+                resolve: jasmine.any(Function),
+            };
+        });
+        it("all queries", () => {
+            const getQueryOneSpy = spyOn(animalModel, "getQueryOne").and.returnValue("q1");
+            const getQueryConnectionSpy = spyOn(animalModel, "getConnectionQuery").and.returnValue("q2");
+            const queries = animalModel.getQueries(resolveFn);
+            const expectedQueries = [{
+                    name: Model_1.uncapitalize(animalModel.name),
+                    field: animalModel.getQueryOne(resolveFn),
+                }, {
+                    name: Model_1.uncapitalize(animalModel.name) + "s",
+                    field: animalModel.getConnectionQuery(resolveFn),
+                }];
+            expect(queries).toEqual(expectedQueries);
+            getQueryOneSpy.and.callThrough();
+            getQueryConnectionSpy.and.callThrough();
+        });
     });
 });
-function fail(obj1, obj2) {
-    return `GraphQL objects not equal: 
-        Object1:
-            name: ${obj1.name},
-            fields: ${JSON.stringify(obj1.getFields())}
-        Object2:
-            name: ${obj2.name},
-            fields: ${JSON.stringify(obj2.getFields())}
-    `;
-}
-;

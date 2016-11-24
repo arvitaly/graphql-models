@@ -10,29 +10,69 @@ Util for generate GraphQL-types from abstract models.
 
     npm install graphql-models --save
 
-# Usage
+# Example
 
-    import {AttributeTypes, Collector} from "graphql-models";
+    import {graphql}
+    import {AttributeTypes, Collection, ResolveTypes, Schema} from "graphql-models";
     
-    const model1 = {
-        id: "model1",
-        name: "model1",
+    const animalModel = {
+        id: "animal",
         attributes: [{
-            name: "title",
-            type: AttributeTypes.String
-        }]
-    }
-    const model2 = {
-        id: "model2",
-        attributes:[{
-            name: "m1",
-            type: AttributeTypes.Model,
-            modelId: "model1"
-        }]
-    }
+            name: "id",
+            type: AttributeTypes.Integer,
+            primaryKey: true,
+        }, {
+            type: AttributeTypes.String,
+            name: "name",
+        }, {
+            type: AttributeTypes.Integer,
+            name: "age",
+        }, {
+            type: AttributeTypes.Float,
+            name: "Weight",
+        }, {
+            type: AttributeTypes.Date,
+            name: "birthday",
+        }, {
+            type: AttributeTypes.Boolean,
+            name: "isCat",
+        }],
+    };
+    const models = new Collection([animalModel]);
 
-    const collector = new Collector([model1, model2]);
-    collector.getModel("model1").getBaseType(); // GraphQLObjectType
+    const resolveFn = (opts) => {
+        if (opts.type === ResolveTypes.Viewer) {
+            return {};
+        }
+        if (opts.type === ResolveTypes.QueryOne && opts.model === "animal") {
+            return { id: 15, name: "Rex", age: 2, Weight: 6.5, birthday: new Date(), isCat: false };
+        }
+    };
+    const schema = new Schema(models, resolveFn);
+    const graphQLSchema = schema.getGraphQLSchema();
+    graphql(graphQLSchema, `query Q1{
+        viewer{
+            animal(id:15){
+                id
+                name
+                age
+                Weight
+                birthday
+                isCat
+            }
+        }
+    }`).then((response) => {
+            console.log(response.data);
+            /*{ viewer:
+                { animal:
+                    { id: 15,
+                        name: 'Rex',
+                        age: 2,
+                        Weight: 6.5,
+                        birthday: 'Fri Nov 25 2016 06:04:16 GMT+0700 (ICT)',
+                        isCat: false } } }*/
+        });
+
 
 # API
 

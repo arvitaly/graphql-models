@@ -1,4 +1,5 @@
 const ResolveTypes = {
+    Viewer: "viewer" as "viewer",
     QueryOne: "queryOne" as "queryOne",
     QueryConnection: "queryConnection" as "queryConnection",
     MutationCreate: "mutationCreate" as "mutationCreate",

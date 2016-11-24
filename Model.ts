@@ -1,4 +1,5 @@
 import {
+    GraphQLArgumentConfig,
     GraphQLBoolean,
     GraphQLFieldConfig,
     GraphQLFieldConfigArgumentMap,
@@ -10,9 +11,10 @@ import {
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType,
+    GraphQLScalarType,
     GraphQLString,
 } from "graphql";
-import { connectionDefinitions, mutationWithClientMutationId } from "graphql-relay";
+import { connectionArgs, connectionDefinitions, mutationWithClientMutationId } from "graphql-relay";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
@@ -21,6 +23,7 @@ import {
     ModelConfig, Queries,
     ResolveFn,
 } from "./typings";
+export const whereArgName = "where";
 class Model {
     public id: string;
     public name: string;
@@ -61,7 +64,7 @@ class Model {
     }
     public getPrimaryKeyAttribute(): Attribute {
         if (!this.primaryKeyAttribute) {
-            throw new Error("Not found primary key attribute for model " + this.name + " for relation");
+            throw new Error("Not found primary key attribute for model `" + this.name + "`");
         }
         return this.primaryKeyAttribute;
     }
@@ -111,14 +114,15 @@ class Model {
         }
         return this.connectionType;
     }
-    public getArgsForOne(): GraphQLFieldConfigArgumentMap {
-        return {
-            id: { type: new GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) },
-        };
+    public getOneArgs(): GraphQLFieldConfigArgumentMap {
+        let args: GraphQLFieldConfigArgumentMap = {};
+        const primary = this.getPrimaryKeyAttribute();
+        args[primary.name] = { type: new GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) };
+        return args;
     }
-    public getSingleQuery(resolveFn: ResolveFn): GraphQLFieldConfig<any> {
+    public getQueryOne(resolveFn: ResolveFn): GraphQLFieldConfig<any> {
         return {
-            args: this.getArgsForOne(),
+            args: this.getOneArgs(),
             type: this.getBaseType(),
             resolve: (source, args, context, info) => {
                 return resolveFn({
@@ -132,27 +136,52 @@ class Model {
             },
         };
     }
-    public getConnectionQuery(): GraphQLFieldConfig<any> {
+    public getConnectionQuery(resolveFn: ResolveFn): GraphQLFieldConfig<any> {
         return {
-            args: {},
+            args: this.getConnectionArgs(),
             type: this.getConnectionType(),
+            resolve: (source, args, context, info) => {
+                return resolveFn({
+                    type: ResolveTypes.QueryConnection,
+                    model: this.id,
+                    source,
+                    args,
+                    context,
+                    info,
+                });
+            },
         };
     }
-    public getFindArgs() {
-
+    public getConnectionArgs(): GraphQLFieldConfigArgumentMap {
+        let args = connectionArgs;
+        args[whereArgName] = { type: this.getWhereInputType() };
+        return args;
     }
-    public getWhereArgs() {
-
+    public getWhereInputType(): GraphQLInputObjectType {
+        let where: GraphQLInputFieldConfigMap = {};
+        this.attributes.map((attr) => {
+            let type;
+            if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
+                type = this.collector.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
+            } else {
+                type = attr.type;
+            }
+            where[attr.name] = { type: scalarTypeToGraphQL(type) };
+        });
+        return new GraphQLInputObjectType({
+            name: this.name + "WhereInput",
+            fields: where,
+        });
     }
     public getQueries(resolveFn: ResolveFn): Queries {
         let queries: Queries = [];
         queries.push({
             name: uncapitalize(this.name),
-            field: this.getSingleQuery(resolveFn),
+            field: this.getQueryOne(resolveFn),
         });
         queries.push({
             name: uncapitalize(this.name) + "s",
-            field: this.getConnectionQuery(),
+            field: this.getConnectionQuery(resolveFn),
         });
         return queries;
     }
@@ -166,7 +195,10 @@ class Model {
         mutationWithClientMutationId({
             name: this.name + "CreateMutation",
             inputFields: {},
-            out
+            outputFields: {},
+            mutateAndGetPayload: () => {
+                return null;
+            },
         })
     }
     public getMutations() {
@@ -192,7 +224,7 @@ class Model {
         });
     }
 }
-export function scalarTypeToGraphQL(type: AttributeType) {
+export function scalarTypeToGraphQL(type: AttributeType): GraphQLScalarType {
     let graphQLType;
     switch (type) {
         case AttributeTypes.Date:

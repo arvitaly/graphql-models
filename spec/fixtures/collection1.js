@@ -4,6 +4,10 @@ const Collection_1 = require("./../../Collection");
 exports.postModel = {
     id: "post",
     attributes: [{
+            name: "id",
+            type: AttributeTypes_1.default.Integer,
+            primaryKey: true,
+        }, {
             name: "owner",
             type: AttributeTypes_1.default.Model,
             model: "user",

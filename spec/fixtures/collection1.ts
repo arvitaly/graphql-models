@@ -4,6 +4,10 @@ import { ModelConfig } from "./../../typings";
 export const postModel: ModelConfig = {
     id: "post",
     attributes: [{
+        name: "id",
+        type: AttributeTypes.Integer,
+        primaryKey: true,
+    },{
         name: "owner",
         type: AttributeTypes.Model,
         model: "user",

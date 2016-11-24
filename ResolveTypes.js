@@ -1,5 +1,6 @@
 "use strict";
 const ResolveTypes = {
+    Viewer: "viewer",
     QueryOne: "queryOne",
     QueryConnection: "queryConnection",
     MutationCreate: "mutationCreate",

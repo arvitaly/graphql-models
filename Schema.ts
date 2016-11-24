@@ -1,18 +1,17 @@
 import { GraphQLFieldConfigMap, GraphQLObjectType, GraphQLSchema } from "graphql";
 import Collection from "./Collection";
+import ResolveTypes from "./ResolveTypes";
 import { Queries, ResolveFn } from "./typings";
 class Schema {
-    protected queries: Queries = [];
     constructor(protected collection: Collection, protected resolveFn: ResolveFn) {
 
     }
     public getQueries() {
-        if (!this.queries) {
-            this.collection.map((model) => {
-                this.queries = this.queries.concat(model.getQueries(this.resolveFn));
-            });
-            return this.queries;
-        }
+        let queries: Queries = [];
+        this.collection.map((model) => {
+            queries = queries.concat(model.getQueries(this.resolveFn));
+        });
+        return queries;
     }
     public getMutations() {
 
@@ -20,23 +19,36 @@ class Schema {
     public getSubscriptions() {
 
     }
-    public getSchema() {
-        let queries: GraphQLFieldConfigMap<any>;
-        this.getQueries().map((q) => {
-            queries[q.name] = q.field;
-        });
+    public getGraphQLSchema() {
         const queryViewer = new GraphQLObjectType({
             name: "QueryViewer",
-            fields: queries,
+            fields: queriesToMap(this.getQueries()),
         })
         return new GraphQLSchema({
             query: new GraphQLObjectType({
                 name: "Query",
                 fields: {
-                    viewer: { type: queryViewer },
+                    viewer: {
+                        type: queryViewer, resolve: (source, args, context, info) => {
+                            return this.resolveFn({
+                                type: ResolveTypes.Viewer,
+                                source,
+                                args,
+                                context,
+                                info,
+                            });
+                        },
+                    },
                 },
             }),
         });
     }
+}
+export function queriesToMap(queries: Queries): GraphQLFieldConfigMap<any> {
+    let out: GraphQLFieldConfigMap<any> = {};
+    queries.map((q) => {
+        out[q.name] = q.field;
+    });
+    return out;
 }
 export default Schema;

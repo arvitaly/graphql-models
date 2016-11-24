@@ -1,4 +1,5 @@
 import {
+    GraphQLArgumentConfig,
     GraphQLBoolean,
     GraphQLFieldConfig,
     GraphQLFieldConfigMap,
@@ -10,9 +11,15 @@ import {
     GraphQLObjectType,
     GraphQLString,
 } from "graphql";
+import { connectionArgs } from "graphql-relay";
+import AttributeTypes from "./../AttributeTypes";
+import { capitalize, scalarTypeToGraphQL, uncapitalize, whereArgName } from "./../Model";
 import ResolveTypes from "./../ResolveTypes";
-import collection1, { postModel } from "./fixtures/collection1";
+import { ModelAttribute, Queries } from "./../typings";
+import fail from "./fail";
+import collection1 from "./fixtures/collection1";
 const animalModel = collection1.get("animal");
+const postModel = collection1.get("post");
 describe("Model spec", () => {
     describe("base type", () => {
         const expectedAnimalType = new GraphQLObjectType({
@@ -35,7 +42,7 @@ describe("Model spec", () => {
             },
         });
         it("when generate base type with scalar attributes, should return equals", () => {
-            const animalModelBaseType = collection1.get("animal").getBaseType();
+            const animalModelBaseType = animalModel.getBaseType();
             expect(animalModelBaseType).toEqual(expectedAnimalType,
                 "Animal-model not equal, expected " +
                 JSON.stringify(animalModelBaseType.getFields()) + " to equal " +
@@ -80,6 +87,7 @@ describe("Model spec", () => {
         const expectedPostCreationType = new GraphQLInputObjectType({
             name: "CreatePostInput",
             fields: {
+                id: { type: GraphQLInt },
                 owner: { type: GraphQLFloat },
                 createOwner: { type: expectedUserCreationType },
                 animals: { type: new GraphQLList(GraphQLInt) },
@@ -102,12 +110,48 @@ describe("Model spec", () => {
                 fail(postCreationType, expectedPostCreationType));
         });
     });
+    describe("Args", () => {
+        it("args for one", () => {
+            const argsForOne = animalModel.getOneArgs();
+            const expectedArgsForOne = {};
+            expectedArgsForOne[animalModel.getPrimaryKeyAttribute().name] =
+                { type: new GraphQLNonNull(scalarTypeToGraphQL(animalModel.getPrimaryKeyAttribute().type)) };
+            expect(argsForOne).toEqual(expectedArgsForOne);
+        });
+        it("args for connection", () => {
+            const argsForConnection = animalModel.getConnectionArgs();
+            const expectedArgsForConnection = connectionArgs;
+            expectedArgsForConnection[whereArgName] = { type: animalModel.getWhereInputType() };
+            expect(argsForConnection).toEqual(expectedArgsForConnection);
+        });
+    });
+    it("WhereInput type", () => {
+        const whereInputType = postModel.getWhereInputType();
+        let where = {};
+        postModel.attributes.map((attr) => {
+            let type;
+            if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
+                type = collection1.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
+            } else {
+                type = attr.type;
+            }
+            where[attr.name] = { type: scalarTypeToGraphQL(type) };
+        });
+        const expectedWhereInputType: GraphQLInputObjectType = new GraphQLInputObjectType({
+            name: postModel.name + "WhereInput",
+            fields: where,
+        });
+        expect(whereInputType).toEqual(expectedWhereInputType, fail(whereInputType, expectedWhereInputType));
+    })
     describe("Queries", () => {
-        it("Single query", () => {
-            const resolveFn = jasmine.createSpy("");
-            const animalSingleQuery = animalModel.getSingleQuery(resolveFn);
+        let resolveFn: jasmine.Spy;
+        beforeEach(() => {
+            resolveFn = jasmine.createSpy("");
+        });
+        it("Query one", () => {
+            const animalSingleQuery = animalModel.getQueryOne(resolveFn);
             const expectedAnimalSingleQuery: GraphQLFieldConfig<any> = {
-                args: animalModel.getArgsForOne(),
+                args: animalModel.getOneArgs(),
                 type: animalModel.getBaseType(),
                 resolve: jasmine.any(Function) as any,
             };
@@ -120,18 +164,31 @@ describe("Model spec", () => {
                 args: "f2",
                 context: "f3",
                 info: "f4",
-            }]])
-        })
-    })
+            }]]);
+        });
+        it("Query connection", () => {
+            const queryConnection = animalModel.getConnectionQuery(resolveFn);
+            const expectedQueryConnection: GraphQLFieldConfig<any> = {
+                args: animalModel.getConnectionArgs(),
+                type: animalModel.getConnectionType(),
+                resolve: jasmine.any(Function) as any,
+            };
+        });
+        it("all queries", () => {
+            const getQueryOneSpy = spyOn(animalModel, "getQueryOne").and.returnValue("q1");
+            const getQueryConnectionSpy = spyOn(animalModel, "getConnectionQuery").and.returnValue("q2");
+            const queries = animalModel.getQueries(resolveFn);
+            const expectedQueries: Queries = [{
+                name: uncapitalize(animalModel.name),
+                field: animalModel.getQueryOne(resolveFn),
+            }, {
+                name: uncapitalize(animalModel.name) + "s",
+                field: animalModel.getConnectionQuery(resolveFn),
+            }];
+            expect(queries).toEqual(expectedQueries);
+            getQueryOneSpy.and.callThrough();
+            getQueryConnectionSpy.and.callThrough();
+        });
+    });
 });
 
-function fail(obj1: { name, getFields }, obj2: { name, getFields }) {
-    return `GraphQL objects not equal: 
-        Object1:
-            name: ${obj1.name},
-            fields: ${ JSON.stringify(obj1.getFields())}
-        Object2:
-            name: ${obj2.name},
-            fields: ${JSON.stringify(obj2.getFields())}
-    `;
-};

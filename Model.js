@@ -3,6 +3,7 @@ const graphql_1 = require("graphql");
 const graphql_relay_1 = require("graphql-relay");
 const AttributeTypes_1 = require("./AttributeTypes");
 const ResolveTypes_1 = require("./ResolveTypes");
+exports.whereArgName = "where";
 class Model {
     constructor(config, collector) {
         this.config = config;
@@ -38,7 +39,7 @@ class Model {
     }
     getPrimaryKeyAttribute() {
         if (!this.primaryKeyAttribute) {
-            throw new Error("Not found primary key attribute for model " + this.name + " for relation");
+            throw new Error("Not found primary key attribute for model `" + this.name + "`");
         }
         return this.primaryKeyAttribute;
     }
@@ -89,14 +90,15 @@ class Model {
         }
         return this.connectionType;
     }
-    getArgsForOne() {
-        return {
-            id: { type: new graphql_1.GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) },
-        };
+    getOneArgs() {
+        let args = {};
+        const primary = this.getPrimaryKeyAttribute();
+        args[primary.name] = { type: new graphql_1.GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) };
+        return args;
     }
-    getSingleQuery(resolveFn) {
+    getQueryOne(resolveFn) {
         return {
-            args: this.getArgsForOne(),
+            args: this.getOneArgs(),
             type: this.getBaseType(),
             resolve: (source, args, context, info) => {
                 return resolveFn({
@@ -110,25 +112,53 @@ class Model {
             },
         };
     }
-    getConnectionQuery() {
+    getConnectionQuery(resolveFn) {
         return {
-            args: {},
+            args: this.getConnectionArgs(),
             type: this.getConnectionType(),
+            resolve: (source, args, context, info) => {
+                return resolveFn({
+                    type: ResolveTypes_1.default.QueryConnection,
+                    model: this.id,
+                    source,
+                    args,
+                    context,
+                    info,
+                });
+            },
         };
     }
-    getFindArgs() {
+    getConnectionArgs() {
+        let args = graphql_relay_1.connectionArgs;
+        args[exports.whereArgName] = { type: this.getWhereInputType() };
+        return args;
     }
-    getWhereArgs() {
+    getWhereInputType() {
+        let where = {};
+        this.attributes.map((attr) => {
+            let type;
+            if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
+                type = this.collector.get(attr.model).getPrimaryKeyAttribute().type;
+            }
+            else {
+                type = attr.type;
+            }
+            where[attr.name] = { type: scalarTypeToGraphQL(type) };
+        });
+        return new graphql_1.GraphQLInputObjectType({
+            name: this.name + "WhereInput",
+            fields: where,
+        });
     }
     getQueries(resolveFn) {
         let queries = [];
         queries.push({
             name: uncapitalize(this.name),
-            field: this.getSingleQuery(resolveFn),
+            field: this.getQueryOne(resolveFn),
         });
         queries.push({
             name: uncapitalize(this.name) + "s",
-            field: this.getConnectionQuery(),
+            field: this.getConnectionQuery(resolveFn),
         });
         return queries;
     }
@@ -140,7 +170,10 @@ class Model {
         graphql_relay_1.mutationWithClientMutationId({
             name: this.name + "CreateMutation",
             inputFields: {},
-            out
+            outputFields: {},
+            mutateAndGetPayload: () => {
+                return null;
+            },
         });
     }
     getMutations() {
