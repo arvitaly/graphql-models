@@ -1,6 +1,8 @@
 "use strict";
 const graphql_1 = require("graphql");
-const collector1_1 = require("./fixtures/collector1");
+const ResolveTypes_1 = require("./../ResolveTypes");
+const collection1_1 = require("./fixtures/collection1");
+const animalModel = collection1_1.default.get("animal");
 describe("Model spec", () => {
     describe("base type", () => {
         const expectedAnimalType = new graphql_1.GraphQLObjectType({
@@ -23,20 +25,20 @@ describe("Model spec", () => {
             },
         });
         it("when generate base type with scalar attributes, should return equals", () => {
-            const animalModelBaseType = collector1_1.default.getModel("animal").getBaseType();
+            const animalModelBaseType = collection1_1.default.get("animal").getBaseType();
             expect(animalModelBaseType).toEqual(expectedAnimalType, "Animal-model not equal, expected " +
                 JSON.stringify(animalModelBaseType.getFields()) + " to equal " +
                 JSON.stringify(expectedAnimalType.getFields()));
         });
         it("when generate base type with sub-model, should generate sub model", () => {
-            const userModelBaseType = collector1_1.default.getModel("user").getBaseType();
+            const userModelBaseType = collection1_1.default.get("user").getBaseType();
             expect(userModelBaseType).toEqual(expectedUserType, "User-model not equal, expected " +
                 JSON.stringify(userModelBaseType.getFields()) + " to equal " +
                 JSON.stringify(expectedUserType.getFields()));
         });
         // tslint:disable:no-string-literal
         it("when model required few times, need generate one time only", () => {
-            const postModelBaseType = collector1_1.default.getModel("post").getBaseType();
+            const postModelBaseType = collection1_1.default.get("post").getBaseType();
             expect(postModelBaseType.getFields()["animals"].type.ofType).toBe((postModelBaseType.getFields()["owner"].type
                 .getFields()["pets"].type).ofType);
         });
@@ -72,16 +74,37 @@ describe("Model spec", () => {
             },
         });
         it("animal creation type", () => {
-            const animalCreationType = collector1_1.default.getModel("animal").getCreationType();
+            const animalCreationType = collection1_1.default.get("animal").getCreationType();
             expect(animalCreationType).toEqual(expectedAnimalCreationType, fail(animalCreationType, expectedAnimalCreationType));
         });
         it("user creation type", () => {
-            const userCreationType = collector1_1.default.getModel("user").getCreationType();
+            const userCreationType = collection1_1.default.get("user").getCreationType();
             expect(userCreationType).toEqual(expectedUserCreationType, fail(userCreationType, expectedUserCreationType));
         });
         it("post creation type", () => {
-            const postCreationType = collector1_1.default.getModel("post").getCreationType();
+            const postCreationType = collection1_1.default.get("post").getCreationType();
             expect(postCreationType).toEqual(expectedPostCreationType, fail(postCreationType, expectedPostCreationType));
+        });
+    });
+    describe("Queries", () => {
+        it("Single query", () => {
+            const resolveFn = jasmine.createSpy("");
+            const animalSingleQuery = animalModel.getSingleQuery(resolveFn);
+            const expectedAnimalSingleQuery = {
+                args: animalModel.getArgsForOne(),
+                type: animalModel.getBaseType(),
+                resolve: jasmine.any(Function),
+            };
+            expect(animalSingleQuery).toEqual(expectedAnimalSingleQuery);
+            animalSingleQuery.resolve("f1", "f2", "f3", "f4");
+            expect(resolveFn.calls.allArgs()).toEqual([[{
+                        type: ResolveTypes_1.default.QueryOne,
+                        model: animalModel.id,
+                        source: "f1",
+                        args: "f2",
+                        context: "f3",
+                        info: "f4",
+                    }]]);
         });
     });
 });

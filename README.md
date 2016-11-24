@@ -36,7 +36,7 @@ Util for generate GraphQL-types from abstract models.
 
 # API
 
-## Suported types
+## Suported attribute type
 
     type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 
@@ -53,6 +53,22 @@ date -> GraphQLString
 model -> new GraphQLObjectType(...)
 
 collection -> new GraphQLList(new GraphQLObjectType(...))
+
+## Schema
+
+### new(models: Collection, resolveFn: ResolveFn)
+
+### getSchema(): GraphQLSchema
+
+Collect queries, mutations and subscriptions, add viewer and return GraphQL-schema.
+
+### getQueries(): Queries
+
+Return array of Query.
+
+#### Query = { name: string; field: GraphQLFieldConfig; }
+
+## Model
 
 # Tests
 

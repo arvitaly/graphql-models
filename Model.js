@@ -1,11 +1,14 @@
 "use strict";
 const graphql_1 = require("graphql");
+const graphql_relay_1 = require("graphql-relay");
 const AttributeTypes_1 = require("./AttributeTypes");
+const ResolveTypes_1 = require("./ResolveTypes");
 class Model {
     constructor(config, collector) {
         this.config = config;
         this.collector = collector;
         this.name = this.config.name || capitalize(this.config.id);
+        this.id = this.config.id;
         let idAttr;
         this.attributes = this.config.attributes.map((attrConfig) => {
             if (attrConfig.type === AttributeTypes_1.default.Model || attrConfig.type === AttributeTypes_1.default.Collection) {
@@ -56,12 +59,12 @@ class Model {
         this.attributes.map((attr) => {
             let graphQLType;
             if (attr.type === AttributeTypes_1.default.Model) {
-                const childModel = this.collector.getModel(attr.model);
+                const childModel = this.collector.get(attr.model);
                 graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
                 fields["create" + capitalize(attr.name)] = { type: childModel.getCreationType() };
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
-                const childModel = this.collector.getModel(attr.model);
+                const childModel = this.collector.get(attr.model);
                 graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
                 graphQLType = new graphql_1.GraphQLList(graphQLType);
                 fields["create" + capitalize(attr.name)] = {
@@ -78,15 +81,79 @@ class Model {
             fields,
         });
     }
+    getConnectionType() {
+        if (!this.connectionType) {
+            this.connectionType = graphql_relay_1.connectionDefinitions({
+                nodeType: this.getBaseType()
+            }).connectionType;
+        }
+        return this.connectionType;
+    }
+    getArgsForOne() {
+        return {
+            id: { type: new graphql_1.GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) },
+        };
+    }
+    getSingleQuery(resolveFn) {
+        return {
+            args: this.getArgsForOne(),
+            type: this.getBaseType(),
+            resolve: (source, args, context, info) => {
+                return resolveFn({
+                    type: ResolveTypes_1.default.QueryOne,
+                    model: this.id,
+                    source,
+                    args,
+                    context,
+                    info,
+                });
+            },
+        };
+    }
+    getConnectionQuery() {
+        return {
+            args: {},
+            type: this.getConnectionType(),
+        };
+    }
+    getFindArgs() {
+    }
+    getWhereArgs() {
+    }
+    getQueries(resolveFn) {
+        let queries = [];
+        queries.push({
+            name: uncapitalize(this.name),
+            field: this.getSingleQuery(resolveFn),
+        });
+        queries.push({
+            name: uncapitalize(this.name) + "s",
+            field: this.getConnectionQuery(),
+        });
+        return queries;
+    }
+    getDeleteMutation() {
+    }
+    getUpdateMutation() {
+    }
+    getCreateMutation() {
+        graphql_relay_1.mutationWithClientMutationId({
+            name: this.name + "CreateMutation",
+            inputFields: {},
+            out
+        });
+    }
+    getMutations() {
+    }
     generateBaseType() {
         let fields = {};
         this.attributes.map((attr) => {
             let graphQLType;
             if (attr.type === AttributeTypes_1.default.Model) {
-                graphQLType = this.collector.getModel(attr.model).getBaseType();
+                graphQLType = this.collector.get(attr.model).getBaseType();
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
-                graphQLType = this.collector.getModel(attr.model).getBaseType();
+                graphQLType = this.collector.get(attr.model).getBaseType();
                 graphQLType = new graphql_1.GraphQLList(graphQLType);
             }
             else {
@@ -122,6 +189,10 @@ function scalarTypeToGraphQL(type) {
     return graphQLType;
 }
 exports.scalarTypeToGraphQL = scalarTypeToGraphQL;
+function uncapitalize(str) {
+    return str.charAt(0).toLowerCase() + str.substr(1);
+}
+exports.uncapitalize = uncapitalize;
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.substr(1);
 }

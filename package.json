@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/arvitaly/graphql-models#readme",
   "dependencies": {
-    "graphql": "^0.8.2"
+    "graphql": "^0.8.2",
+    "graphql-relay": "^0.4.4"
   },
   "devDependencies": {
     "coveralls": "^2.11.15",

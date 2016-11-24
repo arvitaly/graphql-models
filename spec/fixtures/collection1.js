@@ -1,6 +1,6 @@
 "use strict";
 const AttributeTypes_1 = require("./../../AttributeTypes");
-const Collector_1 = require("./../../Collector");
+const Collection_1 = require("./../../Collection");
 exports.postModel = {
     id: "post",
     attributes: [{
@@ -55,4 +55,4 @@ exports.animalModel = {
 };
 const models = [exports.postModel, exports.userModel, exports.animalModel];
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = new Collector_1.default(models);
+exports.default = new Collection_1.default(models);

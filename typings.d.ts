@@ -1,4 +1,4 @@
-import { GraphQLObjectType } from "graphql";
+import { GraphQLObjectType, GraphQLResolveInfo, GraphQLFieldConfig } from "graphql";
 export interface ModelConfig {
     id: string;
     name?: string;
@@ -42,3 +42,20 @@ export type Attribute = AttributeConfig & {
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
 }
+export type ResolveType = "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
+export type ResolveOpts = {
+    type: ResolveType;
+    model: string;
+    parentModel?: string;
+    source: any;
+    args: { [argName: string]: any };
+    context: any;
+    info: GraphQLResolveInfo;
+}
+export type ResolveFn = (opts?: ResolveOpts) => any;
+
+export type Query = {
+    name: string;
+    field: GraphQLFieldConfig<any>;
+}
+export type Queries = Array<Query>;
