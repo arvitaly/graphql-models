@@ -2,13 +2,14 @@ import { GraphQLObjectType } from "graphql";
 export interface ModelConfig {
     id: string;
     name?: string;
-    attributes: Array<AttributeInfo>;
+    attributes: Array<AttributeConfig>;
 }
 export type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
     name: string;
     type: AttributeType;
-    required?: boolean;
+    required?: boolean | undefined;
+    primaryKey?: boolean | undefined;
 }
 export interface StringAttribute extends BaseAttribute {
     type: "string"
@@ -33,8 +34,10 @@ export interface CollectionAttribute extends BaseAttribute {
     type: "collection";
     modelId: string;
 }
-export type AttributeInfo = BaseAttribute | StringAttribute | IntegerAttribute | FloatAttribute | BooleandAttribute | DateAttribute | ModelAttribute | CollectionAttribute;
-
+export type AttributeConfig = BaseAttribute | StringAttribute | IntegerAttribute | FloatAttribute | BooleandAttribute | DateAttribute | ModelAttribute | CollectionAttribute;
+export type Attribute = AttributeConfig & {
+    required: boolean;
+}
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
 }

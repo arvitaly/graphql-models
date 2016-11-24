@@ -3,7 +3,7 @@ const graphql_1 = require("graphql");
 const collector1_1 = require("./fixtures/collector1");
 fdescribe("Model spec", () => {
     const expectedAnimalType = new graphql_1.GraphQLObjectType({
-        name: "Animal",
+        name: "AnimalType",
         fields: {
             name: { type: graphql_1.GraphQLString },
             age: { type: graphql_1.GraphQLInt },
@@ -13,7 +13,7 @@ fdescribe("Model spec", () => {
         },
     });
     const expectedUserType = new graphql_1.GraphQLObjectType({
-        name: "user",
+        name: "userType",
         fields: {
             name: { type: graphql_1.GraphQLString },
             pets: { type: new graphql_1.GraphQLList(expectedAnimalType) },

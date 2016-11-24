@@ -11,7 +11,7 @@ import {
 import collector1, { postModel } from "./fixtures/collector1";
 fdescribe("Model spec", () => {
     const expectedAnimalType = new GraphQLObjectType({
-        name: "Animal",
+        name: "AnimalType",
         fields: {
             name: { type: GraphQLString },
             age: { type: GraphQLInt },
@@ -21,7 +21,7 @@ fdescribe("Model spec", () => {
         },
     });
     const expectedUserType = new GraphQLObjectType({
-        name: "user",
+        name: "userType",
         fields: {
             name: { type: GraphQLString },
             pets: { type: new GraphQLList(expectedAnimalType) },
