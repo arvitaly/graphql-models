@@ -14,7 +14,11 @@ class Schema {
         return queries;
     }
     getMutations() {
-        // TDO
+        let mutations = [];
+        this.collection.map((model) => {
+            mutations = mutations.concat(model.getMutations(this.resolveFn));
+        });
+        return mutations;
     }
     getSubscriptions() {
         // TODO
@@ -45,10 +49,24 @@ class Schema {
             },
         });
     }
+    getMutationType() {
+        return new graphql_1.GraphQLObjectType({
+            name: "Mutation",
+            fields: this.mutationsToMap(),
+        });
+    }
     getGraphQLSchema() {
         return new graphql_1.GraphQLSchema({
             query: this.getQueryType(),
+            mutation: this.getMutationType(),
         });
+    }
+    mutationsToMap() {
+        let out = {};
+        this.getMutations().map((q) => {
+            out[q.name] = q.field;
+        });
+        return out;
     }
     queriesToMap() {
         let out = {};

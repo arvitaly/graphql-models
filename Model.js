@@ -164,7 +164,13 @@ class Model {
     getUpdateMutation() {
         // TODO 
     }
-    getMutations() {
+    getMutations(resolveFn) {
+        let mutations = [];
+        mutations.push({
+            name: "create" + this.name,
+            field: this.getCreateMutation(resolveFn),
+        });
+        return mutations;
         // TODO
     }
     generateBaseType() {
@@ -175,8 +181,7 @@ class Model {
                 graphQLType = this.collector.get(attr.model).getBaseType();
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
-                graphQLType = this.collector.get(attr.model).getBaseType();
-                graphQLType = new graphql_1.GraphQLList(graphQLType);
+                graphQLType = this.collector.get(attr.model).getConnectionType();
             }
             else {
                 graphQLType = scalarTypeToGraphQL(attr.type);

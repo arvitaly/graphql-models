@@ -96,6 +96,88 @@ model -> new GraphQLObjectType(...)
 
 collection -> new GraphQLList(new GraphQLObjectType(...))
 
+## Useful arguments for find
+
+### All types
+
+    name: `type`
+
+    For nullable-attributes
+
+    name**IsNull**
+
+    name**IsNotNull**
+
+### String
+
+    name**In**
+
+    name**NotIn**
+
+    name**Contains**
+
+    name**NotContains**
+
+    name**StartsWith**
+
+    name**NotStartsWith**
+
+    name**EndsWith**
+
+    name**NotEndsWith**
+
+    name**Like**
+
+    name**NotLike**
+
+### Integer
+
+    name**In
+
+    name**NotIn
+
+    name**GreaterThan**
+
+    name**LessThan**
+
+    name**GreaterThanOrEqual**
+
+    name**LessThanOrEqual**
+
+### Float
+
+    name**In
+
+    name**NotIn
+
+    name**GreaterThan**
+
+    name**LessThan**
+
+    name**GreaterThanOrEqual**
+
+    name**LessThanOrEqual**
+
+### Date
+
+    name**In
+
+    name**NotIn
+
+    name**GreaterThan**
+
+    name**LessThan**
+
+    name**GreaterThanOrEqual**
+
+    name**LessThanOrEqual**
+
+### Boolean   
+
+### Model, Collection
+
+    All for primary-key type
+
 ## Schema
 
 ### new(models: Collection, resolveFn: ResolveFn)

@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLResolveInfo, GraphQLFieldConfig } from "graphql";
+import { GraphQLInputFieldConfig, GraphQLObjectType, GraphQLResolveInfo, GraphQLFieldConfig } from "graphql";
 export interface ModelConfig {
     id: string;
     name?: string;
@@ -65,3 +65,7 @@ export type Mutation = {
     field: GraphQLFieldConfig<any>;
 }
 export type Mutations = Array<Mutation>;
+
+export type WhereArgHelper = {
+    
+}

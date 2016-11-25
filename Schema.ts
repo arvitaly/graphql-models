@@ -1,7 +1,7 @@
-import { GraphQLFieldConfigMap, GraphQLObjectType, GraphQLSchema } from "graphql";
+import { GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType, GraphQLSchema } from "graphql";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
-import { Queries, ResolveFn } from "./typings";
+import { Mutations, Queries, ResolveFn } from "./typings";
 class Schema {
     constructor(protected collection: Collection, protected resolveFn: ResolveFn) {
 
@@ -14,7 +14,11 @@ class Schema {
         return queries;
     }
     public getMutations() {
-        // TDO
+        let mutations: Mutations = [];
+        this.collection.map((model) => {
+            mutations = mutations.concat(model.getMutations(this.resolveFn));
+        });
+        return mutations;
     }
     public getSubscriptions() {
         // TODO
@@ -45,10 +49,24 @@ class Schema {
             },
         });
     }
+    public getMutationType() {
+        return new GraphQLObjectType({
+            name: "Mutation",
+            fields: this.mutationsToMap(),
+        });
+    }
     public getGraphQLSchema() {
         return new GraphQLSchema({
             query: this.getQueryType(),
+            mutation: this.getMutationType(),
         });
+    }
+    protected mutationsToMap(): GraphQLFieldConfigMap<any> {
+        let out: GraphQLFieldConfigMap<any> = {};
+        this.getMutations().map((q) => {
+            out[q.name] = q.field;
+        });
+        return out;
     }
     protected queriesToMap(): GraphQLFieldConfigMap<any> {
         let out: GraphQLFieldConfigMap<any> = {};

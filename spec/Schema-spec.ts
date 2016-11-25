@@ -4,6 +4,8 @@ import collection1 from "./fixtures/collection1";
 import { fail } from "./util";
 const fields1 = { f1: { type: GraphQLString } };
 const obj1 = new GraphQLObjectType({ name: "obj1", fields: fields1 });
+const fields2 = { f2: { type: GraphQLString } };
+const obj2 = new GraphQLObjectType({ name: "obj2", fields: fields2 });
 describe("Schema spec", () => {
     const resolveFn = jasmine.createSpy("");
     const schema = new Schema(collection1, resolveFn);
@@ -31,14 +33,20 @@ describe("Schema spec", () => {
         });
         expect(queryType).toEqual(expectedQueryType, fail(queryType, expectedQueryType));
     });
+    it("getMutationType", () => {
+        // TODO
+    });
     it("getGraphQLSchema", () => {
         const getQueryTypeSpy = spyOn(schema, "getQueryType").and.returnValue(obj1);
+        const getMutationTypeSpy = spyOn(schema, "getMutationType").and.returnValue(obj2);
         const graphQLSchema = schema.getGraphQLSchema();
         const fields = {};
         const expectedGraphQLSchema = new GraphQLSchema({
             query: schema.getQueryType(),
+            mutation: schema.getMutationType(),
         });
         expect(graphQLSchema).toEqual(expectedGraphQLSchema);
         getQueryTypeSpy.and.callThrough();
+        getMutationTypeSpy.and.callThrough();
     });
 });

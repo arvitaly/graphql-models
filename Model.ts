@@ -136,6 +136,7 @@ class Model {
                 type = attr.type;
             }
             where[attr.name] = { type: scalarTypeToGraphQL(type) };
+            getWhereArgsForAttribute(attr)
         });
         return new GraphQLInputObjectType({
             name: this.name + "WhereInput",
@@ -188,7 +189,13 @@ class Model {
     public getUpdateMutation() {
         // TODO 
     }
-    public getMutations() {
+    public getMutations(resolveFn: ResolveFn): Mutations {
+        let mutations: Mutations = [];
+        mutations.push({
+            name: "create" + this.name,
+            field: this.getCreateMutation(resolveFn),
+        });
+        return mutations;
         // TODO
     }
     protected generateBaseType(): GraphQLObjectType {
@@ -198,8 +205,7 @@ class Model {
             if (attr.type === AttributeTypes.Model) {
                 graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
             } else if (attr.type === AttributeTypes.Collection) {
-                graphQLType = this.collector.get((attr as CollectionAttribute).model).getBaseType();
-                graphQLType = new GraphQLList(graphQLType);
+                graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
             } else {
                 graphQLType = scalarTypeToGraphQL(attr.type);
             }
@@ -263,4 +269,51 @@ export function uncapitalize(str: string) {
 export function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.substr(1);
 }
+
+const stringFunctions = ["contains", "notContains", "notStartsWith", "endsWith", "notEndsWith", "like", "notLike"];
+const numberFunctions = ["greaterThan", "lessThan", "greaterOrEqualThan", "lessOrEqualThan"];
+export const whereArgHelpers: {
+    [attrType: AttributeType]: (attr: Attribute) => Array<{ name: string; type: any; }>;
+} = {
+        [AttributeTypes.String]: (attr: Attribute) => {
+            const types = [];
+            stringFunctions.map((f) => {
+                return ({
+                    name: attr.name + capitalize(f),
+                    type: GraphQLString,
+                });
+            });
+            return types;
+        },
+        [AttributeTypes.Integer]: (attr: Attribute) => {
+            const types = [];
+            numberFunctions.map((f) => {
+                return {
+                    name: attr.name + capitalize(f),
+                    type: GraphQLInt,
+                };
+            });
+        },
+        [AttributeTypes.Float]: (attr: Attribute) => {
+            const types = [];
+            numberFunctions.map((f) => {
+                return {
+                    name: attr.name + capitalize(f),
+                    type: GraphQLFloat,
+                };
+            });
+        },
+        [AttributeTypes.Date]: (attr: Attribute) => {
+            const types = [];
+            numberFunctions.map((f) => {
+                return {
+                    name: attr.name + capitalize(f),
+                    type: GraphQLString,
+                };
+            });
+        },
+        [AttributeTypes.Boolean]: (attr: Attribute) => {
+            
+        },
+    };
 export default Model;

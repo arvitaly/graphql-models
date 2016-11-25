@@ -46,7 +46,7 @@ describe("Model spec", () => {
             fields: {
                 key: { type: GraphQLFloat },
                 name: { type: GraphQLString },
-                pets: { type: new GraphQLList(expectedAnimalType) },
+                pets: { type: collection1.get("animal").getConnectionType() },
             },
         });
         it("when generate base type with scalar attributes, should return equals", () => {
@@ -226,9 +226,19 @@ describe("Model spec", () => {
                 args: args.input,
                 source: null,
                 context: "f3",
-                info: null
-            }]])
+                info: null,
+            }]]);
             done();
-        })
+        });
+        it("getAllMutations", () => {
+            const getCreateMutationSpy = spyOn(animalModel, "getCreateMutation").and.returnValue("f1");
+            const mutations = animalModel.getMutations(resolveFn);
+            const expectedMutations = [{
+                name: "createAnimal",
+                field: animalModel.getCreateMutation(resolveFn),
+            }];
+            expect(mutations).toEqual(expectedMutations);
+            getCreateMutationSpy.and.callThrough();
+        });
     });
 });
