@@ -124,6 +124,9 @@ describe("Model spec", () => {
             expect(argsForConnection).toEqual(expectedArgsForConnection);
         });
     });
+    it("whereArgHelpers string", () => {
+        expect(Model_1.whereArgHelpers[AttributeTypes_1.default.String]({ name: "n1", type: AttributeTypes_1.default.String, required: false }).length).toBe(8);
+    });
     it("WhereInput type", () => {
         const whereInputType = postModel.getWhereInputType();
         let where = {};
@@ -136,6 +139,9 @@ describe("Model spec", () => {
                 type = attr.type;
             }
             where[attr.name] = { type: Model_1.scalarTypeToGraphQL(type) };
+            Model_1.whereArgHelpers[attr.type](attr).map((t) => {
+                where[t.name] = { type: t.type };
+            });
         });
         const expectedWhereInputType = new graphql_1.GraphQLInputObjectType({
             name: postModel.name + "WhereInput",

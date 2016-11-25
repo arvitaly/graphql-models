@@ -136,7 +136,9 @@ class Model {
                 type = attr.type;
             }
             where[attr.name] = { type: scalarTypeToGraphQL(type) };
-            getWhereArgsForAttribute(attr)
+            whereArgHelpers[attr.type](attr).map((t) => {
+                where[t.name] = { type: t.type };
+            });
         });
         return new GraphQLInputObjectType({
             name: this.name + "WhereInput",
@@ -270,15 +272,16 @@ export function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.substr(1);
 }
 
-const stringFunctions = ["contains", "notContains", "notStartsWith", "endsWith", "notEndsWith", "like", "notLike"];
+const stringFunctions = ["contains", "notContains", "startsWith", "notStartsWith",
+    "endsWith", "notEndsWith", "like", "notLike"];
 const numberFunctions = ["greaterThan", "lessThan", "greaterOrEqualThan", "lessOrEqualThan"];
 export const whereArgHelpers: {
-    [attrType: AttributeType]: (attr: Attribute) => Array<{ name: string; type: any; }>;
+    [attrType: string]: (attr: Attribute) => Array<{ name: string; type: any; }>;
 } = {
         [AttributeTypes.String]: (attr: Attribute) => {
             const types = [];
             stringFunctions.map((f) => {
-                return ({
+                types.push({
                     name: attr.name + capitalize(f),
                     type: GraphQLString,
                 });
@@ -293,6 +296,7 @@ export const whereArgHelpers: {
                     type: GraphQLInt,
                 };
             });
+            return types;
         },
         [AttributeTypes.Float]: (attr: Attribute) => {
             const types = [];
@@ -302,6 +306,7 @@ export const whereArgHelpers: {
                     type: GraphQLFloat,
                 };
             });
+            return types;
         },
         [AttributeTypes.Date]: (attr: Attribute) => {
             const types = [];
@@ -311,9 +316,16 @@ export const whereArgHelpers: {
                     type: GraphQLString,
                 };
             });
+            return types;
         },
         [AttributeTypes.Boolean]: (attr: Attribute) => {
-            
+            return [];
+        },
+        [AttributeTypes.Model]: (attr: Attribute) => {
+            return [];
+        },
+        [AttributeTypes.Collection]: (attr: Attribute) => {
+            return [];
         },
     };
 export default Model;

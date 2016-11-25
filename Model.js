@@ -112,6 +112,9 @@ class Model {
                 type = attr.type;
             }
             where[attr.name] = { type: scalarTypeToGraphQL(type) };
+            exports.whereArgHelpers[attr.type](attr).map((t) => {
+                where[t.name] = { type: t.type };
+            });
         });
         return new graphql_1.GraphQLInputObjectType({
             name: this.name + "WhereInput",
@@ -251,5 +254,59 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.substr(1);
 }
 exports.capitalize = capitalize;
+const stringFunctions = ["contains", "notContains", "startsWith", "notStartsWith",
+    "endsWith", "notEndsWith", "like", "notLike"];
+const numberFunctions = ["greaterThan", "lessThan", "greaterOrEqualThan", "lessOrEqualThan"];
+exports.whereArgHelpers = {
+    [AttributeTypes_1.default.String]: (attr) => {
+        const types = [];
+        stringFunctions.map((f) => {
+            types.push({
+                name: attr.name + capitalize(f),
+                type: graphql_1.GraphQLString,
+            });
+        });
+        return types;
+    },
+    [AttributeTypes_1.default.Integer]: (attr) => {
+        const types = [];
+        numberFunctions.map((f) => {
+            return {
+                name: attr.name + capitalize(f),
+                type: graphql_1.GraphQLInt,
+            };
+        });
+        return types;
+    },
+    [AttributeTypes_1.default.Float]: (attr) => {
+        const types = [];
+        numberFunctions.map((f) => {
+            return {
+                name: attr.name + capitalize(f),
+                type: graphql_1.GraphQLFloat,
+            };
+        });
+        return types;
+    },
+    [AttributeTypes_1.default.Date]: (attr) => {
+        const types = [];
+        numberFunctions.map((f) => {
+            return {
+                name: attr.name + capitalize(f),
+                type: graphql_1.GraphQLString,
+            };
+        });
+        return types;
+    },
+    [AttributeTypes_1.default.Boolean]: (attr) => {
+        return [];
+    },
+    [AttributeTypes_1.default.Model]: (attr) => {
+        return [];
+    },
+    [AttributeTypes_1.default.Collection]: (attr) => {
+        return [];
+    },
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Model;

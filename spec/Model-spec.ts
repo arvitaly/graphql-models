@@ -13,7 +13,7 @@ import {
 } from "graphql";
 import { connectionArgs, mutationWithClientMutationId } from "graphql-relay";
 import AttributeTypes from "./../AttributeTypes";
-import Model, { capitalize, scalarTypeToGraphQL, uncapitalize, whereArgName } from "./../Model";
+import Model, { capitalize, scalarTypeToGraphQL, uncapitalize, whereArgHelpers, whereArgName } from "./../Model";
 import ResolveTypes from "./../ResolveTypes";
 import { ModelAttribute, Queries } from "./../typings";
 import collection1 from "./fixtures/collection1";
@@ -134,6 +134,11 @@ describe("Model spec", () => {
             expect(argsForConnection).toEqual(expectedArgsForConnection);
         });
     });
+    it("whereArgHelpers string", () => {
+        expect(
+            whereArgHelpers[AttributeTypes.String]({ name: "n1", type: AttributeTypes.String, required: false }).length
+        ).toBe(8);
+    })
     it("WhereInput type", () => {
         const whereInputType = postModel.getWhereInputType();
         let where = {};
@@ -145,6 +150,9 @@ describe("Model spec", () => {
                 type = attr.type;
             }
             where[attr.name] = { type: scalarTypeToGraphQL(type) };
+            whereArgHelpers[attr.type](attr).map((t) => {
+                where[t.name] = { type: t.type };
+            });
         });
         const expectedWhereInputType: GraphQLInputObjectType = new GraphQLInputObjectType({
             name: postModel.name + "WhereInput",
