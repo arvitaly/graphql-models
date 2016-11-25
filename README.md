@@ -100,83 +100,83 @@ collection -> new GraphQLList(new GraphQLObjectType(...))
 
 ### All types
 
-    name: `type`
+name: `type`
 
-    For nullable-attributes
+For nullable-attributes
 
-    name**IsNull**
+name**IsNull**
 
-    name**IsNotNull**
+name**IsNotNull**
 
 ### String
 
-    name**In**
+name**In**
 
-    name**NotIn**
+name**NotIn**
 
-    name**Contains**
+name**Contains**
 
-    name**NotContains**
+name**NotContains**
 
-    name**StartsWith**
+name**StartsWith**
 
-    name**NotStartsWith**
+name**NotStartsWith**
 
-    name**EndsWith**
+name**EndsWith**
 
-    name**NotEndsWith**
+name**NotEndsWith**
 
-    name**Like**
+name**Like**
 
-    name**NotLike**
+name**NotLike**
 
 ### Integer
 
-    name**In
+name**In
 
-    name**NotIn
+name**NotIn
 
-    name**GreaterThan**
+name**GreaterThan**
 
-    name**LessThan**
+name**LessThan**
 
-    name**GreaterThanOrEqual**
+name**GreaterThanOrEqual**
 
-    name**LessThanOrEqual**
+name**LessThanOrEqual**
 
 ### Float
 
-    name**In
+name**In
 
-    name**NotIn
+name**NotIn
 
-    name**GreaterThan**
+name**GreaterThan**
 
-    name**LessThan**
+name**LessThan**
 
-    name**GreaterThanOrEqual**
+name**GreaterThanOrEqual**
 
-    name**LessThanOrEqual**
+name**LessThanOrEqual**
 
 ### Date
 
-    name**In
+name**In
 
-    name**NotIn
+name**NotIn
 
-    name**GreaterThan**
+name**GreaterThan**
 
-    name**LessThan**
+name**LessThan**
 
-    name**GreaterThanOrEqual**
+name**GreaterThanOrEqual**
 
-    name**LessThanOrEqual**
+name**LessThanOrEqual**
 
 ### Boolean   
 
 ### Model, Collection
 
-    All for primary-key type
+All for primary-key type
 
 ## Schema
 
