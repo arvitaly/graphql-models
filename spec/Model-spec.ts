@@ -11,16 +11,24 @@ import {
     GraphQLObjectType,
     GraphQLString,
 } from "graphql";
-import { connectionArgs } from "graphql-relay";
+import { connectionArgs, mutationWithClientMutationId } from "graphql-relay";
 import AttributeTypes from "./../AttributeTypes";
-import { capitalize, scalarTypeToGraphQL, uncapitalize, whereArgName } from "./../Model";
+import Model, { capitalize, scalarTypeToGraphQL, uncapitalize, whereArgName } from "./../Model";
 import ResolveTypes from "./../ResolveTypes";
 import { ModelAttribute, Queries } from "./../typings";
-import fail from "./fail";
 import collection1 from "./fixtures/collection1";
+import { compareMutations, fail } from "./util";
 const animalModel = collection1.get("animal");
 const postModel = collection1.get("post");
 describe("Model spec", () => {
+    it("getPrimaryAttribute, when not exists primary key, should throw error", () => {
+        const m1 = new Model({
+            id: "m1",
+            attributes: [],
+        }, {} as any);
+        expect(m1.getPrimaryKeyAttribute.bind(m1)).
+            toThrowError("Not found primary key attribute for model `" + m1.name + "`");
+    });
     describe("base type", () => {
         const expectedAnimalType = new GraphQLObjectType({
             name: "Animal",
@@ -95,17 +103,17 @@ describe("Model spec", () => {
             },
         });
         it("animal creation type", () => {
-            const animalCreationType = collection1.get("animal").getCreationType();
+            const animalCreationType = collection1.get("animal").getCreateType();
             expect(animalCreationType).toEqual(expectedAnimalCreationType,
                 fail(animalCreationType, expectedAnimalCreationType));
         });
         it("user creation type", () => {
-            const userCreationType = collection1.get("user").getCreationType();
+            const userCreationType = collection1.get("user").getCreateType();
             expect(userCreationType).toEqual(expectedUserCreationType,
                 fail(userCreationType, expectedUserCreationType));
         });
         it("post creation type", () => {
-            const postCreationType = collection1.get("post").getCreationType();
+            const postCreationType = collection1.get("post").getCreateType();
             expect(postCreationType).toEqual(expectedPostCreationType,
                 fail(postCreationType, expectedPostCreationType));
         });
@@ -190,5 +198,37 @@ describe("Model spec", () => {
             getQueryOneSpy.and.callThrough();
             getQueryConnectionSpy.and.callThrough();
         });
+    });
+    describe("Mutations", () => {
+        let resolveFn: jasmine.Spy;
+        beforeEach(() => {
+            resolveFn = jasmine.createSpy("");
+        });
+        it("create mutation", async (done) => {
+            const createMutation = animalModel.getCreateMutation(resolveFn);
+            const expectedCreateMutation = mutationWithClientMutationId({
+                name: animalModel.name + "CreateMutation",
+                inputFields: animalModel.getCreateType().getFields(),
+                outputFields: {
+                    [uncapitalize(animalModel.name)]: { type: animalModel.getBaseType() },
+                },
+                mutateAndGetPayload: jasmine.any(Function) as any,
+            });
+            compareMutations(createMutation, expectedCreateMutation);
+            const args = { clientMutationId: "5", input: { f1: "hello" } };
+            const result = { clientMutationId: "5", animal: { name: "m1" } };
+            resolveFn.and.returnValue(result);
+            const mutationResut = await createMutation.resolve("source", args, "f3", "f4" as any);
+            expect(mutationResut).toEqual(result);
+            expect(resolveFn.calls.allArgs()).toEqual([[{
+                type: ResolveTypes.MutationCreate,
+                model: animalModel.id,
+                args: args.input,
+                source: null,
+                context: "f3",
+                info: null
+            }]])
+            done();
+        })
     });
 });

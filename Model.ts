@@ -11,6 +11,7 @@ import {
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType,
+    GraphQLResolveInfo,
     GraphQLScalarType,
     GraphQLString,
 } from "graphql";
@@ -20,8 +21,7 @@ import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
 import {
     Attribute, AttributeType, CollectionAttribute, ModelAttribute,
-    ModelConfig, Queries,
-    ResolveFn,
+    ModelConfig, Mutation, Mutations, Queries, ResolveFn,
 } from "./typings";
 export const whereArgName = "where";
 class Model {
@@ -30,7 +30,7 @@ class Model {
     public attributes: Attribute[];
     protected primaryKeyAttribute: Attribute;
     protected baseType: GraphQLObjectType;
-    protected creationType: GraphQLInputObjectType;
+    protected createType: GraphQLInputObjectType;
     protected connectionType: GraphQLObjectType;
     constructor(public config: ModelConfig, protected collector: Collection) {
         this.name = this.config.name || capitalize(this.config.id);
@@ -68,44 +68,13 @@ class Model {
         }
         return this.primaryKeyAttribute;
     }
-    public getCreationType() {
-        if (!this.creationType) {
-            this.creationType = this.generateCreationType();
-        }
-        return this.creationType;
-
-    }
     public getBaseType() {
         if (!this.baseType) {
             this.baseType = this.generateBaseType();
         }
         return this.baseType;
     }
-    public generateCreationType(): GraphQLInputObjectType {
-        let fields: GraphQLInputFieldConfigMap = {};
-        this.attributes.map((attr) => {
-            let graphQLType;
-            if (attr.type === AttributeTypes.Model) {
-                const childModel = this.collector.get(attr.model);
-                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
-                fields["create" + capitalize(attr.name)] = { type: childModel.getCreationType() };
-            } else if (attr.type === AttributeTypes.Collection) {
-                const childModel = this.collector.get((attr as CollectionAttribute).model);
-                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
-                graphQLType = new GraphQLList(graphQLType);
-                fields["create" + capitalize(attr.name)] = {
-                    type: new GraphQLList(childModel.getCreationType()),
-                };
-            } else {
-                graphQLType = scalarTypeToGraphQL(attr.type);
-            }
-            fields[attr.name] = { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType };
-        });
-        return new GraphQLInputObjectType({
-            name: "Create" + this.name + "Input",
-            fields,
-        });
-    }
+    // Queries
     public getConnectionType() {
         if (!this.connectionType) {
             this.connectionType = connectionDefinitions({
@@ -185,21 +154,39 @@ class Model {
         });
         return queries;
     }
+    // Mutations
+    public getCreateMutation(resolveFn: ResolveFn): GraphQLFieldConfig<any> {
+        let outputFields: GraphQLFieldConfigMap<any> = {};
+        outputFields[uncapitalize(this.name)] = {
+            type: this.getBaseType(),
+        };
+        return mutationWithClientMutationId({
+            name: this.name + "CreateMutation",
+            inputFields: this.getCreateType().getFields(),
+            outputFields,
+            mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
+                return resolveFn({
+                    type: ResolveTypes.MutationCreate,
+                    model: this.id,
+                    source: null,
+                    args: object,
+                    context,
+                    info: null,
+                });
+            },
+        });
+    }
+    public getCreateType() {
+        if (!this.createType) {
+            this.createType = this.generateCreationType();
+        }
+        return this.createType;
+    }
     public getDeleteMutation() {
         // TODO
     }
     public getUpdateMutation() {
         // TODO 
-    }
-    public getCreateMutation() {
-        mutationWithClientMutationId({
-            name: this.name + "CreateMutation",
-            inputFields: {},
-            outputFields: {},
-            mutateAndGetPayload: () => {
-                return null;
-            },
-        });
     }
     public getMutations() {
         // TODO
@@ -220,6 +207,31 @@ class Model {
         });
         return new GraphQLObjectType({
             name: this.name,
+            fields,
+        });
+    }
+    public generateCreationType(): GraphQLInputObjectType {
+        let fields: GraphQLInputFieldConfigMap = {};
+        this.attributes.map((attr) => {
+            let graphQLType;
+            if (attr.type === AttributeTypes.Model) {
+                const childModel = this.collector.get(attr.model);
+                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                fields["create" + capitalize(attr.name)] = { type: childModel.getCreateType() };
+            } else if (attr.type === AttributeTypes.Collection) {
+                const childModel = this.collector.get((attr as CollectionAttribute).model);
+                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                graphQLType = new GraphQLList(graphQLType);
+                fields["create" + capitalize(attr.name)] = {
+                    type: new GraphQLList(childModel.getCreateType()),
+                };
+            } else {
+                graphQLType = scalarTypeToGraphQL(attr.type);
+            }
+            fields[attr.name] = { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType };
+        });
+        return new GraphQLInputObjectType({
+            name: "Create" + this.name + "Input",
             fields,
         });
     }

@@ -1,7 +1,7 @@
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import Schema from "./../Schema";
-import fail from "./fail";
 import collection1 from "./fixtures/collection1";
+import { fail } from "./util";
 const fields1 = { f1: { type: GraphQLString } };
 const obj1 = new GraphQLObjectType({ name: "obj1", fields: fields1 });
 describe("Schema spec", () => {

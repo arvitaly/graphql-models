@@ -59,3 +59,9 @@ export type Query = {
     field: GraphQLFieldConfig<any>;
 }
 export type Queries = Array<Query>;
+
+export type Mutation = {
+    name: string;
+    field: GraphQLFieldConfig<any>;
+}
+export type Mutations = Array<Mutation>;

@@ -1,14 +1,30 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments)).next());
+    });
+};
 const graphql_1 = require("graphql");
 const graphql_relay_1 = require("graphql-relay");
 const AttributeTypes_1 = require("./../AttributeTypes");
 const Model_1 = require("./../Model");
 const ResolveTypes_1 = require("./../ResolveTypes");
-const fail_1 = require("./fail");
 const collection1_1 = require("./fixtures/collection1");
+const util_1 = require("./util");
 const animalModel = collection1_1.default.get("animal");
 const postModel = collection1_1.default.get("post");
 describe("Model spec", () => {
+    it("getPrimaryAttribute, when not exists primary key, should throw error", () => {
+        const m1 = new Model_1.default({
+            id: "m1",
+            attributes: [],
+        }, {});
+        expect(m1.getPrimaryKeyAttribute.bind(m1)).
+            toThrowError("Not found primary key attribute for model `" + m1.name + "`");
+    });
     describe("base type", () => {
         const expectedAnimalType = new graphql_1.GraphQLObjectType({
             name: "Animal",
@@ -80,16 +96,16 @@ describe("Model spec", () => {
             },
         });
         it("animal creation type", () => {
-            const animalCreationType = collection1_1.default.get("animal").getCreationType();
-            expect(animalCreationType).toEqual(expectedAnimalCreationType, fail_1.default(animalCreationType, expectedAnimalCreationType));
+            const animalCreationType = collection1_1.default.get("animal").getCreateType();
+            expect(animalCreationType).toEqual(expectedAnimalCreationType, util_1.fail(animalCreationType, expectedAnimalCreationType));
         });
         it("user creation type", () => {
-            const userCreationType = collection1_1.default.get("user").getCreationType();
-            expect(userCreationType).toEqual(expectedUserCreationType, fail_1.default(userCreationType, expectedUserCreationType));
+            const userCreationType = collection1_1.default.get("user").getCreateType();
+            expect(userCreationType).toEqual(expectedUserCreationType, util_1.fail(userCreationType, expectedUserCreationType));
         });
         it("post creation type", () => {
-            const postCreationType = collection1_1.default.get("post").getCreationType();
-            expect(postCreationType).toEqual(expectedPostCreationType, fail_1.default(postCreationType, expectedPostCreationType));
+            const postCreationType = collection1_1.default.get("post").getCreateType();
+            expect(postCreationType).toEqual(expectedPostCreationType, util_1.fail(postCreationType, expectedPostCreationType));
         });
     });
     describe("Args", () => {
@@ -125,7 +141,7 @@ describe("Model spec", () => {
             name: postModel.name + "WhereInput",
             fields: where,
         });
-        expect(whereInputType).toEqual(expectedWhereInputType, fail_1.default(whereInputType, expectedWhereInputType));
+        expect(whereInputType).toEqual(expectedWhereInputType, util_1.fail(whereInputType, expectedWhereInputType));
     });
     describe("Queries", () => {
         let resolveFn;
@@ -173,5 +189,37 @@ describe("Model spec", () => {
             getQueryOneSpy.and.callThrough();
             getQueryConnectionSpy.and.callThrough();
         });
+    });
+    describe("Mutations", () => {
+        let resolveFn;
+        beforeEach(() => {
+            resolveFn = jasmine.createSpy("");
+        });
+        it("create mutation", (done) => __awaiter(this, void 0, void 0, function* () {
+            const createMutation = animalModel.getCreateMutation(resolveFn);
+            const expectedCreateMutation = graphql_relay_1.mutationWithClientMutationId({
+                name: animalModel.name + "CreateMutation",
+                inputFields: animalModel.getCreateType().getFields(),
+                outputFields: {
+                    [Model_1.uncapitalize(animalModel.name)]: { type: animalModel.getBaseType() },
+                },
+                mutateAndGetPayload: jasmine.any(Function),
+            });
+            util_1.compareMutations(createMutation, expectedCreateMutation);
+            const args = { clientMutationId: "5", input: { f1: "hello" } };
+            const result = { clientMutationId: "5", animal: { name: "m1" } };
+            resolveFn.and.returnValue(result);
+            const mutationResut = yield createMutation.resolve("source", args, "f3", "f4");
+            expect(mutationResut).toEqual(result);
+            expect(resolveFn.calls.allArgs()).toEqual([[{
+                        type: ResolveTypes_1.default.MutationCreate,
+                        model: animalModel.id,
+                        args: args.input,
+                        source: null,
+                        context: "f3",
+                        info: null
+                    }]]);
+            done();
+        }));
     });
 });

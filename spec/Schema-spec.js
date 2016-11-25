@@ -1,8 +1,8 @@
 "use strict";
 const graphql_1 = require("graphql");
 const Schema_1 = require("./../Schema");
-const fail_1 = require("./fail");
 const collection1_1 = require("./fixtures/collection1");
+const util_1 = require("./util");
 const fields1 = { f1: { type: graphql_1.GraphQLString } };
 const obj1 = new graphql_1.GraphQLObjectType({ name: "obj1", fields: fields1 });
 describe("Schema spec", () => {
@@ -15,7 +15,7 @@ describe("Schema spec", () => {
             name: "QueryViewer",
             fields: fields1,
         });
-        expect(queryViewerType).toEqual(expectedQueryViewerType, fail_1.default(queryViewerType, expectedQueryViewerType));
+        expect(queryViewerType).toEqual(expectedQueryViewerType, util_1.fail(queryViewerType, expectedQueryViewerType));
         getQueriesSpy.and.callThrough();
     });
     it("getQueryType", () => {
@@ -30,7 +30,7 @@ describe("Schema spec", () => {
                 },
             },
         });
-        expect(queryType).toEqual(expectedQueryType, fail_1.default(queryType, expectedQueryType));
+        expect(queryType).toEqual(expectedQueryType, util_1.fail(queryType, expectedQueryType));
     });
     it("getGraphQLSchema", () => {
         const getQueryTypeSpy = spyOn(schema, "getQueryType").and.returnValue(obj1);
