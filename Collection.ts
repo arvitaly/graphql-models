@@ -1,6 +1,6 @@
 import Model from "./Model";
 import { ModelConfig } from "./typings";
-class Generator {
+class Collection {
     protected models: Model[] = [];
     constructor(protected modelConfigs: ModelConfig[]) {
         this.models = modelConfigs.map((config) => {
@@ -18,4 +18,4 @@ class Generator {
         return this.models.map(cb);
     }
 }
-export default Generator;
+export default Collection;

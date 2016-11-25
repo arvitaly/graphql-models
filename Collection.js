@@ -1,6 +1,6 @@
 "use strict";
 const Model_1 = require("./Model");
-class Generator {
+class Collection {
     constructor(modelConfigs) {
         this.modelConfigs = modelConfigs;
         this.models = [];
@@ -20,4 +20,4 @@ class Generator {
     }
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = Generator;
+exports.default = Collection;

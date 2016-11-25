@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
+// tslint:disable:no-string-literal
 const graphql_1 = require("graphql");
 const __1 = require("./..");
 const collection1_1 = require("./fixtures/collection1");
@@ -39,7 +40,63 @@ describe("Functional tests", () => {
         expect(j(result.data)).toEqual({ viewer: { animal: rex } });
         done();
     }));
-    // tslint:disable:no-string-literal
+    it("connection of users", (done) => __awaiter(this, void 0, void 0, function* () {
+        const models = new __1.Collection([collection1_1.userModel, collection1_1.animalModel]);
+        const users = [
+            { key: 1, name: "John", pets: { edges: [{ node: { name: "x1" } }] } },
+            { key: 2, name: "Jordan", pets: { edges: [{ node: { name: "x2" } }] } },
+            { id: 3, name: "Nike", pets: { edges: [{ node: { name: "x3" } }] } }];
+        const resolveFn = (opts) => {
+            if (opts.type === __1.ResolveTypes.Viewer) {
+                return {};
+            }
+            if (opts.type === __1.ResolveTypes.QueryConnection && opts.model === "user") {
+                return {
+                    edges: users.filter((u) => {
+                        return u.name.indexOf(opts.args["where"]["nameContains"]) > -1;
+                    }).map((u) => {
+                        return {
+                            node: u,
+                        };
+                    }),
+                };
+            }
+        };
+        const schema = new __1.Schema(models, resolveFn);
+        const graphQLSchema = schema.getGraphQLSchema();
+        const result = yield graphql_1.graphql(graphQLSchema, `query Q1{
+            viewer{
+                users(where:{nameContains:"Jo"}){
+                    edges{
+                        node{
+                            key
+                            name
+                            pets{
+                                edges{
+                                    node{
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }`);
+        if (result.errors) {
+            fail(result.errors);
+            done();
+            return;
+        }
+        expect(j(result.data)).toEqual({
+            viewer: {
+                users: {
+                    edges: users.filter((_, i) => i < 2).map((u) => { return { node: u }; })
+                }
+            }
+        });
+        done();
+    }));
     it("create animal", (done) => __awaiter(this, void 0, void 0, function* () {
         const models = new __1.Collection([collection1_1.animalModel]);
         const resolveFn = jasmine.createSpy("");
