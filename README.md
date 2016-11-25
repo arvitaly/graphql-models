@@ -100,11 +100,11 @@ collection -> new GraphQLList(new GraphQLObjectType(...))
 
 ### All types
 
-name: `type`
+name: `type`, example `where:{ age: 15 }`
 
 For nullable-attributes
 
-`_name_`IsNull`
+_name_`IsNull`, example `where:{ titleIsNull: true }`
 
 _name_`IsNotNull`
 
@@ -132,9 +132,9 @@ _name_`NotLike`
 
 ### Integer
 
-_name_`In
+_name_`In`
 
-_name_`NotIn
+_name_`NotIn`
 
 _name_`GreaterThan`
 
@@ -146,9 +146,9 @@ _name_`LessThanOrEqual`
 
 ### Float
 
-_name_`In
+_name_`In`
 
-_name_`NotIn
+_name_`NotIn`
 
 _name_`GreaterThan`
 
@@ -160,9 +160,9 @@ _name_`LessThanOrEqual`
 
 ### Date
 
-_name_`In
+_name_`In`
 
-_name_`NotIn
+_name_`NotIn`
 
 _name_`GreaterThan`
 
