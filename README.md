@@ -104,73 +104,73 @@ name: `type`
 
 For nullable-attributes
 
-name**IsNull**
+`_name_`IsNull`
 
-name**IsNotNull**
+_name_`IsNotNull`
 
 ### String
 
-name**In**
+_name_`In`
 
-name**NotIn**
+_name_`NotIn`
 
-name**Contains**
+_name_`Contains`
 
-name**NotContains**
+_name_`NotContains`
 
-name**StartsWith**
+_name_`StartsWith`
 
-name**NotStartsWith**
+_name_`NotStartsWith`
 
-name**EndsWith**
+_name_`EndsWith`
 
-name**NotEndsWith**
+_name_`NotEndsWith`
 
-name**Like**
+_name_`Like`
 
-name**NotLike**
+_name_`NotLike`
 
 ### Integer
 
-name**In
+_name_`In
 
-name**NotIn
+_name_`NotIn
 
-name**GreaterThan**
+_name_`GreaterThan`
 
-name**LessThan**
+_name_`LessThan`
 
-name**GreaterThanOrEqual**
+_name_`GreaterThanOrEqual`
 
-name**LessThanOrEqual**
+_name_`LessThanOrEqual`
 
 ### Float
 
-name**In
+_name_`In
 
-name**NotIn
+_name_`NotIn
 
-name**GreaterThan**
+_name_`GreaterThan`
 
-name**LessThan**
+_name_`LessThan`
 
-name**GreaterThanOrEqual**
+_name_`GreaterThanOrEqual`
 
-name**LessThanOrEqual**
+_name_`LessThanOrEqual`
 
 ### Date
 
-name**In
+_name_`In
 
-name**NotIn
+_name_`NotIn
 
-name**GreaterThan**
+_name_`GreaterThan`
 
-name**LessThan**
+_name_`LessThan`
 
-name**GreaterThanOrEqual**
+_name_`GreaterThanOrEqual`
 
-name**LessThanOrEqual**
+_name_`LessThanOrEqual`
 
 ### Boolean   
 
