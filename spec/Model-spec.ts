@@ -240,13 +240,18 @@ describe("Model spec", () => {
         });
         it("getAllMutations", () => {
             const getCreateMutationSpy = spyOn(animalModel, "getCreateMutation").and.returnValue("f1");
+            const getUpdateMutationSpy = spyOn(animalModel, "getUpdateMutation").and.returnValue("f2");
             const mutations = animalModel.getMutations(resolveFn);
             const expectedMutations = [{
                 name: "createAnimal",
                 field: animalModel.getCreateMutation(resolveFn),
+            }, {
+                name: "updateAnimal",
+                field: animalModel.getUpdateMutation(resolveFn),
             }];
             expect(mutations).toEqual(expectedMutations);
             getCreateMutationSpy.and.callThrough();
+            getUpdateMutationSpy.and.callThrough();
         });
     });
 });

@@ -31,6 +31,7 @@ class Model {
     protected primaryKeyAttribute: Attribute;
     protected baseType: GraphQLObjectType;
     protected createType: GraphQLInputObjectType;
+    protected updateType: GraphQLInputObjectType;
     protected connectionType: GraphQLObjectType;
     constructor(public config: ModelConfig, protected collector: Collection) {
         this.name = this.config.name || capitalize(this.config.id);
@@ -185,17 +186,45 @@ class Model {
         }
         return this.createType;
     }
+    public getUpdateType() {
+        if (!this.updateType) {
+            this.updateType = this.generateUpdateType();
+        }
+        return this.updateType;
+    }
     public getDeleteMutation() {
         // TODO
     }
-    public getUpdateMutation() {
-        // TODO 
+    public getUpdateMutation(resolveFn: ResolveFn) {
+        let outputFields: GraphQLFieldConfigMap<any> = {};
+        outputFields[uncapitalize(this.name)] = {
+            type: this.getBaseType(),
+        };
+        return mutationWithClientMutationId({
+            name: this.name + "UpdateMutation",
+            inputFields: this.getUpdateType().getFields(),
+            outputFields,
+            mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
+                return resolveFn({
+                    type: ResolveTypes.MutationUpdate,
+                    model: this.id,
+                    source: null,
+                    args: object,
+                    context,
+                    info: null,
+                });
+            },
+        });
     }
     public getMutations(resolveFn: ResolveFn): Mutations {
         let mutations: Mutations = [];
         mutations.push({
             name: "create" + this.name,
             field: this.getCreateMutation(resolveFn),
+        });
+        mutations.push({
+            name: "update" + this.name,
+            field: this.getUpdateMutation(resolveFn),
         });
         return mutations;
         // TODO
@@ -240,6 +269,38 @@ class Model {
         });
         return new GraphQLInputObjectType({
             name: "Create" + this.name + "Input",
+            fields,
+        });
+    }
+    protected generateUpdateType(): GraphQLInputObjectType {
+        let fields: GraphQLInputFieldConfigMap = {};
+        this.attributes.map((attr) => {
+            let graphQLType;
+            if (attr.type === AttributeTypes.Model) {
+                const childModel = this.collector.get(attr.model);
+                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                fields["create" + capitalize(attr.name)] = { type: childModel.getCreateType() };
+            } else if (attr.type === AttributeTypes.Collection) {
+                const childModel = this.collector.get((attr as CollectionAttribute).model);
+                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                graphQLType = new GraphQLList(graphQLType);
+                fields["create" + capitalize(attr.name)] = {
+                    type: new GraphQLList(childModel.getCreateType()),
+                };
+            } else {
+                graphQLType = scalarTypeToGraphQL(attr.type);
+            }
+            fields["set" + capitalize(attr.name)] = {
+                type: new GraphQLInputObjectType({
+                    name: "Update" + this.name + "InputSet" + capitalize(attr.name),
+                    fields: {
+                        [attr.name]: { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType }
+                    },
+                }),
+            };
+        });
+        return new GraphQLInputObjectType({
+            name: "Update" + this.name + "Input",
             fields,
         });
     }

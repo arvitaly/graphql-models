@@ -184,6 +184,56 @@ describe("Functional tests", () => {
         });
         done();
     }));
+    it("update post", (done) => __awaiter(this, void 0, void 0, function* () {
+        const models = new __1.Collection([collection1_1.animalModel, collection1_1.postModel, collection1_1.userModel]);
+        const data = { post: null };
+        const resolveFn = jasmine.createSpy("").and.returnValue(Object.assign({}, data));
+        const schema = new __1.Schema(models, resolveFn);
+        const graphQLSchema = schema.getGraphQLSchema();
+        const result = yield graphql_1.graphql(graphQLSchema, `mutation M1{
+            updatePost(input:{
+                    clientMutationId:"6"
+                    createAnimals:{ name: "Sta" }
+                    createOwner:{name: "John"}
+                }){
+                post{
+                    animals{
+                        edges{
+                            node{
+                                name
+                            }
+                        }
+                    }
+                    owner{
+                        name
+                    }
+                }
+            }
+        }`);
+        if (result.errors) {
+            fail(result.errors);
+            done();
+            return;
+        }
+        expect(resolveFn.calls.count()).toBe(1);
+        expect(j(resolveFn.calls.argsFor(0)[0])).toEqual({
+            type: __1.ResolveTypes.MutationUpdate,
+            model: "post",
+            source: null,
+            info: null,
+            args: {
+                createAnimals: [{
+                        name: "Sta",
+                    }],
+                createOwner: {
+                    name: "John",
+                },
+                clientMutationId: "6",
+            },
+        });
+        expect(j(result.data)).toEqual({ updatePost: data });
+        done();
+    }));
 });
 // Convert GraphQL data to plain object
 function j(v) {
