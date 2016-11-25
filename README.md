@@ -78,23 +78,37 @@ For more examples, look https://github.com/arvitaly/graphql-models/blob/master/s
 
 # API
 
+## ModelConfig
+
+    id: string;
+    name?: string | undefined;
+    attributes: Array<AttributeConfig>;
+
+## AttributeConfig
+
+    name: string;
+    type: AttributeType;
+    model?: string | undefined;
+    required?: boolean | undefined;
+    primaryKey?: boolean | undefined;
+
 ## Suported attribute type
 
     type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 
-string -> GraphQLString
+string -> `GraphQLString`
 
-integer -> GraphQLInt
+integer -> `GraphQLInt`
 
-float -> GraphQLFloat
+float -> `GraphQLFloat`
 
-boolean -> GraphQLBool
+boolean -> `GraphQLBool`
 
-date -> GraphQLString
+date -> `GraphQLString`
 
-model -> new GraphQLObjectType(...)
+model -> `new GraphQLObjectType(...)`
 
-collection -> new GraphQLList(new GraphQLObjectType(...))
+collection -> `new GraphQLList(new GraphQLObjectType(...))`
 
 ## Useful arguments for find
 
