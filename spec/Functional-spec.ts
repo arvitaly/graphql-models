@@ -49,9 +49,9 @@ describe("Functional tests", () => {
                     }).map((u) => {
                         return {
                             node: u,
-                        }
+                        };
                     }),
-                }
+                };
             }
         };
         const schema = new Schema(models, resolveFn);
@@ -84,9 +84,9 @@ describe("Functional tests", () => {
         expect(j(result.data)).toEqual({
             viewer: {
                 users: {
-                    edges: users.filter((_, i) => i < 2).map((u) => { return { node: u } })
-                }
-            }
+                    edges: users.filter((_, i) => i < 2).map((u) => { return { node: u }; }),
+                },
+            },
         });
         done();
     });
@@ -226,7 +226,7 @@ describe("Functional tests", () => {
         });
         expect(j(result.data)).toEqual({ updatePost: data });
         done();
-    })
+    });
 });
 
 // Convert GraphQL data to plain object

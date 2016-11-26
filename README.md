@@ -108,7 +108,29 @@ date -> `GraphQLString`
 
 model -> `new GraphQLObjectType(...)`
 
-collection -> `new GraphQLList(new GraphQLObjectType(...))`
+collection -> `new GraphQLList(new GraphQLObjectType(...))` or Relay-connection
+
+## Schema
+
+### new(models: Collection, resolveFn: ResolveFn)
+
+### getSchema(): GraphQLSchema
+
+Collect queries, mutations and subscriptions, add viewer and return GraphQL-schema.
+
+### getQueries(): Queries
+
+Return array of Query.
+
+### getMutations(): Mutations
+
+Return array of Mutation.
+
+#### Mutation = { name: string; field: GraphQLFieldConfig; }
+
+## Model
+
+# Documentation
 
 ## Useful arguments for find
 
@@ -188,25 +210,13 @@ _name_`LessThanOrEqual`
 
 ### Boolean   
 
+_name_: type
+_name_`isNull`
+_name_`isNotNull`
+
 ### Model, Collection
 
 All for primary-key type
-
-## Schema
-
-### new(models: Collection, resolveFn: ResolveFn)
-
-### getSchema(): GraphQLSchema
-
-Collect queries, mutations and subscriptions, add viewer and return GraphQL-schema.
-
-### getQueries(): Queries
-
-Return array of Query.
-
-#### Query = { name: string; field: GraphQLFieldConfig; }
-
-## Model
 
 # Tests
 

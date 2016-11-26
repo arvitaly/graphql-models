@@ -138,9 +138,9 @@ describe("Model spec", () => {
     });
     it("whereArgHelpers string", () => {
         expect(
-            whereArgHelpers[AttributeTypes.String]({ name: "n1", type: AttributeTypes.String, required: false }).length
+            whereArgHelpers[AttributeTypes.String]({ name: "n1", type: AttributeTypes.String, required: false }).length,
         ).toBe(8);
-    })
+    });
     it("WhereInput type", () => {
         const whereInputType = postModel.getWhereInputType();
         let where = {};

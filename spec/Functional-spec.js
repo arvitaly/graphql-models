@@ -91,9 +91,9 @@ describe("Functional tests", () => {
         expect(j(result.data)).toEqual({
             viewer: {
                 users: {
-                    edges: users.filter((_, i) => i < 2).map((u) => { return { node: u }; })
-                }
-            }
+                    edges: users.filter((_, i) => i < 2).map((u) => { return { node: u }; }),
+                },
+            },
         });
         done();
     }));

@@ -67,6 +67,8 @@ class Schema {
                 info,
             });
         }, (type) => {
+            const t = type.replace(/Type$/gi, "");
+            return this.collection.get(t.charAt(0) + t.substr(1)).getBaseType();
         });
     }
     getGraphQLSchema() {

@@ -33,7 +33,7 @@ class Model {
     protected createType: GraphQLInputObjectType;
     protected updateType: GraphQLInputObjectType;
     protected connectionType: GraphQLObjectType;
-    constructor(public config: ModelConfig, protected collector: Collection, protected opts?: ModelOptions = {}) {
+    constructor(public config: ModelConfig, protected collector: Collection, protected opts: ModelOptions = {}) {
         this.opts.interfaces = this.opts.interfaces || [];
         this.name = this.config.name || capitalize(this.config.id);
         this.id = this.config.id;
@@ -296,7 +296,7 @@ class Model {
                 type: new GraphQLInputObjectType({
                     name: "Update" + this.name + "InputSet" + capitalize(attr.name),
                     fields: {
-                        [attr.name]: { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType }
+                        [attr.name]: { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType },
                     },
                 }),
             };

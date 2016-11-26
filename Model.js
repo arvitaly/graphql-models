@@ -278,7 +278,7 @@ class Model {
                 type: new graphql_1.GraphQLInputObjectType({
                     name: "Update" + this.name + "InputSet" + capitalize(attr.name),
                     fields: {
-                        [attr.name]: { type: attr.required ? new graphql_1.GraphQLNonNull(graphQLType) : graphQLType }
+                        [attr.name]: { type: attr.required ? new graphql_1.GraphQLNonNull(graphQLType) : graphQLType },
                     },
                 }),
             };

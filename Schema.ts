@@ -65,10 +65,11 @@ class Schema {
                 source: null,
                 context: null,
                 info,
-            })
-        }, (type: any) => {
-
-        })
+            });
+        }, (type: string) => {
+            const t = type.replace(/Type$/gi, "");
+            return this.collection.get(t.charAt(0) + t.substr(1)).getBaseType();
+        });
     }
     public getGraphQLSchema() {
         return new GraphQLSchema({
