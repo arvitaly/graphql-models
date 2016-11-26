@@ -1,4 +1,5 @@
 const ResolveTypes = {
+    Node: "node" as "node",
     Viewer: "viewer" as "viewer",
     QueryOne: "queryOne" as "queryOne",
     QueryConnection: "queryConnection" as "queryConnection",

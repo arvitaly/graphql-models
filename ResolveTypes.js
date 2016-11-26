@@ -1,5 +1,6 @@
 "use strict";
 const ResolveTypes = {
+    Node: "node",
     Viewer: "viewer",
     QueryOne: "queryOne",
     QueryConnection: "queryConnection",

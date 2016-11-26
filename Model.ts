@@ -21,7 +21,7 @@ import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
 import {
     Attribute, AttributeType, CollectionAttribute, ModelAttribute,
-    ModelConfig, Mutation, Mutations, Queries, ResolveFn,
+    ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
 } from "./typings";
 export const whereArgName = "where";
 class Model {
@@ -33,7 +33,8 @@ class Model {
     protected createType: GraphQLInputObjectType;
     protected updateType: GraphQLInputObjectType;
     protected connectionType: GraphQLObjectType;
-    constructor(public config: ModelConfig, protected collector: Collection) {
+    constructor(public config: ModelConfig, protected collector: Collection, protected opts?: ModelOptions = {}) {
+        this.opts.interfaces = this.opts.interfaces || [];
         this.name = this.config.name || capitalize(this.config.id);
         this.id = this.config.id;
         let idAttr: Attribute;
@@ -245,6 +246,7 @@ class Model {
         return new GraphQLObjectType({
             name: this.name,
             fields,
+            interfaces: this.opts.interfaces,
         });
     }
     public generateCreationType(): GraphQLInputObjectType {

@@ -1,8 +1,11 @@
-import { GraphQLInputFieldConfig, GraphQLObjectType, GraphQLResolveInfo, GraphQLFieldConfig } from "graphql";
+import { GraphQLInputFieldConfig, GraphQLInterfaceType, GraphQLObjectType, GraphQLResolveInfo, GraphQLFieldConfig } from "graphql";
 export interface ModelConfig {
     id: string;
     name?: string;
     attributes: Array<AttributeConfig>;
+}
+export type ModelOptions = {
+    interfaces?: Array<GraphQLInterfaceType>;
 }
 export type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
@@ -42,13 +45,13 @@ export type Attribute = AttributeConfig & {
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
 }
-export type ResolveType = "viewer" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
+export type ResolveType = "node" | "viewer" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
 export type ResolveOpts = {
     type: ResolveType;
     model?: string;
     parentModel?: string;
     source: any;
-    args: { [argName: string]: any };
+    args: any;
     context: any;
     info: GraphQLResolveInfo;
 }
@@ -67,5 +70,5 @@ export type Mutation = {
 export type Mutations = Array<Mutation>;
 
 export type WhereArgHelper = {
-    
+
 }

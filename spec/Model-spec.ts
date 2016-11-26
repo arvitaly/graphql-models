@@ -40,6 +40,7 @@ describe("Model spec", () => {
                 birthday: { type: GraphQLString },
                 isCat: { type: GraphQLBoolean },
             },
+            interfaces: [],
         });
         const expectedUserType = new GraphQLObjectType({
             name: "user",
@@ -48,6 +49,7 @@ describe("Model spec", () => {
                 name: { type: GraphQLString },
                 pets: { type: collection1.get("animal").getConnectionType() },
             },
+            interfaces: [],
         });
         it("when generate base type with scalar attributes, should return equals", () => {
             const animalModelBaseType = animalModel.getBaseType();

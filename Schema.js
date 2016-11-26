@@ -1,5 +1,6 @@
 "use strict";
 const graphql_1 = require("graphql");
+const graphql_relay_1 = require("graphql-relay");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Schema {
     constructor(collection, resolveFn) {
@@ -53,6 +54,19 @@ class Schema {
         return new graphql_1.GraphQLObjectType({
             name: "Mutation",
             fields: this.mutationsToMap(),
+        });
+    }
+    getNodeType() {
+        graphql_relay_1.nodeDefinitions((id, info) => {
+            return this.resolveFn({
+                type: "node",
+                model: null,
+                args: id,
+                source: null,
+                context: null,
+                info,
+            });
+        }, (type) => {
         });
     }
     getGraphQLSchema() {

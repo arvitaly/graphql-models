@@ -1,4 +1,5 @@
 import { GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType, GraphQLSchema } from "graphql";
+import { nodeDefinitions } from "graphql-relay";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
 import { Mutations, Queries, ResolveFn } from "./typings";
@@ -54,6 +55,20 @@ class Schema {
             name: "Mutation",
             fields: this.mutationsToMap(),
         });
+    }
+    public getNodeType() {
+        nodeDefinitions((id: string, info) => {
+            return this.resolveFn({
+                type: "node",
+                model: null,
+                args: id,
+                source: null,
+                context: null,
+                info,
+            })
+        }, (type: any) => {
+
+        })
     }
     public getGraphQLSchema() {
         return new GraphQLSchema({

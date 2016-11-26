@@ -5,9 +5,11 @@ const AttributeTypes_1 = require("./AttributeTypes");
 const ResolveTypes_1 = require("./ResolveTypes");
 exports.whereArgName = "where";
 class Model {
-    constructor(config, collector) {
+    constructor(config, collector, opts = {}) {
         this.config = config;
         this.collector = collector;
+        this.opts = opts;
+        this.opts.interfaces = this.opts.interfaces || [];
         this.name = this.config.name || capitalize(this.config.id);
         this.id = this.config.id;
         let idAttr;
@@ -222,6 +224,7 @@ class Model {
         return new graphql_1.GraphQLObjectType({
             name: this.name,
             fields,
+            interfaces: this.opts.interfaces,
         });
     }
     generateCreationType() {
