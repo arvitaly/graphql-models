@@ -10,7 +10,7 @@ export function fail(obj1: { name, getFields }, obj2: { name, getFields }) {
     `;
 };
 // tslint:disable:no-string-literal
-export function compareMutations(mutation1: GraphQLFieldConfig<any>, mutation2: GraphQLFieldConfig<any>) {
+export function compareMutations(mutation1: GraphQLFieldConfig<any, any>, mutation2: GraphQLFieldConfig<any, any>) {
     // Check name
     expect(mutation1.type["name"]).toBe(mutation2.type["name"]);
     // Check output payload fields

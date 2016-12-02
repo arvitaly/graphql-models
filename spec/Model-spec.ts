@@ -169,7 +169,7 @@ describe("Model spec", () => {
         });
         it("Query one", () => {
             const animalSingleQuery = animalModel.getQueryOne(resolveFn);
-            const expectedAnimalSingleQuery: GraphQLFieldConfig<any> = {
+            const expectedAnimalSingleQuery: GraphQLFieldConfig<any, any> = {
                 args: animalModel.getOneArgs(),
                 type: animalModel.getBaseType(),
                 resolve: jasmine.any(Function) as any,
@@ -187,7 +187,7 @@ describe("Model spec", () => {
         });
         it("Query connection", () => {
             const queryConnection = animalModel.getConnectionQuery(resolveFn);
-            const expectedQueryConnection: GraphQLFieldConfig<any> = {
+            const expectedQueryConnection: GraphQLFieldConfig<any, any> = {
                 args: animalModel.getConnectionArgs(),
                 type: animalModel.getConnectionType(),
                 resolve: jasmine.any(Function) as any,

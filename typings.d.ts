@@ -59,13 +59,13 @@ export type ResolveFn = (opts?: ResolveOpts) => any;
 
 export type Query = {
     name: string;
-    field: GraphQLFieldConfig<any>;
+    field: GraphQLFieldConfig<any, any>;
 }
 export type Queries = Array<Query>;
 
 export type Mutation = {
     name: string;
-    field: GraphQLFieldConfig<any>;
+    field: GraphQLFieldConfig<any, any>;
 }
 export type Mutations = Array<Mutation>;
 

@@ -77,15 +77,15 @@ class Schema {
             mutation: this.getMutationType(),
         });
     }
-    protected mutationsToMap(): GraphQLFieldConfigMap<any> {
-        let out: GraphQLFieldConfigMap<any> = {};
+    protected mutationsToMap(): GraphQLFieldConfigMap<any, any> {
+        let out: GraphQLFieldConfigMap<any, any> = {};
         this.getMutations().map((q) => {
             out[q.name] = q.field;
         });
         return out;
     }
-    protected queriesToMap(): GraphQLFieldConfigMap<any> {
-        let out: GraphQLFieldConfigMap<any> = {};
+    protected queriesToMap(): GraphQLFieldConfigMap<any, any> {
+        let out: GraphQLFieldConfigMap<any, any> = {};
         this.getQueries().map((q) => {
             out[q.name] = q.field;
         });

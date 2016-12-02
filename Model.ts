@@ -91,7 +91,7 @@ class Model {
         args[primary.name] = { type: new GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) };
         return args;
     }
-    public getQueryOne(resolveFn: ResolveFn): GraphQLFieldConfig<any> {
+    public getQueryOne(resolveFn: ResolveFn): GraphQLFieldConfig<any, any> {
         return {
             args: this.getOneArgs(),
             type: this.getBaseType(),
@@ -107,7 +107,7 @@ class Model {
             },
         };
     }
-    public getConnectionQuery(resolveFn: ResolveFn): GraphQLFieldConfig<any> {
+    public getConnectionQuery(resolveFn: ResolveFn): GraphQLFieldConfig<any, any> {
         return {
             args: this.getConnectionArgs(),
             type: this.getConnectionType(),
@@ -160,8 +160,8 @@ class Model {
         return queries;
     }
     // Mutations
-    public getCreateMutation(resolveFn: ResolveFn): GraphQLFieldConfig<any> {
-        let outputFields: GraphQLFieldConfigMap<any> = {};
+    public getCreateMutation(resolveFn: ResolveFn): GraphQLFieldConfig<any, any> {
+        let outputFields: GraphQLFieldConfigMap<any, any> = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -197,7 +197,7 @@ class Model {
         // TODO
     }
     public getUpdateMutation(resolveFn: ResolveFn) {
-        let outputFields: GraphQLFieldConfigMap<any> = {};
+        let outputFields: GraphQLFieldConfigMap<any, any> = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -231,7 +231,7 @@ class Model {
         // TODO
     }
     protected generateBaseType(): GraphQLObjectType {
-        let fields: GraphQLFieldConfigMap<any> = {};
+        let fields: GraphQLFieldConfigMap<any, any> = {};
         this.attributes.map((attr) => {
             let graphQLType;
             if (attr.type === AttributeTypes.Model) {
