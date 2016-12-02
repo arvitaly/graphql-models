@@ -12,12 +12,12 @@ import {
     GraphQLString,
 } from "graphql";
 import { connectionArgs, mutationWithClientMutationId } from "graphql-relay";
+import collection1 from "./../__fixtures__/collection1";
 import AttributeTypes from "./../AttributeTypes";
 import Model, { capitalize, scalarTypeToGraphQL, uncapitalize, whereArgHelpers, whereArgName } from "./../Model";
 import ResolveTypes from "./../ResolveTypes";
-import { ModelAttribute, Queries } from "./../typings";
-import collection1 from "./fixtures/collection1";
-import { compareMutations, fail } from "./util";
+import { compareMutations, fail } from "./../test-util";
+import { AttributeType, ModelAttribute, Queries } from "./../typings";
 const animalModel = collection1.get("animal");
 const postModel = collection1.get("post");
 describe("Model spec", () => {
@@ -53,17 +53,16 @@ describe("Model spec", () => {
         });
         it("when generate base type with scalar attributes, should return equals", () => {
             const animalModelBaseType = animalModel.getBaseType();
-            expect(animalModelBaseType).toEqual(expectedAnimalType,
-                "Animal-model not equal, expected " +
+            expect(animalModelBaseType).toEqual(expectedAnimalType); /* "Animal-model not equal, expected " +
                 JSON.stringify(animalModelBaseType.getFields()) + " to equal " +
-                JSON.stringify(expectedAnimalType.getFields()));
+                JSON.stringify(expectedAnimalType.getFields())*/
         });
         it("when generate base type with sub-model, should generate sub model", () => {
             const userModelBaseType = collection1.get("user").getBaseType();
-            expect(userModelBaseType).toEqual(expectedUserType,
+            expect(userModelBaseType).toEqual(expectedUserType); /* ,
                 "User-model not equal, expected " +
                 JSON.stringify(userModelBaseType.getFields()) + " to equal " +
-                JSON.stringify(expectedUserType.getFields()));
+                JSON.stringify(expectedUserType.getFields())*/
         });
         // tslint:disable:no-string-literal
         it("when model required few times, need generate one time only", () => {
@@ -106,18 +105,18 @@ describe("Model spec", () => {
         });
         it("animal creation type", () => {
             const animalCreationType = collection1.get("animal").getCreateType();
-            expect(animalCreationType).toEqual(expectedAnimalCreationType,
-                fail(animalCreationType, expectedAnimalCreationType));
+            expect(animalCreationType).toEqual(expectedAnimalCreationType); /* ,
+                fail(animalCreationType, expectedAnimalCreationType)*/
         });
         it("user creation type", () => {
             const userCreationType = collection1.get("user").getCreateType();
-            expect(userCreationType).toEqual(expectedUserCreationType,
-                fail(userCreationType, expectedUserCreationType));
+            expect(userCreationType).toEqual(expectedUserCreationType); /* ,
+                fail(userCreationType, expectedUserCreationType) */
         });
         it("post creation type", () => {
             const postCreationType = collection1.get("post").getCreateType();
-            expect(postCreationType).toEqual(expectedPostCreationType,
-                fail(postCreationType, expectedPostCreationType));
+            expect(postCreationType).toEqual(expectedPostCreationType); /* ,
+                fail(postCreationType, expectedPostCreationType)*/
         });
     });
     describe("Args", () => {
@@ -145,7 +144,7 @@ describe("Model spec", () => {
         const whereInputType = postModel.getWhereInputType();
         let where = {};
         postModel.attributes.map((attr) => {
-            let type;
+            let type: AttributeType;
             if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
                 type = collection1.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
             } else {
@@ -160,7 +159,7 @@ describe("Model spec", () => {
             name: postModel.name + "WhereInput",
             fields: where,
         });
-        expect(whereInputType).toEqual(expectedWhereInputType, fail(whereInputType, expectedWhereInputType));
+        expect(whereInputType).toEqual(expectedWhereInputType); /* , fail(whereInputType, expectedWhereInputType) */
     });
     describe("Queries", () => {
         let resolveFn: jasmine.Spy;
@@ -214,6 +213,7 @@ describe("Model spec", () => {
         beforeEach(() => {
             resolveFn = jasmine.createSpy("");
         });
+        // tslint:disable:line arrow-parens
         it("create mutation", async (done) => {
             const createMutation = animalModel.getCreateMutation(resolveFn);
             const expectedCreateMutation = mutationWithClientMutationId({

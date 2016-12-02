@@ -131,7 +131,7 @@ class Model {
     public getWhereInputType(): GraphQLInputObjectType {
         let where: GraphQLInputFieldConfigMap = {};
         this.attributes.map((attr) => {
-            let type;
+            let type: AttributeType;
             if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
                 type = this.collector.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
             } else {
@@ -230,25 +230,6 @@ class Model {
         return mutations;
         // TODO
     }
-    protected generateBaseType(): GraphQLObjectType {
-        let fields: GraphQLFieldConfigMap<any, any> = {};
-        this.attributes.map((attr) => {
-            let graphQLType;
-            if (attr.type === AttributeTypes.Model) {
-                graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
-            } else if (attr.type === AttributeTypes.Collection) {
-                graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
-            } else {
-                graphQLType = scalarTypeToGraphQL(attr.type);
-            }
-            fields[attr.name] = { type: graphQLType };
-        });
-        return new GraphQLObjectType({
-            name: this.name,
-            fields,
-            interfaces: this.opts.interfaces,
-        });
-    }
     public generateCreationType(): GraphQLInputObjectType {
         let fields: GraphQLInputFieldConfigMap = {};
         this.attributes.map((attr) => {
@@ -272,6 +253,25 @@ class Model {
         return new GraphQLInputObjectType({
             name: "Create" + this.name + "Input",
             fields,
+        });
+    }
+    protected generateBaseType(): GraphQLObjectType {
+        let fields: GraphQLFieldConfigMap<any, any> = {};
+        this.attributes.map((attr) => {
+            let graphQLType;
+            if (attr.type === AttributeTypes.Model) {
+                graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
+            } else if (attr.type === AttributeTypes.Collection) {
+                graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
+            } else {
+                graphQLType = scalarTypeToGraphQL(attr.type);
+            }
+            fields[attr.name] = { type: graphQLType };
+        });
+        return new GraphQLObjectType({
+            name: this.name,
+            fields,
+            interfaces: this.opts.interfaces,
         });
     }
     protected generateUpdateType(): GraphQLInputObjectType {

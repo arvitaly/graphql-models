@@ -4,8 +4,8 @@
   "description": "Generate GraphQL-types from abstract models",
   "main": "index.js",
   "scripts": {
-    "test": "tsc && tslint --project=tsconfig.json && istanbul cover node_modules/jasmine/bin/jasmine.js",
-    "watch:test": "nodemon --exec jasmine"
+    "test": "tsc && tslint --project=tsconfig.json && jest --verbose",
+    "watch:test": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -21,15 +21,21 @@
   "dependencies": {
     "@types/graphql": "^0.8.2",
     "@types/graphql-relay": "^0.4.0",
-    "@types/jasmine": "^2.5.38",
     "graphql": "^0.8.2",
     "graphql-relay": "^0.4.4"
   },
   "devDependencies": {
+    "@types/jest": "^16.0.1",
     "coveralls": "^2.11.15",
-    "istanbul": "^0.4.5",
-    "jasmine": "^2.4.1",
+    "jest": "^17.0.3",
     "tslint": "^4.0.2",
-    "typescript": "^2.0.10"
+    "typescript": "^2.1.1"
+  },
+  "jest": {
+    "automock": false,
+    "unmockedModulePathPatterns": [
+      "graphql",
+      "graphql-relay"
+    ]
   }
 }

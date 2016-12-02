@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig } from "graphql";
-export function fail(obj1: { name, getFields }, obj2: { name, getFields }) {
+export function fail(obj1, obj2) {
     return `GraphQL objects not equal: 
         Object1:
             name: ${obj1.name},

@@ -1,7 +1,7 @@
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
+import collection1 from "./../__fixtures__/collection1";
 import Schema from "./../Schema";
-import collection1 from "./fixtures/collection1";
-import { fail } from "./util";
+import { fail } from "./../test-util";
 const fields1 = { f1: { type: GraphQLString } };
 const obj1 = new GraphQLObjectType({ name: "obj1", fields: fields1 });
 const fields2 = { f2: { type: GraphQLString } };
@@ -16,7 +16,7 @@ describe("Schema spec", () => {
             name: "QueryViewer",
             fields: fields1,
         });
-        expect(queryViewerType).toEqual(expectedQueryViewerType, fail(queryViewerType, expectedQueryViewerType));
+        expect(queryViewerType).toEqual(expectedQueryViewerType); /* , fail(queryViewerType, expectedQueryViewerType) */
         getQueriesSpy.and.callThrough();
     });
     it("getQueryType", () => {
@@ -31,7 +31,7 @@ describe("Schema spec", () => {
                 },
             },
         });
-        expect(queryType).toEqual(expectedQueryType, fail(queryType, expectedQueryType));
+        expect(queryType).toEqual(expectedQueryType); /* , fail(queryType, expectedQueryType) */
     });
     it("getMutationType", () => {
         // TODO

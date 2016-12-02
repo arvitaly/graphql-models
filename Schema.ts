@@ -1,4 +1,7 @@
-import { GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType, GraphQLSchema } from "graphql";
+import {
+    GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType,
+    GraphQLResolveInfo, GraphQLSchema,
+} from "graphql";
 import { nodeDefinitions } from "graphql-relay";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
@@ -57,7 +60,7 @@ class Schema {
         });
     }
     public getNodeType() {
-        nodeDefinitions((id: string, info) => {
+        nodeDefinitions((id: string, info: GraphQLResolveInfo) => {
             return this.resolveFn({
                 type: "node",
                 model: null,

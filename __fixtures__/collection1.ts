@@ -1,6 +1,6 @@
-import AttributeTypes from "./../../AttributeTypes";
-import Collector from "./../../Collection";
-import { ModelConfig } from "./../../typings";
+import AttributeTypes from "./../AttributeTypes";
+import Collector from "./../Collection";
+import { ModelConfig } from "./../typings";
 export const postModel: ModelConfig = {
     id: "post",
     attributes: [{

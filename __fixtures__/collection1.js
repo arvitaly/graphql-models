@@ -1,6 +1,6 @@
 "use strict";
-const AttributeTypes_1 = require("./../../AttributeTypes");
-const Collection_1 = require("./../../Collection");
+const AttributeTypes_1 = require("./../AttributeTypes");
+const Collection_1 = require("./../Collection");
 exports.postModel = {
     id: "post",
     attributes: [{

@@ -2,18 +2,18 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
 const graphql_1 = require("graphql");
 const graphql_relay_1 = require("graphql-relay");
+const collection1_1 = require("./../__fixtures__/collection1");
 const AttributeTypes_1 = require("./../AttributeTypes");
 const Model_1 = require("./../Model");
 const ResolveTypes_1 = require("./../ResolveTypes");
-const collection1_1 = require("./fixtures/collection1");
-const util_1 = require("./util");
+const test_util_1 = require("./../test-util");
 const animalModel = collection1_1.default.get("animal");
 const postModel = collection1_1.default.get("post");
 describe("Model spec", () => {
@@ -49,15 +49,16 @@ describe("Model spec", () => {
         });
         it("when generate base type with scalar attributes, should return equals", () => {
             const animalModelBaseType = animalModel.getBaseType();
-            expect(animalModelBaseType).toEqual(expectedAnimalType, "Animal-model not equal, expected " +
+            expect(animalModelBaseType).toEqual(expectedAnimalType); /* "Animal-model not equal, expected " +
                 JSON.stringify(animalModelBaseType.getFields()) + " to equal " +
-                JSON.stringify(expectedAnimalType.getFields()));
+                JSON.stringify(expectedAnimalType.getFields())*/
         });
         it("when generate base type with sub-model, should generate sub model", () => {
             const userModelBaseType = collection1_1.default.get("user").getBaseType();
-            expect(userModelBaseType).toEqual(expectedUserType, "User-model not equal, expected " +
+            expect(userModelBaseType).toEqual(expectedUserType); /* ,
+                "User-model not equal, expected " +
                 JSON.stringify(userModelBaseType.getFields()) + " to equal " +
-                JSON.stringify(expectedUserType.getFields()));
+                JSON.stringify(expectedUserType.getFields())*/
         });
         // tslint:disable:no-string-literal
         it("when model required few times, need generate one time only", () => {
@@ -99,15 +100,18 @@ describe("Model spec", () => {
         });
         it("animal creation type", () => {
             const animalCreationType = collection1_1.default.get("animal").getCreateType();
-            expect(animalCreationType).toEqual(expectedAnimalCreationType, util_1.fail(animalCreationType, expectedAnimalCreationType));
+            expect(animalCreationType).toEqual(expectedAnimalCreationType); /* ,
+                fail(animalCreationType, expectedAnimalCreationType)*/
         });
         it("user creation type", () => {
             const userCreationType = collection1_1.default.get("user").getCreateType();
-            expect(userCreationType).toEqual(expectedUserCreationType, util_1.fail(userCreationType, expectedUserCreationType));
+            expect(userCreationType).toEqual(expectedUserCreationType); /* ,
+                fail(userCreationType, expectedUserCreationType) */
         });
         it("post creation type", () => {
             const postCreationType = collection1_1.default.get("post").getCreateType();
-            expect(postCreationType).toEqual(expectedPostCreationType, util_1.fail(postCreationType, expectedPostCreationType));
+            expect(postCreationType).toEqual(expectedPostCreationType); /* ,
+                fail(postCreationType, expectedPostCreationType)*/
         });
     });
     describe("Args", () => {
@@ -149,7 +153,7 @@ describe("Model spec", () => {
             name: postModel.name + "WhereInput",
             fields: where,
         });
-        expect(whereInputType).toEqual(expectedWhereInputType, util_1.fail(whereInputType, expectedWhereInputType));
+        expect(whereInputType).toEqual(expectedWhereInputType); /* , fail(whereInputType, expectedWhereInputType) */
     });
     describe("Queries", () => {
         let resolveFn;
@@ -203,6 +207,7 @@ describe("Model spec", () => {
         beforeEach(() => {
             resolveFn = jasmine.createSpy("");
         });
+        // tslint:disable:line arrow-parens
         it("create mutation", (done) => __awaiter(this, void 0, void 0, function* () {
             const createMutation = animalModel.getCreateMutation(resolveFn);
             const expectedCreateMutation = graphql_relay_1.mutationWithClientMutationId({
@@ -213,7 +218,7 @@ describe("Model spec", () => {
                 },
                 mutateAndGetPayload: jasmine.any(Function),
             });
-            util_1.compareMutations(createMutation, expectedCreateMutation);
+            test_util_1.compareMutations(createMutation, expectedCreateMutation);
             const args = { clientMutationId: "5", input: { f1: "hello" } };
             const result = { clientMutationId: "5", animal: { name: "m1" } };
             resolveFn.and.returnValue(result);

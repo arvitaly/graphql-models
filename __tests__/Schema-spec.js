@@ -1,8 +1,7 @@
 "use strict";
 const graphql_1 = require("graphql");
+const collection1_1 = require("./../__fixtures__/collection1");
 const Schema_1 = require("./../Schema");
-const collection1_1 = require("./fixtures/collection1");
-const util_1 = require("./util");
 const fields1 = { f1: { type: graphql_1.GraphQLString } };
 const obj1 = new graphql_1.GraphQLObjectType({ name: "obj1", fields: fields1 });
 const fields2 = { f2: { type: graphql_1.GraphQLString } };
@@ -17,7 +16,7 @@ describe("Schema spec", () => {
             name: "QueryViewer",
             fields: fields1,
         });
-        expect(queryViewerType).toEqual(expectedQueryViewerType, util_1.fail(queryViewerType, expectedQueryViewerType));
+        expect(queryViewerType).toEqual(expectedQueryViewerType); /* , fail(queryViewerType, expectedQueryViewerType) */
         getQueriesSpy.and.callThrough();
     });
     it("getQueryType", () => {
@@ -32,7 +31,7 @@ describe("Schema spec", () => {
                 },
             },
         });
-        expect(queryType).toEqual(expectedQueryType, util_1.fail(queryType, expectedQueryType));
+        expect(queryType).toEqual(expectedQueryType); /* , fail(queryType, expectedQueryType) */
     });
     it("getMutationType", () => {
         // TODO

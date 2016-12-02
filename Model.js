@@ -206,27 +206,6 @@ class Model {
         return mutations;
         // TODO
     }
-    generateBaseType() {
-        let fields = {};
-        this.attributes.map((attr) => {
-            let graphQLType;
-            if (attr.type === AttributeTypes_1.default.Model) {
-                graphQLType = this.collector.get(attr.model).getBaseType();
-            }
-            else if (attr.type === AttributeTypes_1.default.Collection) {
-                graphQLType = this.collector.get(attr.model).getConnectionType();
-            }
-            else {
-                graphQLType = scalarTypeToGraphQL(attr.type);
-            }
-            fields[attr.name] = { type: graphQLType };
-        });
-        return new graphql_1.GraphQLObjectType({
-            name: this.name,
-            fields,
-            interfaces: this.opts.interfaces,
-        });
-    }
     generateCreationType() {
         let fields = {};
         this.attributes.map((attr) => {
@@ -252,6 +231,27 @@ class Model {
         return new graphql_1.GraphQLInputObjectType({
             name: "Create" + this.name + "Input",
             fields,
+        });
+    }
+    generateBaseType() {
+        let fields = {};
+        this.attributes.map((attr) => {
+            let graphQLType;
+            if (attr.type === AttributeTypes_1.default.Model) {
+                graphQLType = this.collector.get(attr.model).getBaseType();
+            }
+            else if (attr.type === AttributeTypes_1.default.Collection) {
+                graphQLType = this.collector.get(attr.model).getConnectionType();
+            }
+            else {
+                graphQLType = scalarTypeToGraphQL(attr.type);
+            }
+            fields[attr.name] = { type: graphQLType };
+        });
+        return new graphql_1.GraphQLObjectType({
+            name: this.name,
+            fields,
+            interfaces: this.opts.interfaces,
         });
     }
     generateUpdateType() {
