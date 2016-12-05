@@ -8,19 +8,21 @@ import ResolveTypes from "./ResolveTypes";
 import { Mutations, Queries, ResolveFn } from "./typings";
 class Schema {
     constructor(protected collection: Collection, protected resolveFn: ResolveFn) {
-
+        this.collection.map((model) => {
+            model.setResolveFn(resolveFn);
+        });
     }
     public getQueries() {
         let queries: Queries = [];
         this.collection.map((model) => {
-            queries = queries.concat(model.getQueries(this.resolveFn));
+            queries = queries.concat(model.getQueries());
         });
         return queries;
     }
     public getMutations() {
         let mutations: Mutations = [];
         this.collection.map((model) => {
-            mutations = mutations.concat(model.getMutations(this.resolveFn));
+            mutations = mutations.concat(model.getMutations());
         });
         return mutations;
     }

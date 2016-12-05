@@ -44,11 +44,14 @@ describe("Functional tests", () => {
         const users = [
             { key: 1, name: "John", pets: { edges: [{ node: { name: "x1" } }] } },
             { key: 2, name: "Jordan", pets: { edges: [{ node: { name: "x2" } }] } },
-            { id: 3, name: "Nike", pets: { edges: [{ node: { name: "x3" } }] } }
+            { key: 3, name: "Nike", pets: { edges: [{ node: { name: "x3" } }] } }
         ];
         const resolveFn = (opts) => {
             if (opts.type === __1.ResolveTypes.Viewer) {
                 return {};
+            }
+            if (opts.type === __1.ResolveTypes.Connection && opts.model === "animal" && opts.parentModel === "user") {
+                return users.find((u) => u.key === opts.source.key).pets;
             }
             if (opts.type === __1.ResolveTypes.QueryConnection && opts.model === "user") {
                 return {
@@ -122,20 +125,23 @@ describe("Functional tests", () => {
     it("create post", () => __awaiter(this, void 0, void 0, function* () {
         const models = new __1.Collection([collection1_1.animalModel, collection1_1.postModel, collection1_1.userModel]);
         const resolveFn = jest.fn((opts) => {
-            return {
-                post: {
-                    owner: {
-                        name: opts.args["createOwner"].name,
-                    },
-                    animals: {
-                        edges: [{
-                                node: {
-                                    name: opts.args["createAnimals"][0].name,
-                                },
-                            }],
-                    },
-                },
-            };
+            if (opts.type === __1.ResolveTypes.MutationCreate && opts.model === "post") {
+                return { post: {} };
+            }
+            if (opts.type === __1.ResolveTypes.Model &&
+                opts.model === "user" && opts.parentModel === "post") {
+                return { name: opts.args["createOwner"].name };
+            }
+            if (opts.type === __1.ResolveTypes.Connection &&
+                opts.model === "animal" && opts.parentModel === "post") {
+                return {
+                    edges: [{
+                            node: {
+                                name: animal1.name,
+                            },
+                        }],
+                };
+            }
         });
         const schema = new __1.Schema(models, resolveFn);
         const graphQLSchema = schema.getGraphQLSchema();
@@ -182,7 +188,7 @@ describe("Functional tests", () => {
     it("update post", () => __awaiter(this, void 0, void 0, function* () {
         const models = new __1.Collection([collection1_1.animalModel, collection1_1.postModel, collection1_1.userModel]);
         const data = { post: null };
-        const resolveFn = jest.fn(() => {
+        const resolveFn = jest.fn((opts) => {
             return Object.assign({}, data);
         });
         const schema = new __1.Schema(models, resolveFn);

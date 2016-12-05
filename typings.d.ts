@@ -6,6 +6,7 @@ export interface ModelConfig {
 }
 export type ModelOptions = {
     interfaces?: Array<GraphQLInterfaceType>;
+    resolveFn?: ResolveFn;
 }
 export type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
@@ -45,7 +46,7 @@ export type Attribute = AttributeConfig & {
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
 }
-export type ResolveType = "node" | "viewer" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
+export type ResolveType = "node" | "viewer" | "model" | "connection" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
 export type ResolveOpts = {
     type: ResolveType;
     model?: string;

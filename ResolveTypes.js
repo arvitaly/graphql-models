@@ -2,6 +2,8 @@
 const ResolveTypes = {
     Node: "node",
     Viewer: "viewer",
+    Model: "model",
+    Connection: "connection",
     QueryOne: "queryOne",
     QueryConnection: "queryConnection",
     MutationCreate: "mutationCreate",

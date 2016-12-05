@@ -10,6 +10,7 @@ class Model {
         this.collector = collector;
         this.opts = opts;
         this.opts.interfaces = this.opts.interfaces || [];
+        this.resolveFn = this.opts.resolveFn;
         this.name = this.config.name || capitalize(this.config.id);
         this.id = this.config.id;
         let idAttr;
@@ -39,6 +40,9 @@ class Model {
             return attr;
         });
     }
+    setResolveFn(resolveFn) {
+        this.resolveFn = resolveFn;
+    }
     getPrimaryKeyAttribute() {
         if (!this.primaryKeyAttribute) {
             throw new Error("Not found primary key attribute for model `" + this.name + "`");
@@ -66,12 +70,12 @@ class Model {
         args[primary.name] = { type: new graphql_1.GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) };
         return args;
     }
-    getQueryOne(resolveFn) {
+    getQueryOne() {
         return {
             args: this.getOneArgs(),
             type: this.getBaseType(),
             resolve: (source, args, context, info) => {
-                return resolveFn({
+                return this.resolveFn({
                     type: ResolveTypes_1.default.QueryOne,
                     model: this.id,
                     source,
@@ -82,12 +86,12 @@ class Model {
             },
         };
     }
-    getConnectionQuery(resolveFn) {
+    getConnectionQuery() {
         return {
             args: this.getConnectionArgs(),
             type: this.getConnectionType(),
             resolve: (source, args, context, info) => {
-                return resolveFn({
+                return this.resolveFn({
                     type: ResolveTypes_1.default.QueryConnection,
                     model: this.id,
                     source,
@@ -104,39 +108,25 @@ class Model {
         return args;
     }
     getWhereInputType() {
-        let where = {};
-        this.attributes.map((attr) => {
-            let type;
-            if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
-                type = this.collector.get(attr.model).getPrimaryKeyAttribute().type;
-            }
-            else {
-                type = attr.type;
-            }
-            where[attr.name] = { type: scalarTypeToGraphQL(type) };
-            exports.whereArgHelpers[attr.type](attr).map((t) => {
-                where[t.name] = { type: t.type };
-            });
-        });
-        return new graphql_1.GraphQLInputObjectType({
-            name: this.name + "WhereInput",
-            fields: where,
-        });
+        if (!this.whereInputType) {
+            this.whereInputType = this.generateWhereInputType();
+        }
+        return this.whereInputType;
     }
-    getQueries(resolveFn) {
+    getQueries() {
         let queries = [];
         queries.push({
             name: uncapitalize(this.name),
-            field: this.getQueryOne(resolveFn),
+            field: this.getQueryOne(),
         });
         queries.push({
             name: uncapitalize(this.name) + "s",
-            field: this.getConnectionQuery(resolveFn),
+            field: this.getConnectionQuery(),
         });
         return queries;
     }
     // Mutations
-    getCreateMutation(resolveFn) {
+    getCreateMutation() {
         let outputFields = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
@@ -146,7 +136,7 @@ class Model {
             inputFields: this.getCreateType().getFields(),
             outputFields,
             mutateAndGetPayload: (object, context) => {
-                return resolveFn({
+                return this.resolveFn({
                     type: ResolveTypes_1.default.MutationCreate,
                     model: this.id,
                     source: null,
@@ -172,7 +162,7 @@ class Model {
     getDeleteMutation() {
         // TODO
     }
-    getUpdateMutation(resolveFn) {
+    getUpdateMutation() {
         let outputFields = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
@@ -182,7 +172,7 @@ class Model {
             inputFields: this.getUpdateType().getFields(),
             outputFields,
             mutateAndGetPayload: (object, context) => {
-                return resolveFn({
+                return this.resolveFn({
                     type: ResolveTypes_1.default.MutationUpdate,
                     model: this.id,
                     source: null,
@@ -193,18 +183,99 @@ class Model {
             },
         });
     }
-    getMutations(resolveFn) {
+    getUpdateManyMutation() {
+        let outputFields = {};
+        outputFields[uncapitalize(this.name) + "s"] = {
+            type: new graphql_1.GraphQLList(this.getBaseType()),
+        };
+        let inputFields = {};
+        inputFields[exports.whereArgName] = { type: this.getWhereInputType() };
+        inputFields[uncapitalize(this.name)] = {
+            type: this.getUpdateType(),
+        };
+        return graphql_relay_1.mutationWithClientMutationId({
+            name: this.name + "sUpdateMutation",
+            inputFields,
+            outputFields,
+            mutateAndGetPayload: (object, context) => {
+                return this.resolveFn({
+                    type: ResolveTypes_1.default.MutationUpdate,
+                    model: this.id,
+                    source: null,
+                    args: object,
+                    context,
+                    info: null,
+                });
+            },
+        });
+    }
+    getMutations() {
         let mutations = [];
         mutations.push({
             name: "create" + this.name,
-            field: this.getCreateMutation(resolveFn),
+            field: this.getCreateMutation(),
         });
         mutations.push({
             name: "update" + this.name,
-            field: this.getUpdateMutation(resolveFn),
+            field: this.getUpdateMutation(),
         });
+        mutations.push({
+            name: "update" + this.name + "s",
+            field: this.getUpdateManyMutation(),
+        });
+        /*mutations.push({
+            name: "delete" + this.name,
+            field: this.getDeleteMutation(resolveFn),
+        });*/
         return mutations;
-        // TODO
+        // TODO delete
+    }
+    generateBaseType() {
+        let fields = {};
+        this.attributes.map((attr) => {
+            let graphQLType;
+            let resolve;
+            if (attr.type === AttributeTypes_1.default.Model) {
+                graphQLType = this.collector.get(attr.model).getBaseType();
+                resolve = (source, args, context, info) => {
+                    return this.resolveFn({
+                        args,
+                        context,
+                        info,
+                        model: attr.model,
+                        parentModel: this.id,
+                        source,
+                        type: ResolveTypes_1.default.Model,
+                    });
+                };
+            }
+            else if (attr.type === AttributeTypes_1.default.Collection) {
+                graphQLType = this.collector.get(attr.model).getConnectionType();
+                resolve = (source, args, context, info) => {
+                    return this.resolveFn({
+                        args,
+                        context,
+                        info,
+                        model: attr.model,
+                        parentModel: this.id,
+                        source,
+                        type: ResolveTypes_1.default.Connection,
+                    });
+                };
+            }
+            else {
+                graphQLType = scalarTypeToGraphQL(attr.type);
+            }
+            fields[attr.name] = { type: graphQLType };
+            if (resolve) {
+                fields[attr.name].resolve = resolve;
+            }
+        });
+        return new graphql_1.GraphQLObjectType({
+            name: this.name,
+            fields,
+            interfaces: this.opts.interfaces,
+        });
     }
     generateCreationType() {
         let fields = {};
@@ -231,27 +302,6 @@ class Model {
         return new graphql_1.GraphQLInputObjectType({
             name: "Create" + this.name + "Input",
             fields,
-        });
-    }
-    generateBaseType() {
-        let fields = {};
-        this.attributes.map((attr) => {
-            let graphQLType;
-            if (attr.type === AttributeTypes_1.default.Model) {
-                graphQLType = this.collector.get(attr.model).getBaseType();
-            }
-            else if (attr.type === AttributeTypes_1.default.Collection) {
-                graphQLType = this.collector.get(attr.model).getConnectionType();
-            }
-            else {
-                graphQLType = scalarTypeToGraphQL(attr.type);
-            }
-            fields[attr.name] = { type: graphQLType };
-        });
-        return new graphql_1.GraphQLObjectType({
-            name: this.name,
-            fields,
-            interfaces: this.opts.interfaces,
         });
     }
     generateUpdateType() {
@@ -286,6 +336,26 @@ class Model {
         return new graphql_1.GraphQLInputObjectType({
             name: "Update" + this.name + "Input",
             fields,
+        });
+    }
+    generateWhereInputType() {
+        let where = {};
+        this.attributes.map((attr) => {
+            let type;
+            if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
+                type = this.collector.get(attr.model).getPrimaryKeyAttribute().type;
+            }
+            else {
+                type = attr.type;
+            }
+            where[attr.name] = { type: scalarTypeToGraphQL(type) };
+            exports.whereArgHelpers[attr.type](attr).map((t) => {
+                where[t.name] = { type: t.type };
+            });
+        });
+        return new graphql_1.GraphQLInputObjectType({
+            name: this.name + "WhereInput",
+            fields: where,
         });
     }
 }

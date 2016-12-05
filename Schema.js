@@ -6,18 +6,21 @@ class Schema {
     constructor(collection, resolveFn) {
         this.collection = collection;
         this.resolveFn = resolveFn;
+        this.collection.map((model) => {
+            model.setResolveFn(resolveFn);
+        });
     }
     getQueries() {
         let queries = [];
         this.collection.map((model) => {
-            queries = queries.concat(model.getQueries(this.resolveFn));
+            queries = queries.concat(model.getQueries());
         });
         return queries;
     }
     getMutations() {
         let mutations = [];
         this.collection.map((model) => {
-            mutations = mutations.concat(model.getMutations(this.resolveFn));
+            mutations = mutations.concat(model.getMutations());
         });
         return mutations;
     }

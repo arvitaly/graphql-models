@@ -26,18 +26,6 @@ describe("Model spec", () => {
             toThrowError("Not found primary key attribute for model `" + m1.name + "`");
     });
     describe("base type", () => {
-        const expectedAnimalType = new graphql_1.GraphQLObjectType({
-            name: "Animal",
-            fields: {
-                id: { type: graphql_1.GraphQLInt },
-                name: { type: graphql_1.GraphQLString },
-                age: { type: graphql_1.GraphQLInt },
-                Weight: { type: graphql_1.GraphQLFloat },
-                birthday: { type: graphql_1.GraphQLString },
-                isCat: { type: graphql_1.GraphQLBoolean },
-            },
-            interfaces: [],
-        });
         const expectedUserType = new graphql_1.GraphQLObjectType({
             name: "user",
             fields: {
@@ -49,69 +37,32 @@ describe("Model spec", () => {
         });
         it("when generate base type with scalar attributes, should return equals", () => {
             const animalModelBaseType = animalModel.getBaseType();
-            expect(animalModelBaseType).toEqual(expectedAnimalType); /* "Animal-model not equal, expected " +
-                JSON.stringify(animalModelBaseType.getFields()) + " to equal " +
-                JSON.stringify(expectedAnimalType.getFields())*/
+            expect(test_util_1.printGraphQLObjectType(animalModelBaseType)).toMatchSnapshot();
         });
         it("when generate base type with sub-model, should generate sub model", () => {
             const userModelBaseType = collection1_1.default.get("user").getBaseType();
-            expect(userModelBaseType).toEqual(expectedUserType); /* ,
-                "User-model not equal, expected " +
-                JSON.stringify(userModelBaseType.getFields()) + " to equal " +
-                JSON.stringify(expectedUserType.getFields())*/
+            expect(test_util_1.printGraphQLObjectType(userModelBaseType)).toMatchSnapshot();
         });
-        // tslint:disable:no-string-literal
         it("when model required few times, need generate one time only", () => {
             const postModelBaseType = collection1_1.default.get("post").getBaseType();
+            expect(test_util_1.printGraphQLObjectType(postModelBaseType)).toMatchSnapshot();
+            // tslint:disable:line no-string-literal
             expect(postModelBaseType.getFields()["animals"].type.ofType).toBe((postModelBaseType.getFields()["owner"].type
                 .getFields()["pets"].type).ofType);
         });
     });
     describe("Creation Type", () => {
-        const expectedAnimalCreationType = new graphql_1.GraphQLInputObjectType({
-            name: "CreateAnimalInput",
-            fields: {
-                id: { type: graphql_1.GraphQLInt },
-                name: { type: graphql_1.GraphQLString },
-                age: { type: graphql_1.GraphQLInt },
-                Weight: { type: graphql_1.GraphQLFloat },
-                birthday: { type: graphql_1.GraphQLString },
-                isCat: { type: graphql_1.GraphQLBoolean },
-            },
-        });
-        const expectedUserCreationType = new graphql_1.GraphQLInputObjectType({
-            name: "CreateuserInput",
-            fields: {
-                key: { type: graphql_1.GraphQLFloat },
-                name: { type: new graphql_1.GraphQLNonNull(graphql_1.GraphQLString) },
-                pets: { type: new graphql_1.GraphQLList(graphql_1.GraphQLInt) },
-                createPets: { type: new graphql_1.GraphQLList(expectedAnimalCreationType) },
-            },
-        });
-        const expectedPostCreationType = new graphql_1.GraphQLInputObjectType({
-            name: "CreatePostInput",
-            fields: {
-                id: { type: graphql_1.GraphQLInt },
-                owner: { type: graphql_1.GraphQLFloat },
-                createOwner: { type: expectedUserCreationType },
-                animals: { type: new graphql_1.GraphQLList(graphql_1.GraphQLInt) },
-                createAnimals: { type: new graphql_1.GraphQLList(expectedAnimalCreationType) },
-            },
-        });
         it("animal creation type", () => {
             const animalCreationType = collection1_1.default.get("animal").getCreateType();
-            expect(animalCreationType).toEqual(expectedAnimalCreationType); /* ,
-                fail(animalCreationType, expectedAnimalCreationType)*/
+            expect(test_util_1.printGraphQLInputObjectType(animalCreationType)).toMatchSnapshot();
         });
         it("user creation type", () => {
             const userCreationType = collection1_1.default.get("user").getCreateType();
-            expect(userCreationType).toEqual(expectedUserCreationType); /* ,
-                fail(userCreationType, expectedUserCreationType) */
+            expect(test_util_1.printGraphQLInputObjectType(userCreationType)).toMatchSnapshot();
         });
         it("post creation type", () => {
             const postCreationType = collection1_1.default.get("post").getCreateType();
-            expect(postCreationType).toEqual(expectedPostCreationType); /* ,
-                fail(postCreationType, expectedPostCreationType)*/
+            expect(test_util_1.printGraphQLInputObjectType(postCreationType)).toMatchSnapshot();
         });
     });
     describe("Args", () => {
@@ -159,15 +110,11 @@ describe("Model spec", () => {
         let resolveFn;
         beforeEach(() => {
             resolveFn = jasmine.createSpy("");
+            animalModel.setResolveFn(resolveFn);
         });
         it("Query one", () => {
-            const animalSingleQuery = animalModel.getQueryOne(resolveFn);
-            const expectedAnimalSingleQuery = {
-                args: animalModel.getOneArgs(),
-                type: animalModel.getBaseType(),
-                resolve: jasmine.any(Function),
-            };
-            expect(animalSingleQuery).toEqual(expectedAnimalSingleQuery);
+            const animalSingleQuery = animalModel.getQueryOne();
+            expect(test_util_1.printGraphQLFieldConfig(animalSingleQuery)).toMatchSnapshot();
             animalSingleQuery.resolve("f1", "f2", "f3", "f4");
             expect(resolveFn.calls.allArgs()).toEqual([[{
                         type: ResolveTypes_1.default.QueryOne,
@@ -179,23 +126,19 @@ describe("Model spec", () => {
                     }]]);
         });
         it("Query connection", () => {
-            const queryConnection = animalModel.getConnectionQuery(resolveFn);
-            const expectedQueryConnection = {
-                args: animalModel.getConnectionArgs(),
-                type: animalModel.getConnectionType(),
-                resolve: jasmine.any(Function),
-            };
+            const queryConnection = animalModel.getConnectionQuery();
+            expect(test_util_1.printGraphQLFieldConfig(queryConnection)).toMatchSnapshot();
         });
         it("all queries", () => {
             const getQueryOneSpy = spyOn(animalModel, "getQueryOne").and.returnValue("q1");
             const getQueryConnectionSpy = spyOn(animalModel, "getConnectionQuery").and.returnValue("q2");
-            const queries = animalModel.getQueries(resolveFn);
+            const queries = animalModel.getQueries();
             const expectedQueries = [{
                     name: Model_1.uncapitalize(animalModel.name),
-                    field: animalModel.getQueryOne(resolveFn),
+                    field: animalModel.getQueryOne(),
                 }, {
                     name: Model_1.uncapitalize(animalModel.name) + "s",
-                    field: animalModel.getConnectionQuery(resolveFn),
+                    field: animalModel.getConnectionQuery(),
                 }];
             expect(queries).toEqual(expectedQueries);
             getQueryOneSpy.and.callThrough();
@@ -206,19 +149,11 @@ describe("Model spec", () => {
         let resolveFn;
         beforeEach(() => {
             resolveFn = jasmine.createSpy("");
+            animalModel.setResolveFn(resolveFn);
         });
-        // tslint:disable:line arrow-parens
-        it("create mutation", (done) => __awaiter(this, void 0, void 0, function* () {
-            const createMutation = animalModel.getCreateMutation(resolveFn);
-            const expectedCreateMutation = graphql_relay_1.mutationWithClientMutationId({
-                name: animalModel.name + "CreateMutation",
-                inputFields: animalModel.getCreateType().getFields(),
-                outputFields: {
-                    [Model_1.uncapitalize(animalModel.name)]: { type: animalModel.getBaseType() },
-                },
-                mutateAndGetPayload: jasmine.any(Function),
-            });
-            test_util_1.compareMutations(createMutation, expectedCreateMutation);
+        it("create mutation", () => __awaiter(this, void 0, void 0, function* () {
+            const createMutation = animalModel.getCreateMutation();
+            expect(test_util_1.printGraphQLFieldConfig(createMutation)).toMatchSnapshot();
             const args = { clientMutationId: "5", input: { f1: "hello" } };
             const result = { clientMutationId: "5", animal: { name: "m1" } };
             resolveFn.and.returnValue(result);
@@ -232,22 +167,26 @@ describe("Model spec", () => {
                         context: "f3",
                         info: null,
                     }]]);
-            done();
         }));
         it("getAllMutations", () => {
             const getCreateMutationSpy = spyOn(animalModel, "getCreateMutation").and.returnValue("f1");
             const getUpdateMutationSpy = spyOn(animalModel, "getUpdateMutation").and.returnValue("f2");
-            const mutations = animalModel.getMutations(resolveFn);
+            const getUpdateManyMutationSpy = spyOn(animalModel, "getUpdateManyMutation").and.returnValue("f3");
+            const mutations = animalModel.getMutations();
             const expectedMutations = [{
                     name: "createAnimal",
-                    field: animalModel.getCreateMutation(resolveFn),
+                    field: animalModel.getCreateMutation(),
                 }, {
                     name: "updateAnimal",
-                    field: animalModel.getUpdateMutation(resolveFn),
+                    field: animalModel.getUpdateMutation(),
+                }, {
+                    name: "updateAnimals",
+                    field: animalModel.getUpdateManyMutation(),
                 }];
             expect(mutations).toEqual(expectedMutations);
             getCreateMutationSpy.and.callThrough();
             getUpdateMutationSpy.and.callThrough();
+            getUpdateManyMutationSpy.and.callThrough();
         });
     });
 });
