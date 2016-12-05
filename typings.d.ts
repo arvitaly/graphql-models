@@ -67,7 +67,7 @@ export type ResolveBaseOpts = {
     context: any;
     info: GraphQLResolveInfo;
 }
-export type ResolveQueryOneOpts = {
+export type ResolveQueryOneOpts = ResolveBaseOpts & {
     model: Model;
     globalId: typeof GraphQLID;
     id: any;

@@ -16,7 +16,10 @@ import {
     GraphQLScalarType,
     GraphQLString,
 } from "graphql";
-import { connectionArgs, connectionDefinitions, mutationWithClientMutationId } from "graphql-relay";
+import {
+    connectionArgs, connectionDefinitions,
+    fromGlobalId, mutationWithClientMutationId,
+} from "graphql-relay";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
@@ -24,9 +27,10 @@ import ResolveTypes from "./ResolveTypes";
 import {
     Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute, ModelAttribute,
     ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
-    ResolveQueryOne
+    ResolveQueryOneOpts,
 } from "./typings";
 export const whereArgName = "where";
+export const idArgName = "id";
 class Model {
     public id: string;
     public name: string;
@@ -118,10 +122,18 @@ class Model {
         return {
             args: this.getOneArgs(),
             type: this.getBaseType(),
-            resolve: (source, args, context, info): ResolveQueryOne => {
+            resolve: (source, args, context, info) => {
                 const where = Object.keys(args[whereArgName]).map((key) => {
                     return this.getWhereArgument(key);
                 });
+                const resolveOpts: ResolveQueryOneOpts = {
+                    type: ResolveTypes.QueryOne,
+                    
+                    source,
+                    model: this,
+                    globalId: args[idArgName],
+                    id: fromGlobalId(args[idArgName]).id,
+                };
                 return this.resolveFn({
                     type: ResolveTypes.QueryOne,
                     model: this.id,
