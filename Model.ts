@@ -20,7 +20,7 @@ import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
 import {
-    Attribute, AttributeType, CollectionAttribute, ModelAttribute,
+    Argument, Attribute, AttributeType, CollectionAttribute, ModelAttribute,
     ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
 } from "./typings";
 export const whereArgName = "where";
@@ -257,6 +257,30 @@ class Model {
         return mutations;
         // TODO delete
     }
+    public getWhereArguments() {
+        let args: Argument[] = [];
+        this.attributes.map((attr) => {
+            let type: AttributeType;
+            if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
+                type = this.collector.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
+            } else {
+                type = attr.type;
+            }
+            args.push({
+                name: attr.name,
+                attribute: attr.name,
+                graphQLType: scalarTypeToGraphQL(type),
+            });
+            whereArgHelpers[attr.type](attr).map((t) => {
+                args.push({
+                    attribute: attr.name,
+                    name: t.name,
+                    graphQLType: t.type,
+                });
+            });
+        });
+        return args;
+    }
     protected generateBaseType(): GraphQLObjectType {
         let fields: GraphQLFieldConfigMap<any, any> = {};
         this.attributes.map((attr) => {
@@ -361,17 +385,8 @@ class Model {
     }
     protected generateWhereInputType(): GraphQLInputObjectType {
         let where: GraphQLInputFieldConfigMap = {};
-        this.attributes.map((attr) => {
-            let type: AttributeType;
-            if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
-                type = this.collector.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
-            } else {
-                type = attr.type;
-            }
-            where[attr.name] = { type: scalarTypeToGraphQL(type) };
-            whereArgHelpers[attr.type](attr).map((t) => {
-                where[t.name] = { type: t.type };
-            });
+        this.getWhereArguments().map((arg) => {
+            where[arg.name] = { type: arg.graphQLType };
         });
         return new GraphQLInputObjectType({
             name: this.name + "WhereInput",

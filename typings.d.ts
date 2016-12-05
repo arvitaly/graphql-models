@@ -1,4 +1,7 @@
-import { GraphQLInputFieldConfig, GraphQLInterfaceType, GraphQLObjectType, GraphQLResolveInfo, GraphQLFieldConfig } from "graphql";
+import {
+    GraphQLInputFieldConfig, GraphQLInterfaceType, GraphQLObjectType, GraphQLResolveInfo,
+    GraphQLFieldConfig, GraphQLInputType,
+} from "graphql";
 export interface ModelConfig {
     id: string;
     name?: string;
@@ -72,4 +75,9 @@ export type Mutations = Array<Mutation>;
 
 export type WhereArgHelper = {
 
+}
+export type Argument = {
+    name: string;
+    attribute: string;
+    graphQLType: GraphQLInputType
 }

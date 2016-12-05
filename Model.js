@@ -230,6 +230,31 @@ class Model {
         return mutations;
         // TODO delete
     }
+    getWhereArguments() {
+        let args = [];
+        this.attributes.map((attr) => {
+            let type;
+            if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
+                type = this.collector.get(attr.model).getPrimaryKeyAttribute().type;
+            }
+            else {
+                type = attr.type;
+            }
+            args.push({
+                name: attr.name,
+                attribute: attr.name,
+                graphQLType: scalarTypeToGraphQL(type),
+            });
+            exports.whereArgHelpers[attr.type](attr).map((t) => {
+                args.push({
+                    attribute: attr.name,
+                    name: t.name,
+                    graphQLType: t.type,
+                });
+            });
+        });
+        return args;
+    }
     generateBaseType() {
         let fields = {};
         this.attributes.map((attr) => {
@@ -340,18 +365,8 @@ class Model {
     }
     generateWhereInputType() {
         let where = {};
-        this.attributes.map((attr) => {
-            let type;
-            if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
-                type = this.collector.get(attr.model).getPrimaryKeyAttribute().type;
-            }
-            else {
-                type = attr.type;
-            }
-            where[attr.name] = { type: scalarTypeToGraphQL(type) };
-            exports.whereArgHelpers[attr.type](attr).map((t) => {
-                where[t.name] = { type: t.type };
-            });
+        this.getWhereArguments().map((arg) => {
+            where[arg.name] = { type: arg.graphQLType };
         });
         return new graphql_1.GraphQLInputObjectType({
             name: this.name + "WhereInput",
