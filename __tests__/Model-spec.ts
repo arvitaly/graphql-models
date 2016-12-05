@@ -71,6 +71,10 @@ describe("Model spec", () => {
         });
     });
     describe("Args", () => {
+        it("where args", () => {
+            expect(animalModel.getWhereArguments()).toMatchSnapshot();
+            expect(postModel.getWhereArguments()).toMatchSnapshot();
+        });
         it("args for one", () => {
             const argsForOne = animalModel.getOneArgs();
             const expectedArgsForOne = {};
@@ -93,24 +97,7 @@ describe("Model spec", () => {
     });
     it("WhereInput type", () => {
         const whereInputType = postModel.getWhereInputType();
-        let where = {};
-        postModel.attributes.map((attr) => {
-            let type: AttributeType;
-            if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
-                type = collection1.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
-            } else {
-                type = attr.type;
-            }
-            where[attr.name] = { type: scalarTypeToGraphQL(type) };
-            whereArgHelpers[attr.type](attr).map((t) => {
-                where[t.name] = { type: t.type };
-            });
-        });
-        const expectedWhereInputType: GraphQLInputObjectType = new GraphQLInputObjectType({
-            name: postModel.name + "WhereInput",
-            fields: where,
-        });
-        expect(whereInputType).toEqual(expectedWhereInputType); /* , fail(whereInputType, expectedWhereInputType) */
+        expect(printGraphQLInputObjectType(whereInputType)).toMatchSnapshot();
     });
     describe("Queries", () => {
         let resolveFn: jasmine.Spy;

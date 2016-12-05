@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -66,6 +66,10 @@ describe("Model spec", () => {
         });
     });
     describe("Args", () => {
+        it("where args", () => {
+            expect(animalModel.getWhereArguments()).toMatchSnapshot();
+            expect(postModel.getWhereArguments()).toMatchSnapshot();
+        });
         it("args for one", () => {
             const argsForOne = animalModel.getOneArgs();
             const expectedArgsForOne = {};
@@ -86,25 +90,7 @@ describe("Model spec", () => {
     });
     it("WhereInput type", () => {
         const whereInputType = postModel.getWhereInputType();
-        let where = {};
-        postModel.attributes.map((attr) => {
-            let type;
-            if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
-                type = collection1_1.default.get(attr.model).getPrimaryKeyAttribute().type;
-            }
-            else {
-                type = attr.type;
-            }
-            where[attr.name] = { type: Model_1.scalarTypeToGraphQL(type) };
-            Model_1.whereArgHelpers[attr.type](attr).map((t) => {
-                where[t.name] = { type: t.type };
-            });
-        });
-        const expectedWhereInputType = new graphql_1.GraphQLInputObjectType({
-            name: postModel.name + "WhereInput",
-            fields: where,
-        });
-        expect(whereInputType).toEqual(expectedWhereInputType); /* , fail(whereInputType, expectedWhereInputType) */
+        expect(test_util_1.printGraphQLInputObjectType(whereInputType)).toMatchSnapshot();
     });
     describe("Queries", () => {
         let resolveFn;

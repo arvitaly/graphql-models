@@ -1,0 +1,21 @@
+const ArgumentTypes = {
+    Equal: "equal" as "equal",
+    NotEqual: "notEqual" as "notEqual",
+    IsNull: "isNull" as "isNull",
+    IsNotNull: "isNotNull" as "isNotNull",
+    In: "in" as "in",
+    NotIn: "notIn" as "notIn",
+    Contains: "contains" as "contains",
+    NotContains: "notContains" as "notContains",
+    StartsWith: "startsWith" as "startsWith",
+    NotStartsWith: "notStartsWith" as "notStartsWith",
+    EndsWith: "endsWith" as "endsWith",
+    NotEndsWith: "notEndsWith" as "notEndsWith",
+    Like: "like" as "like",
+    NotLike: "notLike" as "notLike",
+    GreaterThan: "greaterThan" as "greaterThan",
+    LessThan: "lessThan" as "lessThan",
+    GreaterThanOrEqual: "greaterThanOrEqual" as "greaterThanOrEqual",
+    LessThanOrEqual: "lessThanOrEqual" as "lessThanOrEqual",
+};
+export default ArgumentTypes;

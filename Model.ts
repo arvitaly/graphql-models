@@ -5,6 +5,7 @@ import {
     GraphQLFieldConfigArgumentMap,
     GraphQLFieldConfigMap,
     GraphQLFloat,
+    GraphQLID,
     GraphQLInputFieldConfigMap,
     GraphQLInputObjectType,
     GraphQLInt,
@@ -16,12 +17,14 @@ import {
     GraphQLString,
 } from "graphql";
 import { connectionArgs, connectionDefinitions, mutationWithClientMutationId } from "graphql-relay";
+import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
 import {
-    Argument, Attribute, AttributeType, CollectionAttribute, ModelAttribute,
+    Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute, ModelAttribute,
     ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
+    ResolveQueryOne
 } from "./typings";
 export const whereArgName = "where";
 class Model {
@@ -34,6 +37,7 @@ class Model {
     protected updateType: GraphQLInputObjectType;
     protected connectionType: GraphQLObjectType;
     protected whereInputType: GraphQLInputObjectType;
+    protected whereArguments: Argument[];
     protected resolveFn: ResolveFn;
     constructor(public config: ModelConfig, protected collector: Collection, protected opts: ModelOptions = {}) {
         this.opts.interfaces = this.opts.interfaces || [];
@@ -58,6 +62,7 @@ class Model {
             }
             if (attrConfig.name.toLowerCase() === "id") {
                 idAttr = attr;
+                attr.name = "_id";
             }
             if (!this.primaryKeyAttribute) {
                 if (idAttr) {
@@ -65,6 +70,11 @@ class Model {
                 }
             }
             return attr;
+        });
+        this.attributes.push({
+            name: "id",
+            type: AttributeTypes.ID,
+            required: false,
         });
     }
     public setResolveFn(resolveFn: ResolveFn) {
@@ -97,11 +107,21 @@ class Model {
         args[primary.name] = { type: new GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) };
         return args;
     }
+    public getWhereArgument(name) {
+        const arg = this.getWhereArguments().find((a) => a.name === name);
+        if (!arg) {
+            throw new Error("Unknown where argument " + name);
+        }
+        return arg;
+    }
     public getQueryOne(): GraphQLFieldConfig<any, any> {
         return {
             args: this.getOneArgs(),
             type: this.getBaseType(),
-            resolve: (source, args, context, info) => {
+            resolve: (source, args, context, info): ResolveQueryOne => {
+                const where = Object.keys(args[whereArgName]).map((key) => {
+                    return this.getWhereArgument(key);
+                });
                 return this.resolveFn({
                     type: ResolveTypes.QueryOne,
                     model: this.id,
@@ -109,6 +129,7 @@ class Model {
                     args,
                     context,
                     info,
+                    where,
                 });
             },
         };
@@ -258,6 +279,12 @@ class Model {
         // TODO delete
     }
     public getWhereArguments() {
+        if (!this.whereArguments) {
+            this.whereArguments = this.generateWhereArguments();
+        }
+        return this.whereArguments;
+    }
+    protected generateWhereArguments() {
         let args: Argument[] = [];
         this.attributes.map((attr) => {
             let type: AttributeType;
@@ -266,15 +293,54 @@ class Model {
             } else {
                 type = attr.type;
             }
-            args.push({
-                name: attr.name,
-                attribute: attr.name,
-                graphQLType: scalarTypeToGraphQL(type),
-            });
+            let graphqlType = scalarTypeToGraphQL(type);
+            if (attr.type !== AttributeTypes.Collection) {
+                args.push({
+                    name: attr.name,
+                    type: ArgumentTypes.Equal,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+                args.push({
+                    name: attr.name + "NotEqual",
+                    type: ArgumentTypes.NotEqual,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+            }
+            if (attr.type !== AttributeTypes.Boolean) {
+                args.push({
+                    name: attr.name + "In",
+                    type: ArgumentTypes.In,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+                args.push({
+                    name: attr.name + "NotIn",
+                    type: ArgumentTypes.NotIn,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+            }
+            if (!attr.required) {
+                args.push({
+                    name: attr.name + "IsNull",
+                    type: ArgumentTypes.IsNull,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+                args.push({
+                    name: attr.name + "IsNotNull",
+                    type: ArgumentTypes.IsNotNull,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+            }
             whereArgHelpers[attr.type](attr).map((t) => {
                 args.push({
                     attribute: attr.name,
                     name: t.name,
+                    type: t.argumentType,
                     graphQLType: t.type,
                 });
             });
@@ -397,6 +463,9 @@ class Model {
 export function scalarTypeToGraphQL(type: AttributeType): GraphQLScalarType {
     let graphQLType;
     switch (type) {
+        case AttributeTypes.ID:
+            graphQLType = GraphQLID;
+            break;
         case AttributeTypes.Date:
         case AttributeTypes.String:
             graphQLType = GraphQLString;
@@ -424,9 +493,13 @@ export function capitalize(str: string) {
 
 const stringFunctions = ["contains", "notContains", "startsWith", "notStartsWith",
     "endsWith", "notEndsWith", "like", "notLike"];
-const numberFunctions = ["greaterThan", "lessThan", "greaterOrEqualThan", "lessOrEqualThan"];
+const numberFunctions = ["greaterThan", "lessThan", "greaterThanOrEqual", "lessThanOrEqual"];
 export const whereArgHelpers: {
-    [attrType: string]: (attr: Attribute) => Array<{ name: string; type: any; }>;
+    [attrType: string]: (attr: Attribute) => Array<{
+        name: string;
+        type: any;
+        argumentType: ArgumentType,
+    }>;
 } = {
         [AttributeTypes.String]: (attr: Attribute) => {
             const types = [];
@@ -434,6 +507,7 @@ export const whereArgHelpers: {
                 types.push({
                     name: attr.name + capitalize(f),
                     type: GraphQLString,
+                    argumentType: f,
                 });
             });
             return types;
@@ -444,6 +518,7 @@ export const whereArgHelpers: {
                 return {
                     name: attr.name + capitalize(f),
                     type: GraphQLInt,
+                    argumentType: f,
                 };
             });
             return types;
@@ -454,6 +529,7 @@ export const whereArgHelpers: {
                 return {
                     name: attr.name + capitalize(f),
                     type: GraphQLFloat,
+                    argumentType: f,
                 };
             });
             return types;
@@ -464,6 +540,7 @@ export const whereArgHelpers: {
                 return {
                     name: attr.name + capitalize(f),
                     type: GraphQLString,
+                    argumentType: f,
                 };
             });
             return types;
@@ -475,6 +552,9 @@ export const whereArgHelpers: {
             return [];
         },
         [AttributeTypes.Collection]: (attr: Attribute) => {
+            return [];
+        },
+        [AttributeTypes.ID]: (attr: Attribute) => {
             return [];
         },
     };

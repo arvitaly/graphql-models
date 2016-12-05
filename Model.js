@@ -1,6 +1,7 @@
 "use strict";
 const graphql_1 = require("graphql");
 const graphql_relay_1 = require("graphql-relay");
+const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
 const ResolveTypes_1 = require("./ResolveTypes");
 exports.whereArgName = "where";
@@ -31,6 +32,7 @@ class Model {
             }
             if (attrConfig.name.toLowerCase() === "id") {
                 idAttr = attr;
+                attr.name = "_id";
             }
             if (!this.primaryKeyAttribute) {
                 if (idAttr) {
@@ -38,6 +40,11 @@ class Model {
                 }
             }
             return attr;
+        });
+        this.attributes.push({
+            name: "id",
+            type: AttributeTypes_1.default.ID,
+            required: false,
         });
     }
     setResolveFn(resolveFn) {
@@ -70,11 +77,21 @@ class Model {
         args[primary.name] = { type: new graphql_1.GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) };
         return args;
     }
+    getWhereArgument(name) {
+        const arg = this.getWhereArguments().find((a) => a.name === name);
+        if (!arg) {
+            throw new Error("Unknown where argument " + name);
+        }
+        return arg;
+    }
     getQueryOne() {
         return {
             args: this.getOneArgs(),
             type: this.getBaseType(),
             resolve: (source, args, context, info) => {
+                const where = Object.keys(args[exports.whereArgName]).map((key) => {
+                    return this.getWhereArgument(key);
+                });
                 return this.resolveFn({
                     type: ResolveTypes_1.default.QueryOne,
                     model: this.id,
@@ -82,6 +99,7 @@ class Model {
                     args,
                     context,
                     info,
+                    where,
                 });
             },
         };
@@ -231,6 +249,12 @@ class Model {
         // TODO delete
     }
     getWhereArguments() {
+        if (!this.whereArguments) {
+            this.whereArguments = this.generateWhereArguments();
+        }
+        return this.whereArguments;
+    }
+    generateWhereArguments() {
         let args = [];
         this.attributes.map((attr) => {
             let type;
@@ -240,15 +264,54 @@ class Model {
             else {
                 type = attr.type;
             }
-            args.push({
-                name: attr.name,
-                attribute: attr.name,
-                graphQLType: scalarTypeToGraphQL(type),
-            });
+            let graphqlType = scalarTypeToGraphQL(type);
+            if (attr.type !== AttributeTypes_1.default.Collection) {
+                args.push({
+                    name: attr.name,
+                    type: ArgumentTypes_1.default.Equal,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+                args.push({
+                    name: attr.name + "NotEqual",
+                    type: ArgumentTypes_1.default.NotEqual,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+            }
+            if (attr.type !== AttributeTypes_1.default.Boolean) {
+                args.push({
+                    name: attr.name + "In",
+                    type: ArgumentTypes_1.default.In,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+                args.push({
+                    name: attr.name + "NotIn",
+                    type: ArgumentTypes_1.default.NotIn,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+            }
+            if (!attr.required) {
+                args.push({
+                    name: attr.name + "IsNull",
+                    type: ArgumentTypes_1.default.IsNull,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+                args.push({
+                    name: attr.name + "IsNotNull",
+                    type: ArgumentTypes_1.default.IsNotNull,
+                    attribute: attr.name,
+                    graphQLType: graphqlType,
+                });
+            }
             exports.whereArgHelpers[attr.type](attr).map((t) => {
                 args.push({
                     attribute: attr.name,
                     name: t.name,
+                    type: t.argumentType,
                     graphQLType: t.type,
                 });
             });
@@ -377,6 +440,9 @@ class Model {
 function scalarTypeToGraphQL(type) {
     let graphQLType;
     switch (type) {
+        case AttributeTypes_1.default.ID:
+            graphQLType = graphql_1.GraphQLID;
+            break;
         case AttributeTypes_1.default.Date:
         case AttributeTypes_1.default.String:
             graphQLType = graphql_1.GraphQLString;
@@ -406,7 +472,7 @@ function capitalize(str) {
 exports.capitalize = capitalize;
 const stringFunctions = ["contains", "notContains", "startsWith", "notStartsWith",
     "endsWith", "notEndsWith", "like", "notLike"];
-const numberFunctions = ["greaterThan", "lessThan", "greaterOrEqualThan", "lessOrEqualThan"];
+const numberFunctions = ["greaterThan", "lessThan", "greaterThanOrEqual", "lessThanOrEqual"];
 exports.whereArgHelpers = {
     [AttributeTypes_1.default.String]: (attr) => {
         const types = [];
@@ -414,6 +480,7 @@ exports.whereArgHelpers = {
             types.push({
                 name: attr.name + capitalize(f),
                 type: graphql_1.GraphQLString,
+                argumentType: f,
             });
         });
         return types;
@@ -424,6 +491,7 @@ exports.whereArgHelpers = {
             return {
                 name: attr.name + capitalize(f),
                 type: graphql_1.GraphQLInt,
+                argumentType: f,
             };
         });
         return types;
@@ -434,6 +502,7 @@ exports.whereArgHelpers = {
             return {
                 name: attr.name + capitalize(f),
                 type: graphql_1.GraphQLFloat,
+                argumentType: f,
             };
         });
         return types;
@@ -444,6 +513,7 @@ exports.whereArgHelpers = {
             return {
                 name: attr.name + capitalize(f),
                 type: graphql_1.GraphQLString,
+                argumentType: f,
             };
         });
         return types;
@@ -455,6 +525,9 @@ exports.whereArgHelpers = {
         return [];
     },
     [AttributeTypes_1.default.Collection]: (attr) => {
+        return [];
+    },
+    [AttributeTypes_1.default.ID]: (attr) => {
         return [];
     },
 };

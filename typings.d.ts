@@ -1,7 +1,8 @@
 import {
-    GraphQLInputFieldConfig, GraphQLInterfaceType, GraphQLObjectType, GraphQLResolveInfo,
+    GraphQLID, GraphQLInputFieldConfig, GraphQLInterfaceType, GraphQLObjectType, GraphQLResolveInfo,
     GraphQLFieldConfig, GraphQLInputType,
 } from "graphql";
+import Model from "./model";
 export interface ModelConfig {
     id: string;
     name?: string;
@@ -11,7 +12,7 @@ export type ModelOptions = {
     interfaces?: Array<GraphQLInterfaceType>;
     resolveFn?: ResolveFn;
 }
-export type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
+export type AttributeType = "id" | "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
     name: string;
     type: AttributeType;
@@ -55,10 +56,23 @@ export type ResolveOpts = {
     model?: string;
     parentModel?: string;
     source: any;
+    where?: Argument[];
     args: any;
     context: any;
     info: GraphQLResolveInfo;
 }
+export type ResolveBaseOpts = {
+    type: ResolveType;
+    source: any;
+    context: any;
+    info: GraphQLResolveInfo;
+}
+export type ResolveQueryOneOpts = {
+    model: Model;
+    globalId: typeof GraphQLID;
+    id: any;
+}
+export type ResolveQueryOne = (opts: ResolveQueryOneOpts) => any;
 export type ResolveFn = (opts?: ResolveOpts) => any;
 
 export type Query = {
@@ -76,8 +90,12 @@ export type Mutations = Array<Mutation>;
 export type WhereArgHelper = {
 
 }
+export type ArgumentType = "equal" | "notEqual" | "isNull" | "isNotNull" | "in" | "notIn" | "contains" |
+    "notContains" | "startsWith" | "notStartsWith" | "endsWith" | "notEndsWith" |
+    "like" | "notLike" | "greaterThan" | "lessThan" | "greaterThanOrEqual" | "lessThanOrEqual";
 export type Argument = {
     name: string;
+    type: ArgumentType;
     attribute: string;
     graphQLType: GraphQLInputType
 }

@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -44,8 +44,7 @@ describe("Functional tests", () => {
         const users = [
             { key: 1, name: "John", pets: { edges: [{ node: { name: "x1" } }] } },
             { key: 2, name: "Jordan", pets: { edges: [{ node: { name: "x2" } }] } },
-            { key: 3, name: "Nike", pets: { edges: [{ node: { name: "x3" } }] } }
-        ];
+            { key: 3, name: "Nike", pets: { edges: [{ node: { name: "x3" } }] } }];
         const resolveFn = (opts) => {
             if (opts.type === __1.ResolveTypes.Viewer) {
                 return {};
