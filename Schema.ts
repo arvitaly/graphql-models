@@ -4,14 +4,11 @@ import {
 } from "graphql";
 import { nodeDefinitions } from "graphql-relay";
 import Collection from "./Collection";
+import Resolver from "./Resolver";
 import ResolveTypes from "./ResolveTypes";
 import { Mutations, Queries, ResolveFn } from "./typings";
 class Schema {
-    constructor(protected collection: Collection, protected resolveFn: ResolveFn) {
-        this.collection.map((model) => {
-            model.setResolveFn(resolveFn);
-        });
-    }
+    constructor(protected collection: Collection, protected resolver: Resolver) { }
     public getQueries() {
         let queries: Queries = [];
         this.collection.map((model) => {
@@ -43,13 +40,7 @@ class Schema {
                 viewer: {
                     type: this.getQueryViewerType(),
                     resolve: (source, args, context, info) => {
-                        return this.resolveFn({
-                            type: ResolveTypes.Viewer,
-                            source,
-                            args,
-                            context,
-                            info,
-                        });
+                        return this.resolver.resolve(null, ResolveTypes.Viewer, { source, args, context, info });
                     },
                 },
             },
@@ -63,14 +54,7 @@ class Schema {
     }
     public getNodeType() {
         nodeDefinitions((id: string, info: GraphQLResolveInfo) => {
-            return this.resolveFn({
-                type: "node",
-                model: null,
-                args: id,
-                source: null,
-                context: null,
-                info,
-            });
+            return this.resolver.resolve(null, ResolveTypes.Node, { source: id, args: null, context: null, info });
         }, (type: string) => {
             const t = type.replace(/Type$/gi, "");
             return this.collection.get(t.charAt(0) + t.substr(1)).getBaseType();

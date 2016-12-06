@@ -1,0 +1,12 @@
+exports[`Functional tests query one 1`] = `
+Object {
+  "data": Object {
+    "viewer": Object {
+      "animal": null,
+    },
+  },
+  "errors": Array [
+    [GraphQLError: TypeError: First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.],
+  ],
+}
+`;

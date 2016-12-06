@@ -43,6 +43,7 @@ export const animalModel: ModelConfig = {
     }, {
         type: AttributeTypes.String,
         name: "name",
+        required: true,
     }, {
         type: AttributeTypes.Integer,
         name: "age",

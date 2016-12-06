@@ -21,3 +21,4 @@ class Collection {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Collection;
+//# sourceMappingURL=Collection.js.map

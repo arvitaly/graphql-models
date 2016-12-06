@@ -20,14 +20,14 @@ import {
     connectionArgs, connectionDefinitions,
     fromGlobalId, mutationWithClientMutationId,
 } from "graphql-relay";
+import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
 import {
-    Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute, ModelAttribute,
-    ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
-    ResolveQueryOneOpts,
+    Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute,
+    ModelAttribute, ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
 } from "./typings";
 export const whereArgName = "where";
 export const idArgName = "id";
@@ -63,18 +63,19 @@ class Model {
             };
             if (attrConfig.primaryKey === true) {
                 this.primaryKeyAttribute = attr;
+                attr.primaryKey = true;
             }
             if (attrConfig.name.toLowerCase() === "id") {
                 idAttr = attr;
                 attr.name = "_id";
             }
-            if (!this.primaryKeyAttribute) {
-                if (idAttr) {
-                    this.primaryKeyAttribute = idAttr;
-                }
-            }
             return attr;
         });
+        if (!this.primaryKeyAttribute) {
+            if (idAttr) {
+                this.primaryKeyAttribute = idAttr;
+            }
+        }
         this.attributes.push({
             name: "id",
             type: AttributeTypes.ID,
@@ -107,8 +108,8 @@ class Model {
     }
     public getOneArgs(): GraphQLFieldConfigArgumentMap {
         let args: GraphQLFieldConfigArgumentMap = {};
-        const primary = this.getPrimaryKeyAttribute();
-        args[primary.name] = { type: new GraphQLNonNull(scalarTypeToGraphQL(this.getPrimaryKeyAttribute().type)) };
+        args[idArgName] = { type: GraphQLID };
+        // new GraphQLNonNull(scalarTypeToGraphQL(this.get PrimaryKeyAttribute().type))
         return args;
     }
     public getWhereArgument(name) {
@@ -123,26 +124,7 @@ class Model {
             args: this.getOneArgs(),
             type: this.getBaseType(),
             resolve: (source, args, context, info) => {
-                const where = Object.keys(args[whereArgName]).map((key) => {
-                    return this.getWhereArgument(key);
-                });
-                const resolveOpts: ResolveQueryOneOpts = {
-                    type: ResolveTypes.QueryOne,
-                    
-                    source,
-                    model: this,
-                    globalId: args[idArgName],
-                    id: fromGlobalId(args[idArgName]).id,
-                };
-                return this.resolveFn({
-                    type: ResolveTypes.QueryOne,
-                    model: this.id,
-                    source,
-                    args,
-                    context,
-                    info,
-                    where,
-                });
+                return this.resolveFn(this.id, ResolveTypes.QueryOne, { source, args, context, info });
             },
         };
     }
@@ -151,14 +133,7 @@ class Model {
             args: this.getConnectionArgs(),
             type: this.getConnectionType(),
             resolve: (source, args, context, info) => {
-                return this.resolveFn({
-                    type: ResolveTypes.QueryConnection,
-                    model: this.id,
-                    source,
-                    args,
-                    context,
-                    info,
-                });
+                return this.resolveFn(this.id, ResolveTypes.QueryConnection, { source, args, context, info });
             },
         };
     }
@@ -196,14 +171,8 @@ class Model {
             inputFields: this.getCreateType().getFields(),
             outputFields,
             mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
-                return this.resolveFn({
-                    type: ResolveTypes.MutationCreate,
-                    model: this.id,
-                    source: null,
-                    args: object,
-                    context,
-                    info: null,
-                });
+                return this.resolveFn(this.id,
+                    ResolveTypes.MutationCreate, { source: null, args: object, context, info: null });
             },
         });
     }
@@ -219,8 +188,20 @@ class Model {
         }
         return this.updateType;
     }
-    public getDeleteMutation() {
-        // TODO
+    public getDeleteMutation(): GraphQLFieldConfig<any, any> {
+        let outputFields: GraphQLFieldConfigMap<any, any> = {};
+        outputFields[uncapitalize(this.name)] = {
+            type: this.getBaseType(),
+        };
+        return mutationWithClientMutationId({
+            name: this.name + "DeleteMutation",
+            inputFields: this.getOneArgs(),
+            outputFields,
+            mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
+                return this.resolveFn(this.id,
+                    ResolveTypes.MutationDelete, { source: null, args: object, context, info: null });
+            },
+        });
     }
     public getUpdateMutation() {
         let outputFields: GraphQLFieldConfigMap<any, any> = {};
@@ -232,14 +213,8 @@ class Model {
             inputFields: this.getUpdateType().getFields(),
             outputFields,
             mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
-                return this.resolveFn({
-                    type: ResolveTypes.MutationUpdate,
-                    model: this.id,
-                    source: null,
-                    args: object,
-                    context,
-                    info: null,
-                });
+                return this.resolveFn(this.id,
+                    ResolveTypes.MutationUpdate, { source: null, args: object, context, info: null });
             },
         });
     }
@@ -258,14 +233,8 @@ class Model {
             inputFields,
             outputFields,
             mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
-                return this.resolveFn({
-                    type: ResolveTypes.MutationUpdate,
-                    model: this.id,
-                    source: null,
-                    args: object,
-                    context,
-                    info: null,
-                });
+                return this.resolveFn(this.id, ResolveTypes.MutationUpdateMany,
+                    { source: null, args: object, context, info: null });
             },
         });
     }
@@ -283,12 +252,11 @@ class Model {
             name: "update" + this.name + "s",
             field: this.getUpdateManyMutation(),
         });
-        /*mutations.push({
+        mutations.push({
             name: "delete" + this.name,
-            field: this.getDeleteMutation(resolveFn),
-        });*/
+            field: this.getDeleteMutation(),
+        });
         return mutations;
-        // TODO delete
     }
     public getWhereArguments() {
         if (!this.whereArguments) {
@@ -301,12 +269,13 @@ class Model {
         this.attributes.map((attr) => {
             let type: AttributeType;
             if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
-                type = this.collector.get((attr as ModelAttribute).model).getPrimaryKeyAttribute().type;
+                type = AttributeTypes.ID;
             } else {
                 type = attr.type;
             }
             let graphqlType = scalarTypeToGraphQL(type);
-            if (attr.type !== AttributeTypes.Collection) {
+            // EQUALS
+            if (attr.type !== AttributeTypes.Collection && !attr.primaryKey && attr.name !== idArgName) {
                 args.push({
                     name: attr.name,
                     type: ArgumentTypes.Equal,
@@ -320,7 +289,8 @@ class Model {
                     graphQLType: graphqlType,
                 });
             }
-            if (attr.type !== AttributeTypes.Boolean) {
+            // IN
+            if (attr.type !== AttributeTypes.Collection && attr.type !== AttributeTypes.Boolean && !attr.primaryKey) {
                 args.push({
                     name: attr.name + "In",
                     type: ArgumentTypes.In,
@@ -334,28 +304,32 @@ class Model {
                     graphQLType: graphqlType,
                 });
             }
-            if (!attr.required) {
+            // IS NULL
+            if (attr.type !== AttributeTypes.Collection &&
+                !attr.required && !attr.primaryKey && attr.name !== idArgName) {
                 args.push({
                     name: attr.name + "IsNull",
                     type: ArgumentTypes.IsNull,
                     attribute: attr.name,
-                    graphQLType: graphqlType,
+                    graphQLType: GraphQLBoolean,
                 });
                 args.push({
                     name: attr.name + "IsNotNull",
                     type: ArgumentTypes.IsNotNull,
                     attribute: attr.name,
-                    graphQLType: graphqlType,
+                    graphQLType: GraphQLBoolean,
                 });
             }
-            whereArgHelpers[attr.type](attr).map((t) => {
-                args.push({
-                    attribute: attr.name,
-                    name: t.name,
-                    type: t.argumentType,
-                    graphQLType: t.type,
+            if (!attr.primaryKey) {
+                whereArgHelpers[attr.type](attr).map((t) => {
+                    args.push({
+                        attribute: attr.name,
+                        name: t.name,
+                        type: t.argumentType,
+                        graphQLType: t.type,
+                    });
                 });
-            });
+            }
         });
         return args;
     }
@@ -367,28 +341,15 @@ class Model {
             if (attr.type === AttributeTypes.Model) {
                 graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
                 resolve = (source, args, context, info) => {
-                    return this.resolveFn({
-                        args,
-                        context,
-                        info,
-                        model: (attr as ModelAttribute).model,
-                        parentModel: this.id,
-                        source,
-                        type: ResolveTypes.Model,
-                    });
+                    return this.collector.get(attr.model).resolveFn(this.id,
+                        ResolveTypes.Node,
+                        { source: source[attr.name], args, context, info });
                 };
             } else if (attr.type === AttributeTypes.Collection) {
                 graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
                 resolve = (source, args, context, info) => {
-                    return this.resolveFn({
-                        args,
-                        context,
-                        info,
-                        model: (attr as CollectionAttribute).model,
-                        parentModel: this.id,
-                        source,
-                        type: ResolveTypes.Connection,
-                    });
+                    return this.resolveFn(this.id, ResolveTypes.QueryConnection,
+                        { source: attr.name, args, context, info });
                 };
             } else {
                 graphQLType = scalarTypeToGraphQL(attr.type);
@@ -407,15 +368,19 @@ class Model {
     protected generateCreationType(): GraphQLInputObjectType {
         let fields: GraphQLInputFieldConfigMap = {};
         this.attributes.map((attr) => {
+            if (attr.name === idArgName) {
+                return;
+            }
             let graphQLType;
             if (attr.type === AttributeTypes.Model) {
                 const childModel = this.collector.get(attr.model);
-                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                graphQLType = GraphQLID;
+                // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
                 fields["create" + capitalize(attr.name)] = { type: childModel.getCreateType() };
             } else if (attr.type === AttributeTypes.Collection) {
                 const childModel = this.collector.get((attr as CollectionAttribute).model);
-                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
-                graphQLType = new GraphQLList(graphQLType);
+                // graphQLType = scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
+                graphQLType = new GraphQLList(GraphQLID);
                 fields["create" + capitalize(attr.name)] = {
                     type: new GraphQLList(childModel.getCreateType()),
                 };
@@ -425,7 +390,7 @@ class Model {
             fields[attr.name] = { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType };
         });
         return new GraphQLInputObjectType({
-            name: "Create" + this.name + "Input",
+            name: "Create" + capitalize(this.name) + "Input",
             fields,
         });
     }
@@ -435,11 +400,11 @@ class Model {
             let graphQLType;
             if (attr.type === AttributeTypes.Model) {
                 const childModel = this.collector.get(attr.model);
-                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                graphQLType = GraphQLID; // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
                 fields["create" + capitalize(attr.name)] = { type: childModel.getCreateType() };
             } else if (attr.type === AttributeTypes.Collection) {
                 const childModel = this.collector.get((attr as CollectionAttribute).model);
-                graphQLType = scalarTypeToGraphQL(childModel.getPrimaryKeyAttribute().type);
+                graphQLType = GraphQLID; // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
                 graphQLType = new GraphQLList(graphQLType);
                 fields["create" + capitalize(attr.name)] = {
                     type: new GraphQLList(childModel.getCreateType()),

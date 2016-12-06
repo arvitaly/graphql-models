@@ -8,9 +8,9 @@ const ResolveTypes = {
     QueryConnection: "queryConnection",
     MutationCreate: "mutationCreate",
     MutationUpdate: "mutationUpdate",
+    MutationUpdateMany: "mutationUpdateMany",
     MutationDelete: "mutationDelete",
-    SubscriptionOne: "subscriptionOne",
-    SubscriptionConnection: "subscriptionConnection",
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ResolveTypes;
+//# sourceMappingURL=ResolveTypes.js.map

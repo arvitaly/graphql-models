@@ -10,3 +10,6 @@ var Schema_1 = require("./Schema");
 exports.Schema = Schema_1.default;
 var ResolveTypes_1 = require("./ResolveTypes");
 exports.ResolveTypes = ResolveTypes_1.default;
+var Resolver_1 = require("./Resolver");
+exports.Resolver = Resolver_1.default;
+//# sourceMappingURL=index.js.map

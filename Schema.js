@@ -3,12 +3,9 @@ const graphql_1 = require("graphql");
 const graphql_relay_1 = require("graphql-relay");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Schema {
-    constructor(collection, resolveFn) {
+    constructor(collection, resolver) {
         this.collection = collection;
-        this.resolveFn = resolveFn;
-        this.collection.map((model) => {
-            model.setResolveFn(resolveFn);
-        });
+        this.resolver = resolver;
     }
     getQueries() {
         let queries = [];
@@ -41,13 +38,7 @@ class Schema {
                 viewer: {
                     type: this.getQueryViewerType(),
                     resolve: (source, args, context, info) => {
-                        return this.resolveFn({
-                            type: ResolveTypes_1.default.Viewer,
-                            source,
-                            args,
-                            context,
-                            info,
-                        });
+                        return this.resolver.resolve(null, ResolveTypes_1.default.Viewer, { source, args, context, info });
                     },
                 },
             },
@@ -61,14 +52,7 @@ class Schema {
     }
     getNodeType() {
         graphql_relay_1.nodeDefinitions((id, info) => {
-            return this.resolveFn({
-                type: "node",
-                model: null,
-                args: id,
-                source: null,
-                context: null,
-                info,
-            });
+            return this.resolver.resolve(null, ResolveTypes_1.default.Node, { source: id, args: null, context: null, info });
         }, (type) => {
             const t = type.replace(/Type$/gi, "");
             return this.collection.get(t.charAt(0) + t.substr(1)).getBaseType();
@@ -97,3 +81,4 @@ class Schema {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Schema;
+//# sourceMappingURL=Schema.js.map

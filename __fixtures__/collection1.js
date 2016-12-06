@@ -43,6 +43,7 @@ exports.animalModel = {
         }, {
             type: AttributeTypes_1.default.String,
             name: "name",
+            required: true,
         }, {
             type: AttributeTypes_1.default.Integer,
             name: "age",
@@ -60,3 +61,4 @@ exports.animalModel = {
 const models = [exports.postModel, exports.userModel, exports.animalModel];
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = new Collection_1.default(models);
+//# sourceMappingURL=collection1.js.map

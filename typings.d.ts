@@ -50,30 +50,20 @@ export type Attribute = AttributeConfig & {
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
 }
-export type ResolveType = "node" | "viewer" | "model" | "connection" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
-export type ResolveOpts = {
-    type: ResolveType;
-    model?: string;
-    parentModel?: string;
-    source: any;
-    where?: Argument[];
-    args: any;
-    context: any;
-    info: GraphQLResolveInfo;
+export type ResolveType = "node" | "viewer" | "model" | "connection" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationUpdateMany" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
+export type ResolveOpts = GraphQLResolveArgs & {
+
 }
-export type ResolveBaseOpts = {
-    type: ResolveType;
-    source: any;
-    context: any;
-    info: GraphQLResolveInfo;
+export type ModelID = string;
+export type ResolveFn = (model: ModelID, type: ResolveType, opts?: ResolveOpts) => any;
+
+export type GraphQLResolveArgs = {
+    source: any,
+    args: { [argName: string]: any },
+    context: any,
+    info: GraphQLResolveInfo
 }
-export type ResolveQueryOneOpts = ResolveBaseOpts & {
-    model: Model;
-    globalId: typeof GraphQLID;
-    id: any;
-}
-export type ResolveQueryOne = (opts: ResolveQueryOneOpts) => any;
-export type ResolveFn = (opts?: ResolveOpts) => any;
+
 
 export type Query = {
     name: string;
@@ -99,3 +89,8 @@ export type Argument = {
     attribute: string;
     graphQLType: GraphQLInputType
 }
+
+export type FindCriteria = {
+    where?: FindCriteriaWhere
+}
+export type FindCriteriaWhere = Argument[];

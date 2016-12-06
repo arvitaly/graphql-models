@@ -47,7 +47,7 @@ function printGraphQLInputObjectType(type) {
 }
 exports.printGraphQLInputObjectType = printGraphQLInputObjectType;
 function printGraphQLInputFieldMap(fields) {
-    return _(fields).map(printGraphQLInputField);
+    return _(fields, printGraphQLInputField);
 }
 exports.printGraphQLInputFieldMap = printGraphQLInputFieldMap;
 function printGraphQLObjectType(type) {
@@ -68,7 +68,7 @@ function printGraphQLInterfaceType(type) {
         type: "GraphQLInterfaceType",
         name: type.name,
         description: type.description,
-        fields: _(type.getFields()).map(printField),
+        fields: _(type.getFields(), printField),
         resolveType: typeof (type.resolveType),
     };
 }
@@ -117,7 +117,7 @@ function printGraphQLType(type) {
 }
 exports.printGraphQLType = printGraphQLType;
 function printGraphQLFieldConfigArgumentMap(args) {
-    return _(args).map(printGraphQLArgumentConfig);
+    return _(args, printGraphQLArgumentConfig);
 }
 exports.printGraphQLFieldConfigArgumentMap = printGraphQLFieldConfigArgumentMap;
 function printGraphQLArgumentConfig(arg) {
@@ -167,9 +167,25 @@ function printField(field) {
 }
 exports.printField = printField;
 ;
-function _(obj) {
+function printGraphQLSchema(schema) {
+    const queryType = schema.getQueryType();
+    const mutationType = schema.getMutationType();
+    const subscriptionType = schema.getSubscriptionType();
+    return {
+        directives: schema.getDirectives(),
+        mutationType: mutationType ? printGraphQLObjectType(mutationType) : undefined,
+        queryType: queryType ? printGraphQLObjectType(schema.getQueryType()) : undefined,
+        subscriptionType: subscriptionType ? printGraphQLObjectType(schema.getSubscriptionType()) : undefined,
+    };
+}
+exports.printGraphQLSchema = printGraphQLSchema;
+function _(obj, cb) {
     return Object.keys(obj).map((name) => {
-        return obj[name];
+        return {
+            name,
+            field: cb(obj[name]),
+        };
     });
 }
 ;
+//# sourceMappingURL=test-util.js.map

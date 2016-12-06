@@ -2,8 +2,8 @@ import {
     GraphQLArgumentConfig, GraphQLEnumType, GraphQLField, GraphQLFieldConfig,
     GraphQLFieldConfigArgumentMap, GraphQLInputField, GraphQLInputFieldMap, GraphQLInputObjectType,
     GraphQLInputType, GraphQLInterfaceType, GraphQLList,
-    GraphQLNonNull, GraphQLObjectType, GraphQLScalarType, GraphQLType,
-    GraphQLUnionType,
+    GraphQLNonNull, GraphQLObjectType, GraphQLScalarType, GraphQLSchema,
+    GraphQLType, GraphQLUnionType,
 } from "graphql";
 /*
     export type GraphQLInputType =
@@ -50,7 +50,7 @@ export function printGraphQLInputObjectType(type: GraphQLInputObjectType) {
     };
 }
 export function printGraphQLInputFieldMap(fields: GraphQLInputFieldMap) {
-    return _(fields).map(printGraphQLInputField);
+    return _(fields, printGraphQLInputField);
 }
 export function printGraphQLObjectType(type: GraphQLObjectType) {
     const fields = type.getFields();
@@ -69,7 +69,7 @@ export function printGraphQLInterfaceType(type: GraphQLInterfaceType) {
         type: "GraphQLInterfaceType",
         name: type.name,
         description: type.description,
-        fields: _(type.getFields()).map(printField),
+        fields: _(type.getFields(), printField),
         resolveType: typeof (type.resolveType),
     };
 }
@@ -116,7 +116,7 @@ export function printGraphQLType(type: GraphQLType) {
     }
 }
 export function printGraphQLFieldConfigArgumentMap(args: GraphQLFieldConfigArgumentMap) {
-    return _(args).map(printGraphQLArgumentConfig);
+    return _(args, printGraphQLArgumentConfig);
 }
 export function printGraphQLArgumentConfig(arg: GraphQLArgumentConfig) {
     return {
@@ -160,8 +160,22 @@ export function printField(field: GraphQLField<any, any>) {
         type: printGraphQLType(field.type),
     };
 };
-function _<T>(obj: { [index: string]: T }): T[] {
+export function printGraphQLSchema(schema: GraphQLSchema) {
+    const queryType = schema.getQueryType();
+    const mutationType = schema.getMutationType();
+    const subscriptionType = schema.getSubscriptionType();
+    return {
+        directives: schema.getDirectives(),
+        mutationType: mutationType ? printGraphQLObjectType(mutationType) : undefined,
+        queryType: queryType ? printGraphQLObjectType(schema.getQueryType()) : undefined,
+        subscriptionType: subscriptionType ? printGraphQLObjectType(schema.getSubscriptionType()) : undefined,
+    };
+}
+function _<T, F>(obj: { [index: string]: T }, cb: (field: T) => F): Array<{ name: string; field: F }> {
     return Object.keys(obj).map((name) => {
-        return obj[name];
+        return {
+            name,
+            field: cb(obj[name]),
+        };
     });
 };

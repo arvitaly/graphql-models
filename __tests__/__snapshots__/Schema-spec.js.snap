@@ -1,0 +1,167 @@
+exports[`Schema spec getGraphQLSchema 1`] = `
+Object {
+  "directives": Array [
+    GraphQLDirective {
+      "args": Array [
+        Object {
+          "defaultValue": undefined,
+          "description": "Included when true.",
+          "name": "if",
+          "type": "Boolean!",
+        },
+      ],
+      "description": "Directs the executor to include this field or fragment only when the \`if\` argument is true.",
+      "locations": Array [
+        "FIELD",
+        "FRAGMENT_SPREAD",
+        "INLINE_FRAGMENT",
+      ],
+      "name": "include",
+    },
+    GraphQLDirective {
+      "args": Array [
+        Object {
+          "defaultValue": undefined,
+          "description": "Skipped when true.",
+          "name": "if",
+          "type": "Boolean!",
+        },
+      ],
+      "description": "Directs the executor to skip this field or fragment when the \`if\` argument is true.",
+      "locations": Array [
+        "FIELD",
+        "FRAGMENT_SPREAD",
+        "INLINE_FRAGMENT",
+      ],
+      "name": "skip",
+    },
+    GraphQLDirective {
+      "args": Array [
+        Object {
+          "defaultValue": "No longer supported",
+          "description": "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted in [Markdown](https://daringfireball.net/projects/markdown/).",
+          "name": "reason",
+          "type": "String",
+        },
+      ],
+      "description": "Marks an element of a GraphQL schema as no longer supported.",
+      "locations": Array [
+        "FIELD_DEFINITION",
+        "ENUM_VALUE",
+      ],
+      "name": "deprecated",
+    },
+  ],
+  "mutationType": Object {
+    "description": undefined,
+    "fields": Array [
+      Object {
+        "args": Array [],
+        "deprecationReason": undefined,
+        "description": undefined,
+        "isDeprecated": false,
+        "name": "f2",
+        "resolve": "undefined",
+        "type": "String",
+      },
+    ],
+    "interfaces": Array [],
+    "name": "obj2",
+    "type": "GraphQLObjectType",
+  },
+  "queryType": Object {
+    "description": undefined,
+    "fields": Array [
+      Object {
+        "args": Array [],
+        "deprecationReason": undefined,
+        "description": undefined,
+        "isDeprecated": false,
+        "name": "f1",
+        "resolve": "undefined",
+        "type": "String",
+      },
+    ],
+    "interfaces": Array [],
+    "name": "obj1",
+    "type": "GraphQLObjectType",
+  },
+  "subscriptionType": undefined,
+}
+`;
+
+exports[`Schema spec getMutationType 1`] = `
+Object {
+  "description": undefined,
+  "fields": Array [
+    Object {
+      "args": Array [],
+      "deprecationReason": undefined,
+      "description": undefined,
+      "isDeprecated": false,
+      "name": "f1",
+      "resolve": "undefined",
+      "type": "String",
+    },
+  ],
+  "interfaces": Array [],
+  "name": "obj1",
+  "type": "GraphQLObjectType",
+}
+`;
+
+exports[`Schema spec getQueryType 1`] = `
+Object {
+  "description": undefined,
+  "fields": Array [
+    Object {
+      "args": Array [],
+      "deprecationReason": undefined,
+      "description": undefined,
+      "isDeprecated": false,
+      "name": "viewer",
+      "resolve": "function",
+      "type": Object {
+        "description": undefined,
+        "fields": Array [
+          Object {
+            "args": Array [],
+            "deprecationReason": undefined,
+            "description": undefined,
+            "isDeprecated": false,
+            "name": "f1",
+            "resolve": "undefined",
+            "type": "String",
+          },
+        ],
+        "interfaces": Array [],
+        "name": "obj1",
+        "type": "GraphQLObjectType",
+      },
+    },
+  ],
+  "interfaces": Array [],
+  "name": "Query",
+  "type": "GraphQLObjectType",
+}
+`;
+
+exports[`Schema spec getQueryViewerType 1`] = `
+Object {
+  "description": undefined,
+  "fields": Array [
+    Object {
+      "args": Array [],
+      "deprecationReason": undefined,
+      "description": undefined,
+      "isDeprecated": false,
+      "name": "f1",
+      "resolve": "undefined",
+      "type": "String",
+    },
+  ],
+  "interfaces": Array [],
+  "name": "QueryViewer",
+  "type": "GraphQLObjectType",
+}
+`;
