@@ -1,1 +1,0 @@
-{"version":3,"file":"AttributeTypes.js","sourceRoot":"","sources":["AttributeTypes.ts"],"names":[],"mappings":";AAAA,MAAM,cAAc,GAAG;IACnB,OAAO,EAAE,SAAsB;IAC/B,UAAU,EAAE,YAA4B;IACxC,IAAI,EAAE,MAAgB;IACtB,KAAK,EAAE,OAAkB;IACzB,EAAE,EAAE,IAAY;IAChB,OAAO,EAAE,SAAsB;IAC/B,KAAK,EAAE,OAAkB;IACzB,MAAM,EAAE,QAAoB;CAC/B,CAAC;AACF;kBAAe,cAAc,CAAC"}
