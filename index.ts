@@ -1,3 +1,4 @@
+export { default as Adapter } from "./Adapter";
 export { default as AttributeTypes } from "./AttributeTypes";
 export { default as Collection } from "./Collection";
 export { default as Model, whereArgName } from "./Model";

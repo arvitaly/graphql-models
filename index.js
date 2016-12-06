@@ -1,4 +1,6 @@
 "use strict";
+var Adapter_1 = require("./Adapter");
+exports.Adapter = Adapter_1.default;
 var AttributeTypes_1 = require("./AttributeTypes");
 exports.AttributeTypes = AttributeTypes_1.default;
 var Collection_1 = require("./Collection");
