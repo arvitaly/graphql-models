@@ -10,16 +10,13 @@ import ResolveTypes from "./ResolveTypes";
 import { Callbacks, FindCriteria, ModelID, ResolveOpts, ResolveType, SubscriptionID } from "./typings";
 class Resolver {
     public collection: Collection;
-    protected subscribes: Array<{
-        modelId: ModelID;
-        globalId: string;
-        subscriptionId: SubscriptionID;
-    }> = [];
-    protected findSubscribes: Array<{
-        modelId: ModelID;
-        findCriteria: FindCriteria;
-        subscriptionId: SubscriptionID;
-    }> = [];
+    protected subscribes: {
+        [index: string]: {
+            modelId: string;
+            ids: string[];
+            findCriteria?: FindCriteria;
+        };
+    } = {};
     constructor(public adapter: Adapter, protected callbacks: Callbacks, public publisher: Publisher) {
 
     }
@@ -29,43 +26,44 @@ class Resolver {
             this.callbacks.onUpdate(model.id, (updated) => {
                 const globalId = toGlobalId(model.getNameForGlobalId(),
                     updated[model.getPrimaryKeyAttribute().realName]);
-                let subscribes = this.subscribes.filter((subscribe) => {
-                    return subscribe.modelId === model.id && subscribe.globalId === globalId;
-                });
-                if (subscribes.length === 0) {
-                    const newSubscribes = this.findSubscribes.filter((subscribe) => {
-                        return this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
-                    }).map((subscribe) => {
-                        return {
-                            globalId,
-                            modelId: model.id,
-                            subscriptionId: subscribe.subscriptionId,
-                        };
-                    });
-                    if (newSubscribes.length > 0) {
-                        this.subscribes = this.subscribes.concat(newSubscribes);
-                        subscribes = subscribes.concat(newSubscribes);
+                Object.keys(this.subscribes).map((subscriptionId) => {
+                    const subscribe = this.subscribes[subscriptionId];
+                    if (subscribe.findCriteria) {
+                        const isCriteriaEqual = this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
+                        const isExists = subscribe.ids.indexOf(globalId) > -1;
+                        if (isExists && isCriteriaEqual) {
+                            // publish update
+                            this.publisher.publishUpdate(subscriptionId, model.id, updated);
+                        }
+                        if (isExists && !isCriteriaEqual) {
+                            // publish remove
+                            this.publisher.publishRemove(subscriptionId, model.id, updated);
+                        }
+                        if (!isExists && isCriteriaEqual) {
+                            // publish add
+                            this.publisher.publishAdd(subscriptionId, model.id, updated);
+                        }
+                    } else {
+                        if (globalId === subscribe.ids[0]) {
+                            // publish update
+                            this.publisher.publishUpdate(subscriptionId, model.id, updated);
+                        }
                     }
-                }
-                subscribes.map((subscribe) => {
-                    this.publisher.publishUpdate(subscribe.subscriptionId, model.id, updated);
                 });
             });
             this.callbacks.onCreate(model.id, (created) => {
                 const globalId = toGlobalId(model.getNameForGlobalId(),
                     created[model.getPrimaryKeyAttribute().realName]);
-                const newSubscribes = this.findSubscribes.filter((subscribe) => {
-                    return this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
-                }).map((subscribe) => {
-                    return {
-                        globalId,
-                        modelId: model.id,
-                        subscriptionId: subscribe.subscriptionId,
-                    };
-                });
-                this.subscribes = this.subscribes.concat(newSubscribes);
-                newSubscribes.map((subscribe) => {
-                    this.publisher.publishCreate(subscribe.subscriptionId, model.id, created);
+                Object.keys(this.subscribes).map((subscriptionId) => {
+                    const subscribe = this.subscribes[subscriptionId];
+                    if (!subscribe.findCriteria) {
+                        return;
+                    }
+                    const isCriteriaEqual = this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                    if (isCriteriaEqual) {
+                        // publish add
+                        this.publisher.publishAdd(subscriptionId, model.id, created);
+                    }
                 });
             });
         });
@@ -183,11 +181,10 @@ class Resolver {
     resolveMutationUpdateMany();
     resolveMutationDelete();*/
     public subscribeOne(subscriptionId: string, modelId: ModelID, globalId: string, opts: ResolveOpts) {
-        this.subscribes.push({
-            globalId,
+        this.subscribes[subscriptionId] = {
             modelId,
-            subscriptionId,
-        });
+            ids: [globalId],
+        };
     }
     public subscribeConnection(
         subscriptionId: string,
@@ -195,18 +192,11 @@ class Resolver {
         ids: string[],
         findCriteria: FindCriteria,
         opts: ResolveOpts) {
-        this.subscribes = this.subscribes.concat(ids.map((globalId) => {
-            return {
-                modelId,
-                globalId,
-                subscriptionId,
-            };
-        }));
-        this.findSubscribes.push({
+        this.subscribes[subscriptionId] = {
+            ids,
             findCriteria,
             modelId,
-            subscriptionId,
-        });
+        };
     }
     protected equalRowToFindCriteria(modelId: ModelID, row: any, findCriteria: FindCriteria) {
         // if all criteria not false

@@ -8,50 +8,51 @@ class Resolver {
         this.adapter = adapter;
         this.callbacks = callbacks;
         this.publisher = publisher;
-        this.subscribes = [];
-        this.findSubscribes = [];
+        this.subscribes = {};
     }
     setCollection(coll) {
         this.collection = coll;
         this.collection.map((model) => {
             this.callbacks.onUpdate(model.id, (updated) => {
                 const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]);
-                let subscribes = this.subscribes.filter((subscribe) => {
-                    return subscribe.modelId === model.id && subscribe.globalId === globalId;
-                });
-                if (subscribes.length === 0) {
-                    const newSubscribes = this.findSubscribes.filter((subscribe) => {
-                        return this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
-                    }).map((subscribe) => {
-                        return {
-                            globalId,
-                            modelId: model.id,
-                            subscriptionId: subscribe.subscriptionId,
-                        };
-                    });
-                    if (newSubscribes.length > 0) {
-                        this.subscribes = this.subscribes.concat(newSubscribes);
-                        subscribes = subscribes.concat(newSubscribes);
+                Object.keys(this.subscribes).map((subscriptionId) => {
+                    const subscribe = this.subscribes[subscriptionId];
+                    if (subscribe.findCriteria) {
+                        const isCriteriaEqual = this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
+                        const isExists = subscribe.ids.indexOf(globalId) > -1;
+                        if (isExists && isCriteriaEqual) {
+                            // publish update
+                            this.publisher.publishUpdate(subscriptionId, model.id, updated);
+                        }
+                        if (isExists && !isCriteriaEqual) {
+                            // publish remove
+                            this.publisher.publishRemove(subscriptionId, model.id, updated);
+                        }
+                        if (!isExists && isCriteriaEqual) {
+                            // publish add
+                            this.publisher.publishAdd(subscriptionId, model.id, updated);
+                        }
                     }
-                }
-                subscribes.map((subscribe) => {
-                    this.publisher.publishUpdate(subscribe.subscriptionId, model.id, updated);
+                    else {
+                        if (globalId === subscribe.ids[0]) {
+                            // publish update
+                            this.publisher.publishUpdate(subscriptionId, model.id, updated);
+                        }
+                    }
                 });
             });
             this.callbacks.onCreate(model.id, (created) => {
                 const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), created[model.getPrimaryKeyAttribute().realName]);
-                const newSubscribes = this.findSubscribes.filter((subscribe) => {
-                    return this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
-                }).map((subscribe) => {
-                    return {
-                        globalId,
-                        modelId: model.id,
-                        subscriptionId: subscribe.subscriptionId,
-                    };
-                });
-                this.subscribes = this.subscribes.concat(newSubscribes);
-                newSubscribes.map((subscribe) => {
-                    this.publisher.publishCreate(subscribe.subscriptionId, model.id, created);
+                Object.keys(this.subscribes).map((subscriptionId) => {
+                    const subscribe = this.subscribes[subscriptionId];
+                    if (!subscribe.findCriteria) {
+                        return;
+                    }
+                    const isCriteriaEqual = this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                    if (isCriteriaEqual) {
+                        // publish add
+                        this.publisher.publishAdd(subscriptionId, model.id, created);
+                    }
                 });
             });
         });
@@ -168,25 +169,17 @@ class Resolver {
     resolveMutationUpdateMany();
     resolveMutationDelete();*/
     subscribeOne(subscriptionId, modelId, globalId, opts) {
-        this.subscribes.push({
-            globalId,
+        this.subscribes[subscriptionId] = {
             modelId,
-            subscriptionId,
-        });
+            ids: [globalId],
+        };
     }
     subscribeConnection(subscriptionId, modelId, ids, findCriteria, opts) {
-        this.subscribes = this.subscribes.concat(ids.map((globalId) => {
-            return {
-                modelId,
-                globalId,
-                subscriptionId,
-            };
-        }));
-        this.findSubscribes.push({
+        this.subscribes[subscriptionId] = {
+            ids,
             findCriteria,
             modelId,
-            subscriptionId,
-        });
+        };
     }
     equalRowToFindCriteria(modelId, row, findCriteria) {
         // if all criteria not false

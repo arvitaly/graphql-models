@@ -56,6 +56,7 @@ function createAnimal() {
     };
 }
 exports.createAnimal = createAnimal;
+const subscribers = [];
 // tslint:disable max-classes-per-file
 class DataAdapter extends Adapter_1.default {
     create(modelId, row) {
@@ -100,7 +101,6 @@ class DataAdapter extends Adapter_1.default {
     }
 }
 exports.DataAdapter = DataAdapter;
-const subscribers = [];
 exports.callbacks = {
     onUpdate: (modelId, cb) => {
         subscribers.push({
@@ -125,12 +125,6 @@ exports.callbacks = {
     },
 };
 class DataPublisher extends Publisher_1.default {
-    publishCreate(subscriptionId, modelId, created) {
-        throw new Error("Not implemented publishUpdateOne");
-    }
-    publishUpdate(subscriptionId, modelId, updates) {
-        throw new Error("Not implemented publishUpdateOne");
-    }
 }
 exports.publisher = new DataPublisher();
 //# sourceMappingURL=data.js.map

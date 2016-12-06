@@ -1,10 +1,13 @@
 "use strict";
 class Publisher {
-    publishCreate(subscriptionId, modelId, created) {
-        throw new Error("Not implemented publishUpdateOne");
+    publishAdd(subscriptionId, modelId, created) {
+        throw new Error("Not implemented publishAdd");
+    }
+    publishRemove(subscriptionId, modelId, created) {
+        throw new Error("Not implemented publishRemove");
     }
     publishUpdate(subscriptionId, modelId, updated) {
-        throw new Error("Not implemented publishUpdateOne");
+        throw new Error("Not implemented publishUpdate");
     }
 }
 Object.defineProperty(exports, "__esModule", { value: true });

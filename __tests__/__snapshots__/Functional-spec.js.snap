@@ -48,6 +48,55 @@ Object {
 }
 `;
 
+exports[`Functional tests subscribe connection 1`] = `
+Object {
+  "data": Object {
+    "viewer": Object {
+      "animals": Object {
+        "edges": Array [
+          Object {
+            "node": Object {
+              "name": "Felix",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`Functional tests subscribe connection 2`] = `
+Array [
+  Array [
+    "123",
+    "animal",
+    Object {
+      "Weight": 10.1,
+      "age": 6,
+      "birthday": 2010-11-10T17:00:00.000Z,
+      "id": 1,
+      "isCat": false,
+      "name": "testn",
+    },
+  ],
+]
+`;
+
+exports[`Functional tests subscribe connection 3`] = `Array []`;
+
+exports[`Functional tests subscribe connection 4`] = `
+Array [
+  Array [
+    "123",
+    "animal",
+    Object {
+      "name": "axz",
+    },
+  ],
+]
+`;
+
 exports[`Functional tests subscribe one 1`] = `
 Object {
   "data": Object {
