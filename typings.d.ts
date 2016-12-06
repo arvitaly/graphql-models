@@ -95,3 +95,9 @@ export type FindCriteria = {
     where?: FindCriteriaWhere
 }
 export type FindCriteriaWhere = Argument[];
+
+export interface Callbacks {
+    onUpdate(modelId: string, cb: (updated) => any): any;
+    onCreate(modelId: string, cb: (created) => any): any;
+    onDelete(modelId: string, cb: (deleted) => any): any;
+}

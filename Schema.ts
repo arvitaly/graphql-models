@@ -49,7 +49,7 @@ class Schema {
                         return this.resolver.resolve(null, ResolveTypes.Viewer, { source, args, context, info });
                     },
                 },
-            }
+            },
         });
     }
     public getMutationType() {

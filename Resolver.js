@@ -3,8 +3,9 @@ const graphql_relay_1 = require("graphql-relay");
 const Model_1 = require("./Model");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Resolver {
-    constructor(adapter) {
+    constructor(adapter, subscriber) {
         this.adapter = adapter;
+        this.subscriber = subscriber;
     }
     setCollection(coll) {
         this.collection = coll;
@@ -40,17 +41,24 @@ class Resolver {
         return {};
     }
     resolveQueryOne(modelId, opts) {
-        const result = this.adapter.findOne(modelId, graphql_relay_1.fromGlobalId(opts.args[Model_1.idArgName]).id);
+        const id = graphql_relay_1.fromGlobalId(opts.args[Model_1.idArgName]).id;
+        const model = this.collection.get(modelId);
+        const result = this.adapter.findOne(modelId, id);
         if (!result) {
             return null;
+        }
+        if (opts.context.subscriptionId) {
+            this.subscriber.subscribeOne(opts.context.subscriptionId, model, id, opts);
         }
         return this.prepareRow(modelId, result);
     }
     resolveQueryConnection(modelId, opts) {
-        let findCriteria = this.argsToFindCriteria(modelId, opts.args);
-        const result = this.adapter.findMany(modelId, findCriteria);
-        if (!result || result.length === 0) {
-            return {
+        const model = this.collection.get(modelId);
+        const findCriteria = this.argsToFindCriteria(modelId, opts.args);
+        const rows = this.adapter.findMany(modelId, findCriteria);
+        let result;
+        if (!rows || rows.length === 0) {
+            result = {
                 edges: [],
                 pageInfo: {
                     hasNextPage: false,
@@ -60,21 +68,27 @@ class Resolver {
                 },
             };
         }
-        const edges = result.map((row) => {
-            return {
-                cursor: null,
-                node: this.prepareRow(modelId, row),
+        else {
+            const edges = rows.map((row) => {
+                return {
+                    cursor: null,
+                    node: this.prepareRow(modelId, row),
+                };
+            });
+            result = {
+                edges,
+                pageInfo: {
+                    hasNextPage: this.adapter.hasNextPage(modelId, findCriteria),
+                    hasPreviousPage: this.adapter.hasPreviousPage(modelId, findCriteria),
+                    startCursor: edges[0].node.id,
+                    endCursor: edges[edges.length - 1].node.id,
+                },
             };
-        });
-        return {
-            edges,
-            pageInfo: {
-                hasNextPage: this.adapter.hasNextPage(modelId, findCriteria),
-                hasPreviousPage: this.adapter.hasPreviousPage(modelId, findCriteria),
-                startCursor: edges[0].node.id,
-                endCursor: edges[edges.length - 1].node.id,
-            },
-        };
+        }
+        if (opts.context.subscriptionId) {
+            this.subscriber.subscribeConnection(opts.context.subscriptionId, model, findCriteria, opts);
+        }
+        return result;
     }
     resolveModel(modelId, opts) {
         return this.resolveNode(modelId, opts);

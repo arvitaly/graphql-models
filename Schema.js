@@ -44,7 +44,7 @@ class Schema {
                         return this.resolver.resolve(null, ResolveTypes_1.default.Viewer, { source, args, context, info });
                     },
                 },
-            }
+            },
         });
     }
     getMutationType() {

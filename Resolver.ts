@@ -4,10 +4,11 @@ import Adapter from "./Adapter";
 import Collection from "./Collection";
 import Model, { idArgName } from "./Model";
 import ResolveTypes from "./ResolveTypes";
+import Subscriber from "./Subscriber";
 import { FindCriteria, ModelID, ResolveOpts, ResolveType } from "./typings";
 class Resolver {
     public collection: Collection;
-    constructor(public adapter: Adapter) {
+    constructor(public adapter: Adapter, public subscriber: Subscriber) {
 
     }
     public setCollection(coll: Collection) {
@@ -44,17 +45,24 @@ class Resolver {
         return {};
     }
     public resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
-        const result = this.adapter.findOne(modelId, fromGlobalId(opts.args[idArgName]).id);
+        const id = fromGlobalId(opts.args[idArgName]).id;
+        const model = this.collection.get(modelId);
+        const result = this.adapter.findOne(modelId, id);
         if (!result) {
             return null;
+        }
+        if (opts.context.subscriptionId) {
+            this.subscriber.subscribeOne(opts.context.subscriptionId, model, id, opts);
         }
         return this.prepareRow(modelId, result);
     }
     public resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Connection<any> {
-        let findCriteria: FindCriteria = this.argsToFindCriteria(modelId, opts.args);
-        const result = this.adapter.findMany(modelId, findCriteria);
-        if (!result || result.length === 0) {
-            return {
+        const model = this.collection.get(modelId);
+        const findCriteria: FindCriteria = this.argsToFindCriteria(modelId, opts.args);
+        const rows = this.adapter.findMany(modelId, findCriteria);
+        let result: Connection<any>;
+        if (!rows || rows.length === 0) {
+            result = {
                 edges: [],
                 pageInfo: {
                     hasNextPage: false,
@@ -63,22 +71,27 @@ class Resolver {
                     startCursor: undefined,
                 },
             };
-        }
-        const edges = result.map((row) => {
-            return {
-                cursor: null,
-                node: this.prepareRow(modelId, row),
+        } else {
+            const edges = rows.map((row) => {
+                return {
+                    cursor: null,
+                    node: this.prepareRow(modelId, row),
+                };
+            });
+            result = {
+                edges,
+                pageInfo: {
+                    hasNextPage: this.adapter.hasNextPage(modelId, findCriteria),
+                    hasPreviousPage: this.adapter.hasPreviousPage(modelId, findCriteria),
+                    startCursor: edges[0].node.id,
+                    endCursor: edges[edges.length - 1].node.id,
+                },
             };
-        });
-        return {
-            edges,
-            pageInfo: {
-                hasNextPage: this.adapter.hasNextPage(modelId, findCriteria),
-                hasPreviousPage: this.adapter.hasPreviousPage(modelId, findCriteria),
-                startCursor: edges[0].node.id,
-                endCursor: edges[edges.length - 1].node.id,
-            },
-        };
+        }
+        if (opts.context.subscriptionId) {
+            this.subscriber.subscribeConnection(opts.context.subscriptionId, model, findCriteria, opts);
+        }
+        return result;
     }
     public resolveModel(modelId: ModelID, opts: ResolveOpts) {
         return this.resolveNode(modelId, opts);
