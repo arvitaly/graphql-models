@@ -1,12 +1,12 @@
 "use strict";
 class Publisher {
-    publishAdd(subscriptionId, modelId, created) {
+    publishAdd(subscriptionId, modelId, created, context) {
         throw new Error("Not implemented publishAdd");
     }
-    publishRemove(subscriptionId, modelId, created) {
+    publishRemove(subscriptionId, modelId, created, context) {
         throw new Error("Not implemented publishRemove");
     }
-    publishUpdate(subscriptionId, modelId, updated) {
+    publishUpdate(subscriptionId, modelId, updated, context) {
         throw new Error("Not implemented publishUpdate");
     }
 }
