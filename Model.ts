@@ -267,7 +267,7 @@ class Model {
         return this.whereArguments;
     }
     public getNameForGlobalId() {
-        return capitalize(this.id);
+        return capitalize(this.name);
     }
     public prepareRow(row) {
         if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
