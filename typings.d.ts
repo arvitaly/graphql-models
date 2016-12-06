@@ -2,6 +2,7 @@ import {
     GraphQLID, GraphQLInputFieldConfig, GraphQLInterfaceType, GraphQLObjectType, GraphQLResolveInfo,
     GraphQLFieldConfig, GraphQLInputType,
 } from "graphql";
+import { ConnectionArguments } from "graphql-relay";
 import Model from "./model";
 export interface ModelConfig {
     id: string;
@@ -92,7 +93,7 @@ export type Argument = {
     value?: any;
 }
 
-export type FindCriteria = {
+export type FindCriteria = ConnectionArguments & {
     where?: FindCriteriaWhere
 }
 export type FindCriteriaWhere = Argument[];
