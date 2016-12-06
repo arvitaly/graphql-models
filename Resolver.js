@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments)).next());
+    });
+};
 const graphql_relay_1 = require("graphql-relay");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const Model_1 = require("./Model");
@@ -100,63 +108,67 @@ class Resolver {
         return model.prepareRow(result);
     }
     resolveQueryConnection(modelId, opts) {
-        const model = this.collection.get(modelId);
-        const findCriteria = this.argsToFindCriteria(modelId, opts.args);
-        const rows = this.adapter.findMany(modelId, findCriteria);
-        let result;
-        if (!rows || rows.length === 0) {
-            result = {
-                edges: [],
-                pageInfo: {
-                    hasNextPage: false,
-                    hasPreviousPage: false,
-                    endCursor: undefined,
-                    startCursor: undefined,
-                },
-            };
-        }
-        else {
-            const edges = rows.map((row) => {
-                return {
-                    cursor: null,
-                    node: model.prepareRow(row),
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.collection.get(modelId);
+            const findCriteria = this.argsToFindCriteria(modelId, opts.args);
+            const rows = yield this.adapter.findMany(modelId, findCriteria);
+            let result;
+            if (!rows || rows.length === 0) {
+                result = {
+                    edges: [],
+                    pageInfo: {
+                        hasNextPage: false,
+                        hasPreviousPage: false,
+                        endCursor: undefined,
+                        startCursor: undefined,
+                    },
                 };
-            });
-            result = {
-                edges,
-                pageInfo: {
-                    hasNextPage: this.adapter.hasNextPage(modelId, findCriteria),
-                    hasPreviousPage: this.adapter.hasPreviousPage(modelId, findCriteria),
-                    startCursor: edges[0].node.id,
-                    endCursor: edges[edges.length - 1].node.id,
-                },
-            };
-        }
-        if (opts.context && opts.context.subscriptionId) {
-            this.subscribeConnection(opts.context.subscriptionId, modelId, result.edges.map((r) => { return r.node.id; }), findCriteria, opts);
-        }
-        return result;
+            }
+            else {
+                const edges = rows.map((row) => {
+                    return {
+                        cursor: null,
+                        node: model.prepareRow(row),
+                    };
+                });
+                result = {
+                    edges,
+                    pageInfo: {
+                        hasNextPage: yield this.adapter.hasNextPage(modelId, findCriteria),
+                        hasPreviousPage: yield this.adapter.hasPreviousPage(modelId, findCriteria),
+                        startCursor: edges[0].node.id,
+                        endCursor: edges[edges.length - 1].node.id,
+                    },
+                };
+            }
+            if (opts.context && opts.context.subscriptionId) {
+                this.subscribeConnection(opts.context.subscriptionId, modelId, result.edges.map((r) => { return r.node.id; }), findCriteria, opts);
+            }
+            return result;
+        });
     }
     resolveModel(modelId, opts) {
         return this.resolveNode(modelId, opts);
     }
     resolveConnection(modelId, opts) {
-        const rows = this.adapter.populate(modelId, opts.source);
-        const edges = rows.map((row) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const rows = yield this.adapter.populate(modelId, opts.source);
+            const edges = rows.map((row) => {
+                return {
+                    cursor: null,
+                    node: this.collection.get(modelId).prepareRow(row),
+                };
+            });
             return {
-                cursor: null,
-                node: this.collection.get(modelId).prepareRow(row),
+                edges,
+                pageInfo: {
+                    hasNextPage: false,
+                    hasPreviousPage: false,
+                    startCursor: edges[0].node.id,
+                    endCursor: edges[edges.length - 1].node.id,
+                },
             };
         });
-        return {
-            edges,
-            pageInfo: {
-                hasNextPage: false,
-                hasPreviousPage: false,
-                startCursor: edges[0].node.id,
-                endCursor: edges[edges.length - 1].node.id,
-            },
-        };
     }
     resolveMutationCreate(modelId, opts) {
         // TODO

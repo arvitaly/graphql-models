@@ -111,10 +111,10 @@ class Resolver {
         }
         return model.prepareRow(result);
     }
-    public resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Connection<any> {
+    public async resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
         const model = this.collection.get(modelId);
         const findCriteria: FindCriteria = this.argsToFindCriteria(modelId, opts.args);
-        const rows = this.adapter.findMany(modelId, findCriteria);
+        const rows = await this.adapter.findMany(modelId, findCriteria);
         let result: Connection<any>;
         if (!rows || rows.length === 0) {
             result = {
@@ -136,8 +136,8 @@ class Resolver {
             result = {
                 edges,
                 pageInfo: {
-                    hasNextPage: this.adapter.hasNextPage(modelId, findCriteria),
-                    hasPreviousPage: this.adapter.hasPreviousPage(modelId, findCriteria),
+                    hasNextPage: await this.adapter.hasNextPage(modelId, findCriteria),
+                    hasPreviousPage: await this.adapter.hasPreviousPage(modelId, findCriteria),
                     startCursor: edges[0].node.id,
                     endCursor: edges[edges.length - 1].node.id,
                 },
@@ -153,8 +153,8 @@ class Resolver {
     public resolveModel(modelId: ModelID, opts: ResolveOpts) {
         return this.resolveNode(modelId, opts);
     }
-    public resolveConnection(modelId: ModelID, opts: ResolveOpts): Connection<any> {
-        const rows = this.adapter.populate(modelId, opts.source);
+    public async resolveConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
+        const rows = await this.adapter.populate(modelId, opts.source);
         const edges = rows.map((row) => {
             return {
                 cursor: null,
