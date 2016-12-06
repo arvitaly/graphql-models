@@ -25,7 +25,7 @@ import { AttributeType, ModelAttribute, Queries } from "./../typings";
 const animalModel = collection1.get("animal");
 const postModel = collection1.get("post");
 const userModel = collection1.get("user");
-xdescribe("Model spec", () => {
+describe("Model spec", () => {
     it("getPrimaryAttribute, when not exists primary key, should throw error", () => {
         const m1 = new Model({
             id: "m1",
@@ -129,6 +129,7 @@ xdescribe("Model spec", () => {
             expect(printGraphQLFieldConfig(animalSingleQuery)).toMatchSnapshot();
             animalSingleQuery.resolve("f1", "f2" as any, "f3", "f4" as any);
             expect(resolveFn.calls.allArgs()).toEqual([[
+                "animal",
                 ResolveTypes.QueryOne,
                 {
                     source: "f1",
@@ -142,6 +143,7 @@ xdescribe("Model spec", () => {
             expect(printGraphQLFieldConfig(queryConnection)).toMatchSnapshot();
             queryConnection.resolve("f1", "f2" as any, "f3", "f4" as any);
             expect(resolveFn.calls.allArgs()).toEqual([[
+                "animal",
                 ResolveTypes.QueryConnection,
                 {
                     source: "f1",
@@ -180,12 +182,14 @@ xdescribe("Model spec", () => {
             resolveFn.and.returnValue(result);
             const mutationResut = await createMutation.resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
-            expect(resolveFn.calls.allArgs()).toEqual([[ResolveTypes.MutationCreate, {
-                args: args.input,
-                source: null,
-                context: "f3",
-                info: null,
-            }]]);
+            expect(resolveFn.calls.allArgs()).toEqual([[
+                "animal",
+                ResolveTypes.MutationCreate, {
+                    args: args.input,
+                    source: null,
+                    context: "f3",
+                    info: null,
+                }]]);
         });
         it("update mutation", async () => {
             const updateMutation = animalModel.getUpdateMutation();
@@ -195,12 +199,14 @@ xdescribe("Model spec", () => {
             resolveFn.and.returnValue(result);
             const mutationResut = await updateMutation.resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
-            expect(resolveFn.calls.allArgs()).toEqual([[ResolveTypes.MutationUpdate, {
-                args: args.input,
-                source: null,
-                context: "f3",
-                info: null,
-            }]]);
+            expect(resolveFn.calls.allArgs()).toEqual([[
+                "animal",
+                ResolveTypes.MutationUpdate, {
+                    args: args.input,
+                    source: null,
+                    context: "f3",
+                    info: null,
+                }]]);
         });
         it("update many mutation", async () => {
             const updateManyMutation = animalModel.getUpdateManyMutation();
@@ -210,12 +216,14 @@ xdescribe("Model spec", () => {
             resolveFn.and.returnValue(result);
             const mutationResut = await updateManyMutation.resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
-            expect(resolveFn.calls.allArgs()).toEqual([[ResolveTypes.MutationUpdateMany, {
-                args: args.input,
-                source: null,
-                context: "f3",
-                info: null,
-            }]]);
+            expect(resolveFn.calls.allArgs()).toEqual([[
+                "animal",
+                ResolveTypes.MutationUpdateMany, {
+                    args: args.input,
+                    source: null,
+                    context: "f3",
+                    info: null,
+                }]]);
         });
         it("delete mutation", async () => {
             const deleteMutation = animalModel.getDeleteMutation();
@@ -225,12 +233,14 @@ xdescribe("Model spec", () => {
             resolveFn.and.returnValue(result);
             const mutationResut = await deleteMutation.resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
-            expect(resolveFn.calls.allArgs()).toEqual([[ResolveTypes.MutationDelete, {
-                args: args.input,
-                source: null,
-                context: "f3",
-                info: null,
-            }]]);
+            expect(resolveFn.calls.allArgs()).toEqual([[
+                "animal",
+                ResolveTypes.MutationDelete, {
+                    args: args.input,
+                    source: null,
+                    context: "f3",
+                    info: null,
+                }]]);
         });
         it("getAllMutations", () => {
             const getCreateMutationSpy = spyOn(animalModel, "getCreateMutation").and.returnValue("f1");

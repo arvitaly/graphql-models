@@ -5,7 +5,7 @@ import { AttributeTypes, Collection, ResolveOpts, Resolver, ResolveTypes, Schema
 import { animalModel, postModel, userModel } from "./../__fixtures__/collection1";
 import { callbacks, createAnimal, DataAdapter, publisher } from "./../__fixtures__/data";
 const animalId1 = toGlobalId("Animal", "1");
-fdescribe("Functional tests", () => {
+describe("Functional tests", () => {
     let adapter: DataAdapter;
     let resolver: Resolver;
     let schema: Schema;

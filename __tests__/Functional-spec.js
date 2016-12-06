@@ -14,7 +14,7 @@ const __1 = require("./..");
 const collection1_1 = require("./../__fixtures__/collection1");
 const data_1 = require("./../__fixtures__/data");
 const animalId1 = graphql_relay_1.toGlobalId("Animal", "1");
-fdescribe("Functional tests", () => {
+describe("Functional tests", () => {
     let adapter;
     let resolver;
     let schema;
