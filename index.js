@@ -12,4 +12,6 @@ var ResolveTypes_1 = require("./ResolveTypes");
 exports.ResolveTypes = ResolveTypes_1.default;
 var Resolver_1 = require("./Resolver");
 exports.Resolver = Resolver_1.default;
+var Publisher_1 = require("./Publisher");
+exports.Publisher = Publisher_1.default;
 //# sourceMappingURL=index.js.map

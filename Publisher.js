@@ -1,9 +1,9 @@
 "use strict";
 class Publisher {
-    publishCreate(subscriptionId, model, created) {
+    publishCreate(subscriptionId, modelId, created) {
         throw new Error("Not implemented publishUpdateOne");
     }
-    publishUpdate(subscriptionId, model, updated) {
+    publishUpdate(subscriptionId, modelId, updated) {
         throw new Error("Not implemented publishUpdateOne");
     }
 }

@@ -1,14 +1,60 @@
 "use strict";
 const graphql_relay_1 = require("graphql-relay");
+const ArgumentTypes_1 = require("./ArgumentTypes");
 const Model_1 = require("./Model");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Resolver {
-    constructor(adapter, subscriber) {
+    constructor(adapter, callbacks, publisher) {
         this.adapter = adapter;
-        this.subscriber = subscriber;
+        this.callbacks = callbacks;
+        this.publisher = publisher;
+        this.subscribes = [];
+        this.findSubscribes = [];
     }
     setCollection(coll) {
         this.collection = coll;
+        this.collection.map((model) => {
+            this.callbacks.onUpdate(model.id, (updated) => {
+                const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]);
+                let subscribes = this.subscribes.filter((subscribe) => {
+                    return subscribe.modelId === model.id && subscribe.globalId === globalId;
+                });
+                if (subscribes.length === 0) {
+                    const newSubscribes = this.findSubscribes.filter((subscribe) => {
+                        return this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
+                    }).map((subscribe) => {
+                        return {
+                            globalId,
+                            modelId: model.id,
+                            subscriptionId: subscribe.subscriptionId,
+                        };
+                    });
+                    if (newSubscribes.length > 0) {
+                        this.subscribes = this.subscribes.concat(newSubscribes);
+                        subscribes = subscribes.concat(newSubscribes);
+                    }
+                }
+                subscribes.map((subscribe) => {
+                    this.publisher.publishUpdate(subscribe.subscriptionId, model.id, updated);
+                });
+            });
+            this.callbacks.onCreate(model.id, (created) => {
+                const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), created[model.getPrimaryKeyAttribute().realName]);
+                const newSubscribes = this.findSubscribes.filter((subscribe) => {
+                    return this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                }).map((subscribe) => {
+                    return {
+                        globalId,
+                        modelId: model.id,
+                        subscriptionId: subscribe.subscriptionId,
+                    };
+                });
+                this.subscribes = this.subscribes.concat(newSubscribes);
+                newSubscribes.map((subscribe) => {
+                    this.publisher.publishCreate(subscribe.subscriptionId, model.id, created);
+                });
+            });
+        });
     }
     resolve(modelId, type, opts) {
         switch (type) {
@@ -35,7 +81,7 @@ class Resolver {
         if (!result) {
             return null;
         }
-        return this.prepareRow(modelId, result);
+        return this.collection.get(modelId).prepareRow(result);
     }
     resolveViewer(opts) {
         return {};
@@ -47,10 +93,10 @@ class Resolver {
         if (!result) {
             return null;
         }
-        if (opts.context.subscriptionId) {
-            this.subscriber.subscribeOne(opts.context.subscriptionId, model, id, opts);
+        if (opts.context && opts.context.subscriptionId) {
+            this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[Model_1.idArgName], opts);
         }
-        return this.prepareRow(modelId, result);
+        return model.prepareRow(result);
     }
     resolveQueryConnection(modelId, opts) {
         const model = this.collection.get(modelId);
@@ -72,7 +118,7 @@ class Resolver {
             const edges = rows.map((row) => {
                 return {
                     cursor: null,
-                    node: this.prepareRow(modelId, row),
+                    node: model.prepareRow(row),
                 };
             });
             result = {
@@ -85,8 +131,8 @@ class Resolver {
                 },
             };
         }
-        if (opts.context.subscriptionId) {
-            this.subscriber.subscribeConnection(opts.context.subscriptionId, model, findCriteria, opts);
+        if (opts.context && opts.context.subscriptionId) {
+            this.subscribeConnection(opts.context.subscriptionId, modelId, result.edges.map((r) => { return r.node.id; }), findCriteria, opts);
         }
         return result;
     }
@@ -98,7 +144,7 @@ class Resolver {
         const edges = rows.map((row) => {
             return {
                 cursor: null,
-                node: this.prepareRow(modelId, row),
+                node: this.collection.get(modelId).prepareRow(row),
             };
         });
         return {
@@ -121,6 +167,47 @@ class Resolver {
     resolveMutationUpdate();
     resolveMutationUpdateMany();
     resolveMutationDelete();*/
+    subscribeOne(subscriptionId, modelId, globalId, opts) {
+        this.subscribes.push({
+            globalId,
+            modelId,
+            subscriptionId,
+        });
+    }
+    subscribeConnection(subscriptionId, modelId, ids, findCriteria, opts) {
+        this.subscribes = this.subscribes.concat(ids.map((globalId) => {
+            return {
+                modelId,
+                globalId,
+                subscriptionId,
+            };
+        }));
+        this.findSubscribes.push({
+            findCriteria,
+            modelId,
+            subscriptionId,
+        });
+    }
+    equalRowToFindCriteria(modelId, row, findCriteria) {
+        // if all criteria not false
+        return !findCriteria.where.some((arg) => {
+            const rowValue = row[arg.attribute];
+            switch (arg.type) {
+                case ArgumentTypes_1.default.Contains:
+                    return rowValue.indexOf(arg.value) === -1;
+                case ArgumentTypes_1.default.NotContains:
+                    return rowValue.indexOf(arg.value) > -1;
+                case ArgumentTypes_1.default.StartsWith:
+                    return rowValue.substr(0, arg.value.length) !== arg.value;
+                case ArgumentTypes_1.default.NotStartsWith:
+                    return rowValue.substr(0, arg.value.length) === arg.value;
+                case ArgumentTypes_1.default.GreaterThan:
+                    return rowValue > arg.value;
+                default:
+                    throw new Error("Unsupported argument type " + arg.type);
+            }
+        });
+    }
     argsToFindCriteria(modelId, args) {
         const model = this.collection.get(modelId);
         const whereArguments = model.getWhereArguments();
@@ -134,14 +221,6 @@ class Resolver {
             });
         }
         return criteria;
-    }
-    prepareRow(modelId, row) {
-        const model = this.collection.get(modelId);
-        if (model.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
-            row._id = row.id;
-        }
-        row.id = graphql_relay_1.toGlobalId(model.id, row[model.getPrimaryKeyAttribute().name]);
-        return row;
     }
 }
 Object.defineProperty(exports, "__esModule", { value: true });

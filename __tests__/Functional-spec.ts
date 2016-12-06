@@ -3,9 +3,9 @@ import { graphql, GraphQLSchema } from "graphql";
 import { toGlobalId } from "graphql-relay";
 import { AttributeTypes, Collection, ResolveOpts, Resolver, ResolveTypes, Schema } from "./..";
 import { animalModel, postModel, userModel } from "./../__fixtures__/collection1";
-import { DataAdapter } from "./../__fixtures__/data";
+import { callbacks, createAnimal, DataAdapter, publisher } from "./../__fixtures__/data";
 const adapter = new DataAdapter();
-const resolver = new Resolver(adapter);
+const resolver = new Resolver(adapter, callbacks, publisher);
 const schema = new Schema(resolver);
 const collection = new Collection([animalModel, postModel, userModel], {
     interfaces: [schema.getNodeDefinition().nodeInterface],
@@ -36,7 +36,12 @@ fdescribe("Functional tests", () => {
         const result = await graphql(graphqlSchema, `query Q1{  
             viewer{
                 animal(id:"${animalId1}"){
+                    id
                     name
+                    age
+                    birthday
+                    Weight
+                    isCat
                 }
             }
         }`);
@@ -64,9 +69,26 @@ fdescribe("Functional tests", () => {
         }`);
         expect(result).toMatchSnapshot();
     });
+    it("subscribe one", async () => {
+        const subscriptionId = "123";
+        const result = await graphql(graphqlSchema, `query Q1{  
+            viewer{
+                animal(id:"${animalId1}"){
+                    name
+                }
+            }
+        }`, {}, {
+                subscriptionId,
+            });
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+        const publishUpdateSpy = spyOn(publisher, "publishUpdate");
+        adapter.update("animal", 1, { name: "testn" });
+        expect(publishUpdateSpy.calls.allArgs()).toMatchSnapshot();
+    });
 });
-
-// Convert GraphQL data to plain object
-function j(v) {
-    return JSON.parse(JSON.stringify(v));
-}

@@ -24,6 +24,7 @@ class Model {
             }
             const attr = {
                 name: attrConfig.name,
+                realName: attrConfig.name,
                 type: attrConfig.type,
                 model: attrConfig.model,
                 required: typeof (attrConfig.required) !== "undefined" ? attrConfig.required : false,
@@ -45,6 +46,7 @@ class Model {
         }
         this.attributes.push({
             name: "id",
+            realName: null,
             type: AttributeTypes_1.default.ID,
             required: false,
         });
@@ -225,6 +227,23 @@ class Model {
             this.whereArguments = this.generateWhereArguments();
         }
         return this.whereArguments;
+    }
+    getNameForGlobalId() {
+        return capitalize(this.id);
+    }
+    prepareRow(row) {
+        if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
+            row._id = row.id;
+        }
+        row.id = graphql_relay_1.toGlobalId(this.getNameForGlobalId(), row[this.getPrimaryKeyAttribute().name]);
+        this.attributes.map((attr) => {
+            if (typeof (row[attr.name]) !== "undefined") {
+                if (attr.type === AttributeTypes_1.default.Date) {
+                    row[attr.name] = row[attr.name].toString();
+                }
+            }
+        });
+        return row;
     }
     generateWhereArguments() {
         let args = [];

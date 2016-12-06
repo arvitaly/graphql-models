@@ -19,6 +19,7 @@ import {
 import {
     connectionArgs, connectionDefinitions,
     fromGlobalId, mutationWithClientMutationId,
+    toGlobalId,
 } from "graphql-relay";
 import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
@@ -57,6 +58,7 @@ class Model {
             }
             const attr: Attribute = {
                 name: attrConfig.name,
+                realName: attrConfig.name,
                 type: attrConfig.type,
                 model: (attrConfig as ModelAttribute).model,
                 required: typeof (attrConfig.required) !== "undefined" ? attrConfig.required : false,
@@ -78,6 +80,7 @@ class Model {
         }
         this.attributes.push({
             name: "id",
+            realName: null,
             type: AttributeTypes.ID,
             required: false,
         });
@@ -262,6 +265,23 @@ class Model {
             this.whereArguments = this.generateWhereArguments();
         }
         return this.whereArguments;
+    }
+    public getNameForGlobalId() {
+        return capitalize(this.id);
+    }
+    public prepareRow(row) {
+        if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
+            row._id = row.id;
+        }
+        row.id = toGlobalId(this.getNameForGlobalId(), row[this.getPrimaryKeyAttribute().name]);
+        this.attributes.map((attr) => {
+            if (typeof (row[attr.name]) !== "undefined") {
+                if (attr.type === AttributeTypes.Date) {
+                    row[attr.name] = (row[attr.name] as Date).toString();
+                }
+            }
+        });
+        return row;
     }
     protected generateWhereArguments() {
         let args: Argument[] = [];

@@ -14,7 +14,7 @@ const __1 = require("./..");
 const collection1_1 = require("./../__fixtures__/collection1");
 const data_1 = require("./../__fixtures__/data");
 const adapter = new data_1.DataAdapter();
-const resolver = new __1.Resolver(adapter);
+const resolver = new __1.Resolver(adapter, data_1.callbacks, data_1.publisher);
 const schema = new __1.Schema(resolver);
 const collection = new __1.Collection([collection1_1.animalModel, collection1_1.postModel, collection1_1.userModel], {
     interfaces: [schema.getNodeDefinition().nodeInterface],
@@ -45,7 +45,12 @@ fdescribe("Functional tests", () => {
         const result = yield graphql_1.graphql(graphqlSchema, `query Q1{  
             viewer{
                 animal(id:"${animalId1}"){
+                    id
                     name
+                    age
+                    birthday
+                    Weight
+                    isCat
                 }
             }
         }`);
@@ -73,9 +78,27 @@ fdescribe("Functional tests", () => {
         }`);
         expect(result).toMatchSnapshot();
     }));
+    it("subscribe one", () => __awaiter(this, void 0, void 0, function* () {
+        const subscriptionId = "123";
+        const result = yield graphql_1.graphql(graphqlSchema, `query Q1{  
+            viewer{
+                animal(id:"${animalId1}"){
+                    name
+                }
+            }
+        }`, {}, {
+            subscriptionId,
+        });
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+        const publishUpdateSpy = spyOn(data_1.publisher, "publishUpdate");
+        adapter.update("animal", 1, { name: "testn" });
+        expect(publishUpdateSpy.calls.allArgs()).toMatchSnapshot();
+    }));
 });
-// Convert GraphQL data to plain object
-function j(v) {
-    return JSON.parse(JSON.stringify(v));
-}
 //# sourceMappingURL=Functional-spec.js.map

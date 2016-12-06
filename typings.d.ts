@@ -15,6 +15,7 @@ export type ModelOptions = {
 export type AttributeType = "id" | "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
     name: string;
+    realName: string;
     type: AttributeType;
     required?: boolean | undefined;
     primaryKey?: boolean | undefined;
@@ -101,3 +102,4 @@ export interface Callbacks {
     onCreate(modelId: string, cb: (created) => any): any;
     onDelete(modelId: string, cb: (deleted) => any): any;
 }
+export type SubscriptionID = any;

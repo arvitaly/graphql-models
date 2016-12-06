@@ -1,18 +1,74 @@
 import { } from "graphql";
 import { Connection, fromGlobalId, toGlobalId } from "graphql-relay";
 import Adapter from "./Adapter";
+import ArgumentTypes from "./ArgumentTypes";
+import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import Model, { idArgName } from "./Model";
+import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
-import Subscriber from "./Subscriber";
-import { FindCriteria, ModelID, ResolveOpts, ResolveType } from "./typings";
+import { Callbacks, FindCriteria, ModelID, ResolveOpts, ResolveType, SubscriptionID } from "./typings";
 class Resolver {
     public collection: Collection;
-    constructor(public adapter: Adapter, public subscriber: Subscriber) {
+    protected subscribes: Array<{
+        modelId: ModelID;
+        globalId: string;
+        subscriptionId: SubscriptionID;
+    }> = [];
+    protected findSubscribes: Array<{
+        modelId: ModelID;
+        findCriteria: FindCriteria;
+        subscriptionId: SubscriptionID;
+    }> = [];
+    constructor(public adapter: Adapter, protected callbacks: Callbacks, public publisher: Publisher) {
 
     }
     public setCollection(coll: Collection) {
         this.collection = coll;
+        this.collection.map((model) => {
+            this.callbacks.onUpdate(model.id, (updated) => {
+                const globalId = toGlobalId(model.getNameForGlobalId(),
+                    updated[model.getPrimaryKeyAttribute().realName]);
+                let subscribes = this.subscribes.filter((subscribe) => {
+                    return subscribe.modelId === model.id && subscribe.globalId === globalId;
+                });
+                if (subscribes.length === 0) {
+                    const newSubscribes = this.findSubscribes.filter((subscribe) => {
+                        return this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
+                    }).map((subscribe) => {
+                        return {
+                            globalId,
+                            modelId: model.id,
+                            subscriptionId: subscribe.subscriptionId,
+                        };
+                    });
+                    if (newSubscribes.length > 0) {
+                        this.subscribes = this.subscribes.concat(newSubscribes);
+                        subscribes = subscribes.concat(newSubscribes);
+                    }
+                }
+                subscribes.map((subscribe) => {
+                    this.publisher.publishUpdate(subscribe.subscriptionId, model.id, updated);
+                });
+            });
+            this.callbacks.onCreate(model.id, (created) => {
+                const globalId = toGlobalId(model.getNameForGlobalId(),
+                    created[model.getPrimaryKeyAttribute().realName]);
+                const newSubscribes = this.findSubscribes.filter((subscribe) => {
+                    return this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                }).map((subscribe) => {
+                    return {
+                        globalId,
+                        modelId: model.id,
+                        subscriptionId: subscribe.subscriptionId,
+                    };
+                });
+                this.subscribes = this.subscribes.concat(newSubscribes);
+                newSubscribes.map((subscribe) => {
+                    this.publisher.publishCreate(subscribe.subscriptionId, model.id, created);
+                });
+            });
+        });
     }
     public resolve(modelId: ModelID, type: ResolveType, opts: ResolveOpts) {
         switch (type) {
@@ -39,7 +95,7 @@ class Resolver {
         if (!result) {
             return null;
         }
-        return this.prepareRow(modelId, result);
+        return this.collection.get(modelId).prepareRow(result);
     }
     public resolveViewer(opts: ResolveOpts) {
         return {};
@@ -51,10 +107,10 @@ class Resolver {
         if (!result) {
             return null;
         }
-        if (opts.context.subscriptionId) {
-            this.subscriber.subscribeOne(opts.context.subscriptionId, model, id, opts);
+        if (opts.context && opts.context.subscriptionId) {
+            this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[idArgName], opts);
         }
-        return this.prepareRow(modelId, result);
+        return model.prepareRow(result);
     }
     public resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Connection<any> {
         const model = this.collection.get(modelId);
@@ -75,7 +131,7 @@ class Resolver {
             const edges = rows.map((row) => {
                 return {
                     cursor: null,
-                    node: this.prepareRow(modelId, row),
+                    node: model.prepareRow(row),
                 };
             });
             result = {
@@ -88,8 +144,10 @@ class Resolver {
                 },
             };
         }
-        if (opts.context.subscriptionId) {
-            this.subscriber.subscribeConnection(opts.context.subscriptionId, model, findCriteria, opts);
+        if (opts.context && opts.context.subscriptionId) {
+            this.subscribeConnection(opts.context.subscriptionId, modelId,
+                result.edges.map((r) => { return r.node.id; }),
+                findCriteria, opts);
         }
         return result;
     }
@@ -101,7 +159,7 @@ class Resolver {
         const edges = rows.map((row) => {
             return {
                 cursor: null,
-                node: this.prepareRow(modelId, row),
+                node: this.collection.get(modelId).prepareRow(row),
             };
         });
         return {
@@ -124,6 +182,52 @@ class Resolver {
     resolveMutationUpdate();
     resolveMutationUpdateMany();
     resolveMutationDelete();*/
+    public subscribeOne(subscriptionId: string, modelId: ModelID, globalId: string, opts: ResolveOpts) {
+        this.subscribes.push({
+            globalId,
+            modelId,
+            subscriptionId,
+        });
+    }
+    public subscribeConnection(
+        subscriptionId: string,
+        modelId: ModelID,
+        ids: string[],
+        findCriteria: FindCriteria,
+        opts: ResolveOpts) {
+        this.subscribes = this.subscribes.concat(ids.map((globalId) => {
+            return {
+                modelId,
+                globalId,
+                subscriptionId,
+            };
+        }));
+        this.findSubscribes.push({
+            findCriteria,
+            modelId,
+            subscriptionId,
+        });
+    }
+    protected equalRowToFindCriteria(modelId: ModelID, row: any, findCriteria: FindCriteria) {
+        // if all criteria not false
+        return !findCriteria.where.some((arg) => {
+            const rowValue = row[arg.attribute];
+            switch (arg.type) {
+                case ArgumentTypes.Contains:
+                    return rowValue.indexOf(arg.value) === -1;
+                case ArgumentTypes.NotContains:
+                    return rowValue.indexOf(arg.value) > -1;
+                case ArgumentTypes.StartsWith:
+                    return (rowValue as string).substr(0, arg.value.length) !== arg.value;
+                case ArgumentTypes.NotStartsWith:
+                    return (rowValue as string).substr(0, arg.value.length) === arg.value;
+                case ArgumentTypes.GreaterThan:
+                    return (rowValue as number) > arg.value;
+                default:
+                    throw new Error("Unsupported argument type " + arg.type);
+            }
+        });
+    }
     protected argsToFindCriteria(modelId: ModelID, args: any): FindCriteria {
         const model = this.collection.get(modelId);
         const whereArguments = model.getWhereArguments();
@@ -137,14 +241,6 @@ class Resolver {
             });
         }
         return criteria;
-    }
-    protected prepareRow(modelId: ModelID, row) {
-        const model = this.collection.get(modelId);
-        if (model.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
-            row._id = row.id;
-        }
-        row.id = toGlobalId(model.id, row[model.getPrimaryKeyAttribute().name]);
-        return row;
     }
 }
 export default Resolver;

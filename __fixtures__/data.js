@@ -1,6 +1,8 @@
 "use strict";
 const Adapter_1 = require("./../Adapter");
 const ArgumentTypes_1 = require("./../ArgumentTypes");
+const Publisher_1 = require("./../Publisher");
+const animalsName = "animals";
 exports.data = {
     animals: [{
             id: 1,
@@ -42,8 +44,34 @@ exports.data = {
             pets: [2, 3, 4],
         }],
 };
+function createAnimal() {
+    const newId = exports.data[animalsName][exports.data[animalsName].length - 1].id + 1;
+    return {
+        id: newId,
+        name: "Name" + newId,
+        age: 1000 + newId,
+        Weight: 1000.1 + newId,
+        birthday: new Date(+new Date("2100/11/11") + newId),
+        isCat: newId % 2 === 0,
+    };
+}
+exports.createAnimal = createAnimal;
 // tslint:disable max-classes-per-file
 class DataAdapter extends Adapter_1.default {
+    create(modelId, row) {
+        const newRow = Object.assign({}, row);
+        exports.data[modelId.toLowerCase() + "s"].push(newRow);
+        subscribers.filter((s) => {
+            return s.type === "create" && s.model === modelId;
+        }).map((s) => s.callback(newRow));
+    }
+    update(modelId, id, row) {
+        let oldRow = exports.data[modelId.toLowerCase() + "s"].find((r) => r.id === id);
+        Object.assign(oldRow, row);
+        subscribers.filter((s) => {
+            return s.type === "update" && s.model === modelId;
+        }).map((s) => s.callback(oldRow));
+    }
     findOne(modelId, id) {
         return Object.assign({}, exports.data[modelId.toLowerCase() + "s"].find((a) => "" + a.id === "" + id));
     }
@@ -72,4 +100,37 @@ class DataAdapter extends Adapter_1.default {
     }
 }
 exports.DataAdapter = DataAdapter;
+const subscribers = [];
+exports.callbacks = {
+    onUpdate: (modelId, cb) => {
+        subscribers.push({
+            type: "update",
+            model: modelId,
+            callback: cb,
+        });
+    },
+    onCreate: (modelId, cb) => {
+        subscribers.push({
+            type: "create",
+            model: modelId,
+            callback: cb,
+        });
+    },
+    onDelete: (modelId, cb) => {
+        subscribers.push({
+            type: "delete",
+            model: modelId,
+            callback: cb,
+        });
+    },
+};
+class DataPublisher extends Publisher_1.default {
+    publishCreate(subscriptionId, modelId, created) {
+        throw new Error("Not implemented publishUpdateOne");
+    }
+    publishUpdate(subscriptionId, modelId, updates) {
+        throw new Error("Not implemented publishUpdateOne");
+    }
+}
+exports.publisher = new DataPublisher();
 //# sourceMappingURL=data.js.map

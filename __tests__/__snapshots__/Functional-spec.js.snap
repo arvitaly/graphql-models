@@ -36,9 +36,43 @@ Object {
   "data": Object {
     "viewer": Object {
       "animal": Object {
+        "Weight": 10.1,
+        "age": 6,
+        "birthday": "Thu Nov 11 2010 00:00:00 GMT+0700 (SE Asia Standard Time)",
+        "id": "QW5pbWFsOjE=",
+        "isCat": false,
         "name": "Rex",
       },
     },
   },
 }
+`;
+
+exports[`Functional tests subscribe one 1`] = `
+Object {
+  "data": Object {
+    "viewer": Object {
+      "animal": Object {
+        "name": "Rex",
+      },
+    },
+  },
+}
+`;
+
+exports[`Functional tests subscribe one 2`] = `
+Array [
+  Array [
+    "123",
+    "animal",
+    Object {
+      "Weight": 10.1,
+      "age": 6,
+      "birthday": 2010-11-10T17:00:00.000Z,
+      "id": 1,
+      "isCat": false,
+      "name": "testn",
+    },
+  ],
+]
 `;

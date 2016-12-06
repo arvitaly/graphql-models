@@ -1,6 +1,9 @@
 import Adapter from "./../Adapter";
 import ArgumentTypes from "./../ArgumentTypes";
-import { FindCriteria } from "./../typings";
+import Model from "./../Model";
+import Publisher from "./../Publisher";
+import { Callbacks, FindCriteria, ModelID } from "./../typings";
+const animalsName = "animals";
 export const data: { [index: string]: any[] } = {
     animals: [{
         id: 1,
@@ -42,8 +45,33 @@ export const data: { [index: string]: any[] } = {
         pets: [2, 3, 4],
     }],
 };
+export function createAnimal() {
+    const newId: number = data[animalsName][data[animalsName].length - 1].id + 1;
+    return {
+        id: newId,
+        name: "Name" + newId,
+        age: 1000 + newId,
+        Weight: 1000.1 + newId,
+        birthday: new Date(+new Date("2100/11/11") + newId),
+        isCat: newId % 2 === 0,
+    };
+}
 // tslint:disable max-classes-per-file
 export class DataAdapter extends Adapter {
+    public create(modelId, row) {
+        const newRow = Object.assign({}, row);
+        data[modelId.toLowerCase() + "s"].push(newRow);
+        subscribers.filter((s) => {
+            return s.type === "create" && s.model === modelId;
+        }).map((s) => s.callback(newRow));
+    }
+    public update(modelId, id: number, row) {
+        let oldRow = data[modelId.toLowerCase() + "s"].find((r) => r.id === id);
+        Object.assign(oldRow, row);
+        subscribers.filter((s) => {
+            return s.type === "update" && s.model === modelId;
+        }).map((s) => s.callback(oldRow));
+    }
     public findOne(modelId, id: number) {
         return Object.assign({}, data[modelId.toLowerCase() + "s"].find((a) => "" + a.id === "" + id));
     }
@@ -71,3 +99,40 @@ export class DataAdapter extends Adapter {
         return true;
     }
 }
+const subscribers: Array<{
+    type: "update" | "create" | "delete";
+    model: string;
+    callback: (row) => any;
+}> = [];
+export const callbacks: Callbacks = {
+    onUpdate: (modelId: string, cb: (updated) => any) => {
+        subscribers.push({
+            type: "update",
+            model: modelId,
+            callback: cb,
+        });
+    },
+    onCreate: (modelId: string, cb: (updated) => any) => {
+        subscribers.push({
+            type: "create",
+            model: modelId,
+            callback: cb,
+        });
+    },
+    onDelete: (modelId: string, cb: (updated) => any) => {
+        subscribers.push({
+            type: "delete",
+            model: modelId,
+            callback: cb,
+        });
+    },
+};
+class DataPublisher extends Publisher {
+    public publishCreate(subscriptionId: any, modelId: ModelID, created) {
+        throw new Error("Not implemented publishUpdateOne");
+    }
+    public publishUpdate(subscriptionId: any, modelId: ModelID, updates) {
+        throw new Error("Not implemented publishUpdateOne");
+    }
+}
+export const publisher = new DataPublisher();

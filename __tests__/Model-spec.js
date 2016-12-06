@@ -95,7 +95,12 @@ xdescribe("Model spec", () => {
         });
     });
     it("whereArgHelpers string", () => {
-        expect(Model_1.whereArgHelpers[AttributeTypes_1.default.String]({ name: "n1", type: AttributeTypes_1.default.String, required: false }).length).toBe(8);
+        expect(Model_1.whereArgHelpers[AttributeTypes_1.default.String]({
+            name: "n1",
+            realName: "n1",
+            type: AttributeTypes_1.default.String,
+            required: false,
+        }).length).toBe(8);
     });
     it("WhereInput type", () => {
         const whereInputType = postModel.getWhereInputType();
