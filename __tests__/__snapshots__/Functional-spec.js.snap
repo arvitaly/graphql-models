@@ -1,12 +1,44 @@
+exports[`Functional tests node 1`] = `
+Object {
+  "data": Object {
+    "node": Object {
+      "name": "Rex",
+    },
+  },
+}
+`;
+
+exports[`Functional tests query connection 1`] = `
+Object {
+  "data": Object {
+    "viewer": Object {
+      "animals": Object {
+        "edges": Array [
+          Object {
+            "node": Object {
+              "name": "Rex",
+            },
+          },
+          Object {
+            "node": Object {
+              "name": "Felix",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`Functional tests query one 1`] = `
 Object {
   "data": Object {
     "viewer": Object {
-      "animal": null,
+      "animal": Object {
+        "name": "Rex",
+      },
     },
   },
-  "errors": Array [
-    [GraphQLError: TypeError: First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.],
-  ],
 }
 `;

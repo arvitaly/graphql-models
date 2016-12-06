@@ -2,13 +2,18 @@ import {
     GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType,
     GraphQLResolveInfo, GraphQLSchema,
 } from "graphql";
-import { nodeDefinitions } from "graphql-relay";
+import { fromGlobalId, GraphQLNodeDefinitions, nodeDefinitions } from "graphql-relay";
 import Collection from "./Collection";
 import Resolver from "./Resolver";
 import ResolveTypes from "./ResolveTypes";
 import { Mutations, Queries, ResolveFn } from "./typings";
 class Schema {
-    constructor(protected collection: Collection, protected resolver: Resolver) { }
+    protected nodeDefinition: GraphQLNodeDefinitions;
+    protected collection: Collection;
+    constructor(protected resolver: Resolver) { }
+    public setCollection(models: Collection) {
+        this.collection = models;
+    }
     public getQueries() {
         let queries: Queries = [];
         this.collection.map((model) => {
@@ -28,7 +33,7 @@ class Schema {
     }
     public getQueryViewerType() {
         const queryViewer = new GraphQLObjectType({
-            name: "QueryViewer",
+            name: "Viewer",
             fields: this.queriesToMap(),
         });
         return queryViewer;
@@ -37,13 +42,14 @@ class Schema {
         return new GraphQLObjectType({
             name: "Query",
             fields: {
+                node: this.getNodeDefinition().nodeField,
                 viewer: {
                     type: this.getQueryViewerType(),
                     resolve: (source, args, context, info) => {
                         return this.resolver.resolve(null, ResolveTypes.Viewer, { source, args, context, info });
                     },
                 },
-            },
+            }
         });
     }
     public getMutationType() {
@@ -52,13 +58,16 @@ class Schema {
             fields: this.mutationsToMap(),
         });
     }
-    public getNodeType() {
-        nodeDefinitions((id: string, info: GraphQLResolveInfo) => {
-            return this.resolver.resolve(null, ResolveTypes.Node, { source: id, args: null, context: null, info });
-        }, (type: string) => {
-            const t = type.replace(/Type$/gi, "");
-            return this.collection.get(t.charAt(0) + t.substr(1)).getBaseType();
-        });
+    public getNodeDefinition() {
+        if (!this.nodeDefinition) {
+            this.nodeDefinition = nodeDefinitions((id: string, info: GraphQLResolveInfo) => {
+                return this.resolver.resolve(null, ResolveTypes.Node, { source: id, args: null, context: null, info });
+            }, (value: any, context: any, info: GraphQLResolveInfo) => {
+                return this.collection.get(fromGlobalId(value.id).type.replace(/Type$/gi, "").toLowerCase())
+                    .getBaseType();
+            });
+        }
+        return this.nodeDefinition;
     }
     public getGraphQLSchema() {
         return new GraphQLSchema({

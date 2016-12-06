@@ -2,12 +2,16 @@ import { } from "graphql";
 import { Connection, fromGlobalId, toGlobalId } from "graphql-relay";
 import Adapter from "./Adapter";
 import Collection from "./Collection";
-import Model from "./Model";
+import Model, { idArgName } from "./Model";
 import ResolveTypes from "./ResolveTypes";
 import { FindCriteria, ModelID, ResolveOpts, ResolveType } from "./typings";
 class Resolver {
-    constructor(public collection: Collection, public adapter: Adapter) {
+    public collection: Collection;
+    constructor(public adapter: Adapter) {
 
+    }
+    public setCollection(coll: Collection) {
+        this.collection = coll;
     }
     public resolve(modelId: ModelID, type: ResolveType, opts: ResolveOpts) {
         switch (type) {
@@ -27,8 +31,10 @@ class Resolver {
                 throw new Error("Unsupported resolve type: " + type);
         }
     }
-    public resolveNode(modelId: ModelID, opts: ResolveOpts) {
-        const result = this.adapter.findOne(modelId, opts.source);
+    public resolveNode(_: ModelID, opts: ResolveOpts) {
+        const {id, type} = fromGlobalId(opts.source);
+        const modelId = type.replace(/Type$/gi, "").toLowerCase();
+        const result = this.adapter.findOne(modelId, id);
         if (!result) {
             return null;
         }
@@ -38,15 +44,14 @@ class Resolver {
         return {};
     }
     public resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
-        const primaryAttrName = this.collection.get(modelId).getPrimaryKeyAttribute().name;
-        const result = this.adapter.findOne(modelId, fromGlobalId(opts.args[primaryAttrName]).id);
+        const result = this.adapter.findOne(modelId, fromGlobalId(opts.args[idArgName]).id);
         if (!result) {
             return null;
         }
         return this.prepareRow(modelId, result);
     }
     public resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Connection<any> {
-        let findCriteria: FindCriteria = {};
+        let findCriteria: FindCriteria = this.argsToFindCriteria(modelId, opts.args);
         const result = this.adapter.findMany(modelId, findCriteria);
         if (!result || result.length === 0) {
             return {
@@ -106,9 +111,23 @@ class Resolver {
     resolveMutationUpdate();
     resolveMutationUpdateMany();
     resolveMutationDelete();*/
+    protected argsToFindCriteria(modelId: ModelID, args: any): FindCriteria {
+        const model = this.collection.get(modelId);
+        const whereArguments = model.getWhereArguments();
+        const criteria: FindCriteria = {};
+        criteria.where = [];
+        if (args.where) {
+            criteria.where = Object.keys(args.where).map((whereArgName) => {
+                const arg = whereArguments.find((w) => w.name === whereArgName);
+                arg.value = args.where[whereArgName];
+                return arg;
+            });
+        }
+        return criteria;
+    }
     protected prepareRow(modelId: ModelID, row) {
         const model = this.collection.get(modelId);
-        if (model.getPrimaryKeyAttribute().name.toLowerCase() === "id") {
+        if (model.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
             row._id = row.id;
         }
         row.id = toGlobalId(model.id, row[model.getPrimaryKeyAttribute().name]);

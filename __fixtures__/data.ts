@@ -1,5 +1,7 @@
 import Adapter from "./../Adapter";
-export const data = {
+import ArgumentTypes from "./../ArgumentTypes";
+import { FindCriteria } from "./../typings";
+export const data: { [index: string]: any[] } = {
     animals: [{
         id: 1,
         name: "Rex",
@@ -43,6 +45,29 @@ export const data = {
 // tslint:disable max-classes-per-file
 export class DataAdapter extends Adapter {
     public findOne(modelId, id: number) {
-        return data[modelId.toLowerCase() + "s"].find((a) => a.id === id);
+        return Object.assign({}, data[modelId.toLowerCase() + "s"].find((a) => "" + a.id === "" + id));
+    }
+    public findMany(modelId, findCriteria: FindCriteria) {
+        let result = data[modelId.toLowerCase() + "s"].map((row) => Object.assign({}, row));
+        if (findCriteria && findCriteria.where) {
+            findCriteria.where.map((arg) => {
+                switch (arg.type) {
+                    case ArgumentTypes.Contains:
+                        result = result.filter((row) => {
+                            return row[arg.attribute].indexOf(arg.value) > -1;
+                        });
+                        break;
+                    default:
+                        throw new Error("Unknown argument type " + arg.type);
+                }
+            });
+        }
+        return result;
+    }
+    public hasNextPage(modelId, findCriteria: FindCriteria) {
+        return true;
+    }
+    public hasPreviousPage(modelId, findCriteria: FindCriteria) {
+        return true;
     }
 }

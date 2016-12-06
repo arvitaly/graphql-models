@@ -1,10 +1,10 @@
 import Model from "./Model";
-import { ModelConfig, ResolveFn } from "./typings";
+import { ModelConfig, ModelOptions, ResolveFn } from "./typings";
 class Collection {
     protected models: Model[] = [];
-    constructor(protected modelConfigs: ModelConfig[]) {
+    constructor(protected modelConfigs: ModelConfig[], opts?: ModelOptions) {
         this.models = modelConfigs.map((config) => {
-            return new Model(config, this);
+            return new Model(config, this, opts);
         });
     }
     public get(id: string) {

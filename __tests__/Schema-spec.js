@@ -1,6 +1,5 @@
 "use strict";
 const graphql_1 = require("graphql");
-const collection1_1 = require("./../__fixtures__/collection1");
 const Schema_1 = require("./../Schema");
 const test_util_1 = require("./../test-util");
 const fields1 = { f1: { type: graphql_1.GraphQLString } };
@@ -9,7 +8,7 @@ const fields2 = { f2: { type: graphql_1.GraphQLString } };
 const obj2 = new graphql_1.GraphQLObjectType({ name: "obj2", fields: fields2 });
 describe("Schema spec", () => {
     const resolver = { resolve: jasmine.createSpy("") };
-    const schema = new Schema_1.default(collection1_1.default, resolver);
+    const schema = new Schema_1.default(resolver);
     it("getQueryViewerType", () => {
         const getQueriesSpy = spyOn(schema, "queriesToMap").and.returnValue(fields1);
         const queryViewerType = schema.getQueryViewerType();

@@ -87,7 +87,8 @@ export type Argument = {
     name: string;
     type: ArgumentType;
     attribute: string;
-    graphQLType: GraphQLInputType
+    graphQLType: GraphQLInputType;
+    value?: any;
 }
 
 export type FindCriteria = {

@@ -108,8 +108,7 @@ class Model {
     }
     public getOneArgs(): GraphQLFieldConfigArgumentMap {
         let args: GraphQLFieldConfigArgumentMap = {};
-        args[idArgName] = { type: GraphQLID };
-        // new GraphQLNonNull(scalarTypeToGraphQL(this.get PrimaryKeyAttribute().type))
+        args[idArgName] = { type: new GraphQLNonNull(GraphQLID) };
         return args;
     }
     public getWhereArgument(name) {
@@ -351,6 +350,8 @@ class Model {
                     return this.resolveFn(this.id, ResolveTypes.QueryConnection,
                         { source: attr.name, args, context, info });
                 };
+            } else if (attr.type === AttributeTypes.ID) {
+                graphQLType = new GraphQLNonNull(GraphQLID);
             } else {
                 graphQLType = scalarTypeToGraphQL(attr.type);
             }
@@ -360,7 +361,7 @@ class Model {
             }
         });
         return new GraphQLObjectType({
-            name: this.name,
+            name: capitalize(this.name),
             fields,
             interfaces: this.opts.interfaces,
         });

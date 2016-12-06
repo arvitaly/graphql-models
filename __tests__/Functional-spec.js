@@ -13,34 +13,64 @@ const graphql_relay_1 = require("graphql-relay");
 const __1 = require("./..");
 const collection1_1 = require("./../__fixtures__/collection1");
 const data_1 = require("./../__fixtures__/data");
-const collection = new __1.Collection([collection1_1.animalModel, collection1_1.postModel, collection1_1.userModel]);
+const adapter = new data_1.DataAdapter();
+const resolver = new __1.Resolver(adapter);
+const schema = new __1.Schema(resolver);
+const collection = new __1.Collection([collection1_1.animalModel, collection1_1.postModel, collection1_1.userModel], {
+    interfaces: [schema.getNodeDefinition().nodeInterface],
+    resolveFn: resolver.resolve.bind(resolver),
+});
+schema.setCollection(collection);
+resolver.setCollection(collection);
+const graphqlSchema = schema.getGraphQLSchema();
 const animalId1 = graphql_relay_1.toGlobalId("Animal", "1");
 fdescribe("Functional tests", () => {
-    let schema;
-    beforeEach(() => {
-        const adapter = new data_1.DataAdapter();
-        const resolver = new __1.Resolver(collection, adapter);
-        collection.map((model) => {
-            model.setResolveFn(resolver.resolve.bind(resolver));
-        });
-        schema = (new __1.Schema(collection, resolver)).getGraphQLSchema();
-    });
+    it("node", () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield graphql_1.graphql(graphqlSchema, `query Q1{  
+            node(id:"${animalId1}"){
+                ... on Animal{
+                    name
+                }
+            }
+        }`);
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+    }));
     it("query one", () => __awaiter(this, void 0, void 0, function* () {
-        const result = yield graphql_1.graphql(schema, `query Q1{
+        const result = yield graphql_1.graphql(graphqlSchema, `query Q1{  
             viewer{
                 animal(id:"${animalId1}"){
                     name
                 }
             }
         }`);
-        console.log(`query Q1{
-            viewer{
-                animal(id: "${animalId1}" ){
-                    name
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+    }));
+    it("query connection", () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield graphql_1.graphql(graphqlSchema, `query Q1{
+            viewer{            
+                animals(where:{nameContains:"x"}){
+                    edges{
+                        node{
+                            ... on Animal{
+                                name
+                            }
+                        }
+                    }
                 }
             }
         }`);
-        console.log(JSON.stringify(result.errors));
         expect(result).toMatchSnapshot();
     }));
 });

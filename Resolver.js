@@ -1,10 +1,13 @@
 "use strict";
 const graphql_relay_1 = require("graphql-relay");
+const Model_1 = require("./Model");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Resolver {
-    constructor(collection, adapter) {
-        this.collection = collection;
+    constructor(adapter) {
         this.adapter = adapter;
+    }
+    setCollection(coll) {
+        this.collection = coll;
     }
     resolve(modelId, type, opts) {
         switch (type) {
@@ -24,8 +27,10 @@ class Resolver {
                 throw new Error("Unsupported resolve type: " + type);
         }
     }
-    resolveNode(modelId, opts) {
-        const result = this.adapter.findOne(modelId, opts.source);
+    resolveNode(_, opts) {
+        const { id, type } = graphql_relay_1.fromGlobalId(opts.source);
+        const modelId = type.replace(/Type$/gi, "").toLowerCase();
+        const result = this.adapter.findOne(modelId, id);
         if (!result) {
             return null;
         }
@@ -35,15 +40,14 @@ class Resolver {
         return {};
     }
     resolveQueryOne(modelId, opts) {
-        const primaryAttrName = this.collection.get(modelId).getPrimaryKeyAttribute().name;
-        const result = this.adapter.findOne(modelId, graphql_relay_1.fromGlobalId(opts.args[primaryAttrName]).id);
+        const result = this.adapter.findOne(modelId, graphql_relay_1.fromGlobalId(opts.args[Model_1.idArgName]).id);
         if (!result) {
             return null;
         }
         return this.prepareRow(modelId, result);
     }
     resolveQueryConnection(modelId, opts) {
-        let findCriteria = {};
+        let findCriteria = this.argsToFindCriteria(modelId, opts.args);
         const result = this.adapter.findMany(modelId, findCriteria);
         if (!result || result.length === 0) {
             return {
@@ -103,9 +107,23 @@ class Resolver {
     resolveMutationUpdate();
     resolveMutationUpdateMany();
     resolveMutationDelete();*/
+    argsToFindCriteria(modelId, args) {
+        const model = this.collection.get(modelId);
+        const whereArguments = model.getWhereArguments();
+        const criteria = {};
+        criteria.where = [];
+        if (args.where) {
+            criteria.where = Object.keys(args.where).map((whereArgName) => {
+                const arg = whereArguments.find((w) => w.name === whereArgName);
+                arg.value = args.where[whereArgName];
+                return arg;
+            });
+        }
+        return criteria;
+    }
     prepareRow(modelId, row) {
         const model = this.collection.get(modelId);
-        if (model.getPrimaryKeyAttribute().name.toLowerCase() === "id") {
+        if (model.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
             row._id = row.id;
         }
         row.id = graphql_relay_1.toGlobalId(model.id, row[model.getPrimaryKeyAttribute().name]);

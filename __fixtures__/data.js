@@ -1,5 +1,6 @@
 "use strict";
 const Adapter_1 = require("./../Adapter");
+const ArgumentTypes_1 = require("./../ArgumentTypes");
 exports.data = {
     animals: [{
             id: 1,
@@ -44,7 +45,30 @@ exports.data = {
 // tslint:disable max-classes-per-file
 class DataAdapter extends Adapter_1.default {
     findOne(modelId, id) {
-        return exports.data[modelId.toLowerCase() + "s"].find((a) => a.id === id);
+        return Object.assign({}, exports.data[modelId.toLowerCase() + "s"].find((a) => "" + a.id === "" + id));
+    }
+    findMany(modelId, findCriteria) {
+        let result = exports.data[modelId.toLowerCase() + "s"].map((row) => Object.assign({}, row));
+        if (findCriteria && findCriteria.where) {
+            findCriteria.where.map((arg) => {
+                switch (arg.type) {
+                    case ArgumentTypes_1.default.Contains:
+                        result = result.filter((row) => {
+                            return row[arg.attribute].indexOf(arg.value) > -1;
+                        });
+                        break;
+                    default:
+                        throw new Error("Unknown argument type " + arg.type);
+                }
+            });
+        }
+        return result;
+    }
+    hasNextPage(modelId, findCriteria) {
+        return true;
+    }
+    hasPreviousPage(modelId, findCriteria) {
+        return true;
     }
 }
 exports.DataAdapter = DataAdapter;

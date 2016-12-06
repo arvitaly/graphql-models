@@ -115,6 +115,47 @@ Object {
   "description": undefined,
   "fields": Array [
     Object {
+      "args": Array [
+        Object {
+          "defaultValue": undefined,
+          "description": "The ID of an object",
+          "name": "id",
+          "type": Object {
+            "of": "ID",
+            "type": "GraphQLNonNull",
+          },
+        },
+      ],
+      "deprecationReason": undefined,
+      "description": "Fetches an object given its ID",
+      "isDeprecated": false,
+      "name": "node",
+      "resolve": "function",
+      "type": Object {
+        "description": "An object with an ID",
+        "fields": Array [
+          Object {
+            "field": Object {
+              "args": Array [],
+              "deprecationReason": undefined,
+              "description": "The id of the object.",
+              "isDeprecated": false,
+              "name": "id",
+              "resolve": "undefined",
+              "type": Object {
+                "of": "ID",
+                "type": "GraphQLNonNull",
+              },
+            },
+            "name": "id",
+          },
+        ],
+        "name": "Node",
+        "resolveType": "function",
+        "type": "GraphQLInterfaceType",
+      },
+    },
+    Object {
       "args": Array [],
       "deprecationReason": undefined,
       "description": undefined,
@@ -161,7 +202,7 @@ Object {
     },
   ],
   "interfaces": Array [],
-  "name": "QueryViewer",
+  "name": "Viewer",
   "type": "GraphQLObjectType",
 }
 `;

@@ -1,11 +1,11 @@
 "use strict";
 const Model_1 = require("./Model");
 class Collection {
-    constructor(modelConfigs) {
+    constructor(modelConfigs, opts) {
         this.modelConfigs = modelConfigs;
         this.models = [];
         this.models = modelConfigs.map((config) => {
-            return new Model_1.default(config, this);
+            return new Model_1.default(config, this, opts);
         });
     }
     get(id) {

@@ -3,9 +3,11 @@ const graphql_1 = require("graphql");
 const graphql_relay_1 = require("graphql-relay");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Schema {
-    constructor(collection, resolver) {
-        this.collection = collection;
+    constructor(resolver) {
         this.resolver = resolver;
+    }
+    setCollection(models) {
+        this.collection = models;
     }
     getQueries() {
         let queries = [];
@@ -26,7 +28,7 @@ class Schema {
     }
     getQueryViewerType() {
         const queryViewer = new graphql_1.GraphQLObjectType({
-            name: "QueryViewer",
+            name: "Viewer",
             fields: this.queriesToMap(),
         });
         return queryViewer;
@@ -35,13 +37,14 @@ class Schema {
         return new graphql_1.GraphQLObjectType({
             name: "Query",
             fields: {
+                node: this.getNodeDefinition().nodeField,
                 viewer: {
                     type: this.getQueryViewerType(),
                     resolve: (source, args, context, info) => {
                         return this.resolver.resolve(null, ResolveTypes_1.default.Viewer, { source, args, context, info });
                     },
                 },
-            },
+            }
         });
     }
     getMutationType() {
@@ -50,13 +53,16 @@ class Schema {
             fields: this.mutationsToMap(),
         });
     }
-    getNodeType() {
-        graphql_relay_1.nodeDefinitions((id, info) => {
-            return this.resolver.resolve(null, ResolveTypes_1.default.Node, { source: id, args: null, context: null, info });
-        }, (type) => {
-            const t = type.replace(/Type$/gi, "");
-            return this.collection.get(t.charAt(0) + t.substr(1)).getBaseType();
-        });
+    getNodeDefinition() {
+        if (!this.nodeDefinition) {
+            this.nodeDefinition = graphql_relay_1.nodeDefinitions((id, info) => {
+                return this.resolver.resolve(null, ResolveTypes_1.default.Node, { source: id, args: null, context: null, info });
+            }, (value, context, info) => {
+                return this.collection.get(graphql_relay_1.fromGlobalId(value.id).type.replace(/Type$/gi, "").toLowerCase())
+                    .getBaseType();
+            });
+        }
+        return this.nodeDefinition;
     }
     getGraphQLSchema() {
         return new graphql_1.GraphQLSchema({
