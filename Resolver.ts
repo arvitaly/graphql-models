@@ -91,11 +91,11 @@ class Resolver {
                 throw new Error("Unsupported resolve type: " + type);
         }
     }
-    public resolveNode(_: ModelID, opts: ResolveOpts) {
+    public async resolveNode(_: ModelID, opts: ResolveOpts) {
         const {id, type} = fromGlobalId(opts.source);
         const modelId = type.replace(/Type$/gi, "").toLowerCase();
 
-        const result = this.adapter.findOne(modelId, id);
+        const result = await this.adapter.findOne(modelId, id);
         if (!result) {
             return null;
         }
@@ -105,10 +105,10 @@ class Resolver {
     public resolveViewer(opts: ResolveOpts) {
         return {};
     }
-    public resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
+    public async resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
         const id = fromGlobalId(opts.args[idArgName]).id;
         const model = this.collection.get(modelId);
-        const result = this.adapter.findOne(modelId, id);
+        const result = await this.adapter.findOne(modelId, id);
         if (!result) {
             return null;
         }
@@ -227,7 +227,7 @@ class Resolver {
                     throw new Error("Unsupported argument type " + arg.type + " for update");
             }
         }));
-        const updated = this.adapter.updateOne(model.id, id, updating);
+        const updated = await this.adapter.updateOne(model.id, id, updating);
         const row = await this.resolveModel(modelId, {
             source: toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
             args: null,

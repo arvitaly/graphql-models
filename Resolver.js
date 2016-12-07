@@ -89,30 +89,34 @@ class Resolver {
         }
     }
     resolveNode(_, opts) {
-        const { id, type } = graphql_relay_1.fromGlobalId(opts.source);
-        const modelId = type.replace(/Type$/gi, "").toLowerCase();
-        const result = this.adapter.findOne(modelId, id);
-        if (!result) {
-            return null;
-        }
-        const row = this.collection.get(modelId).rowToResolve(result);
-        return row;
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id, type } = graphql_relay_1.fromGlobalId(opts.source);
+            const modelId = type.replace(/Type$/gi, "").toLowerCase();
+            const result = yield this.adapter.findOne(modelId, id);
+            if (!result) {
+                return null;
+            }
+            const row = this.collection.get(modelId).rowToResolve(result);
+            return row;
+        });
     }
     resolveViewer(opts) {
         return {};
     }
     resolveQueryOne(modelId, opts) {
-        const id = graphql_relay_1.fromGlobalId(opts.args[Model_1.idArgName]).id;
-        const model = this.collection.get(modelId);
-        const result = this.adapter.findOne(modelId, id);
-        if (!result) {
-            return null;
-        }
-        if (opts.context && opts.context.subscriptionId) {
-            this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[Model_1.idArgName], opts);
-        }
-        const row = model.rowToResolve(result);
-        return row;
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = graphql_relay_1.fromGlobalId(opts.args[Model_1.idArgName]).id;
+            const model = this.collection.get(modelId);
+            const result = yield this.adapter.findOne(modelId, id);
+            if (!result) {
+                return null;
+            }
+            if (opts.context && opts.context.subscriptionId) {
+                this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[Model_1.idArgName], opts);
+            }
+            const row = model.rowToResolve(result);
+            return row;
+        });
     }
     resolveQueryConnection(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -227,7 +231,7 @@ class Resolver {
                         throw new Error("Unsupported argument type " + arg.type + " for update");
                 }
             })));
-            const updated = this.adapter.updateOne(model.id, id, updating);
+            const updated = yield this.adapter.updateOne(model.id, id, updating);
             const row = yield this.resolveModel(modelId, {
                 source: graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
                 args: null,
