@@ -3,7 +3,7 @@ import {
     GraphQLFieldConfig, GraphQLInputType,
 } from "graphql";
 import { ConnectionArguments } from "graphql-relay";
-import Model from "./model";
+import Model from "./Model";
 export interface ModelConfig {
     id: string;
     name?: string;
