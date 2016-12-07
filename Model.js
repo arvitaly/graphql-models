@@ -246,6 +246,7 @@ class Model {
         return capitalize(this.name);
     }
     rowFromResolve(row) {
+        row = Object.assign({}, row);
         const id = graphql_relay_1.fromGlobalId(row.id).id;
         row[this.getPrimaryKeyAttribute().realName] = id;
         this.attributes.map((attr) => {
@@ -253,10 +254,10 @@ class Model {
                 if (attr.type === AttributeTypes_1.default.Date) {
                     row[attr.name] = new Date(row[attr.name]);
                 }
-                if (attr.type === AttributeTypes_1.default.Model) {
+                if (attr.type === AttributeTypes_1.default.Model && typeof (row[attr.name]) === "string") {
                     row[attr.name] = graphql_relay_1.fromGlobalId(row[attr.name]).id;
                 }
-                if (attr.type === AttributeTypes_1.default.Collection) {
+                if (attr.type === AttributeTypes_1.default.Collection && row[attr.name] && row[attr.name].edges) {
                     row[attr.name] = row[attr.name].edges.map((value) => {
                         return graphql_relay_1.fromGlobalId(value.node.id).id;
                     });
@@ -266,6 +267,7 @@ class Model {
         return row;
     }
     rowToResolve(row) {
+        row = Object.assign({}, row);
         if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
             row._id = row.id;
         }
@@ -275,18 +277,12 @@ class Model {
                 if (attr.type === AttributeTypes_1.default.Date) {
                     row[attr.name] = row[attr.name].toUTCString();
                 }
-                if (attr.type === AttributeTypes_1.default.Model) {
-                    const childModel = this.collector.get(attr.model);
-                    row[attr.name] = graphql_relay_1.toGlobalId(childModel.getNameForGlobalId(), "" + row[attr.name]);
-                }
-                if (attr.type === AttributeTypes_1.default.Collection) {
-                    const childModelGlobalIdName = this.collector.get(attr.model).getNameForGlobalId();
-                    row[attr.name] = {
-                        edges: row[attr.name].map((value) => {
-                            return { node: { id: graphql_relay_1.toGlobalId(childModelGlobalIdName, "" + value) } };
-                        }),
-                    };
-                }
+            }
+            if (attr.type === AttributeTypes_1.default.Model) {
+                row[attr.name] = row[attr.name] || {};
+            }
+            if (attr.type === AttributeTypes_1.default.Collection) {
+                row[attr.name] = row[attr.name] || { edges: [] };
             }
         });
         return row;
@@ -411,13 +407,13 @@ class Model {
             if (attr.type === AttributeTypes_1.default.Model) {
                 graphQLType = this.collector.get(attr.model).getBaseType();
                 resolve = (source, args, context, info) => {
-                    return this.collector.get(attr.model).resolveFn(this.id, ResolveTypes_1.default.Node, { source: source[attr.name], args, context, info });
+                    return this.collector.get(attr.model).resolveFn(this.id, ResolveTypes_1.default.Model, { attrName: attr.name, source, args, context, info });
                 };
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
                 graphQLType = this.collector.get(attr.model).getConnectionType();
                 resolve = (source, args, context, info) => {
-                    return this.resolveFn(this.id, ResolveTypes_1.default.Connection, { attrName: attr.name, source: this.rowFromResolve(source), args, context, info });
+                    return this.resolveFn(this.id, ResolveTypes_1.default.Connection, { attrName: attr.name, source, args, context, info });
                 };
             }
             else if (attr.type === AttributeTypes_1.default.ID) {

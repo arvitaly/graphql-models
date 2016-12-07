@@ -104,19 +104,34 @@ export class DataAdapter extends Adapter {
             return s.type === "update" && s.model === modelId;
         }).map((s) => s.callback(oldRow));
     }
-    public findOne(modelId, id: number) {
+    public findOne(modelId, id: number, populate = false) {
         const result = Object.assign({}, data[modelId.toLowerCase() + "s"].find((a) => modelId === "user" ?
             "" + a.key === "" + id
             : "" + a.id === "" + id));
+        if (modelId === "post" && !populate) {
+            delete result.owner;
+            delete result.animals;
+        }
+        if (modelId === "user" && !populate) {
+            delete result.pets;
+        }
         return result;
     }
-    public populate(modelId, source, attr) {
+    public populateModel(modelId, source, attr) {
+        if (modelId === "post" && attr === "owner") {
+            source = this.findOne(modelId, source.id, true);
+            return this.findOne("user", source.owner);
+        }
+    }
+    public populateCollection(modelId, source, attr) {
         if (modelId === "post" && attr === "animals") {
+            source = this.findOne(modelId, source.id, true);
             return source.animals.map((id) => {
                 return this.findOne("animal", id);
             });
         }
         if (modelId === "user" && attr === "pets") {
+            source = this.findOne(modelId, source.key, true);
             return source.pets.map((id) => {
                 return this.findOne("animal", id);
             });

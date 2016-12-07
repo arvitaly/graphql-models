@@ -287,6 +287,7 @@ class Model {
         return capitalize(this.name);
     }
     public rowFromResolve(row) {
+        row = Object.assign({}, row);
         const id = fromGlobalId(row.id).id;
         row[this.getPrimaryKeyAttribute().realName] = id;
         this.attributes.map((attr) => {
@@ -294,10 +295,10 @@ class Model {
                 if (attr.type === AttributeTypes.Date) {
                     row[attr.name] = new Date(row[attr.name] as string);
                 }
-                if (attr.type === AttributeTypes.Model) {
+                if (attr.type === AttributeTypes.Model && typeof (row[attr.name]) === "string") {
                     row[attr.name] = fromGlobalId(row[attr.name]).id;
                 }
-                if (attr.type === AttributeTypes.Collection) {
+                if (attr.type === AttributeTypes.Collection && row[attr.name] && row[attr.name].edges) {
                     row[attr.name] = row[attr.name].edges.map((value) => {
                         return fromGlobalId(value.node.id).id;
                     });
@@ -307,6 +308,7 @@ class Model {
         return row;
     }
     public rowToResolve(row) {
+        row = Object.assign({}, row);
         if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
             row._id = row.id;
         }
@@ -316,18 +318,12 @@ class Model {
                 if (attr.type === AttributeTypes.Date) {
                     row[attr.name] = (row[attr.name] as Date).toUTCString();
                 }
-                if (attr.type === AttributeTypes.Model) {
-                    const childModel = this.collector.get(attr.model);
-                    row[attr.name] = toGlobalId(childModel.getNameForGlobalId(), "" + row[attr.name]);
-                }
-                if (attr.type === AttributeTypes.Collection) {
-                    const childModelGlobalIdName = this.collector.get(attr.model).getNameForGlobalId();
-                    row[attr.name] = {
-                        edges: (row[attr.name] as any[]).map((value) => {
-                            return { node: { id: toGlobalId(childModelGlobalIdName, "" + value) } };
-                        }),
-                    };
-                }
+            }
+            if (attr.type === AttributeTypes.Model) {
+                row[attr.name] = row[attr.name] || {};
+            }
+            if (attr.type === AttributeTypes.Collection) {
+                row[attr.name] = row[attr.name] || { edges: [] };
             }
         });
         return row;
@@ -450,14 +446,13 @@ class Model {
                 graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
                 resolve = (source, args, context, info) => {
                     return this.collector.get(attr.model).resolveFn(this.id,
-                        ResolveTypes.Node,
-                        { source: source[attr.name], args, context, info });
+                        ResolveTypes.Model, { attrName: attr.name, source, args, context, info });
                 };
             } else if (attr.type === AttributeTypes.Collection) {
                 graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
                 resolve = (source, args, context, info) => {
                     return this.resolveFn(this.id, ResolveTypes.Connection,
-                        { attrName: attr.name, source: this.rowFromResolve(source), args, context, info });
+                        { attrName: attr.name, source, args, context, info });
                 };
             } else if (attr.type === AttributeTypes.ID) {
                 graphQLType = new GraphQLNonNull(GraphQLID);

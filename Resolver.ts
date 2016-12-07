@@ -157,11 +157,17 @@ class Resolver {
         }
         return result;
     }
-    public resolveModel(modelId: ModelID, opts: ResolveOpts) {
-        return this.resolveNode(modelId, opts);
+    public async resolveModel(modelId: ModelID, opts: ResolveOpts) {
+        const row = await this.adapter.populateModel(modelId,
+            this.collection.get(modelId).rowFromResolve(opts.source), opts.attrName);
+        return this.collection.get(
+            this.collection.get(modelId).attributes.find((a) => a.name === opts.attrName).model,
+        ).rowToResolve(row);
     }
     public async resolveConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
-        const rows = await this.adapter.populate(modelId, opts.source, opts.attrName);
+        const rows = await this.adapter.populateCollection(modelId,
+            this.collection.get(modelId).rowFromResolve(opts.source),
+            opts.attrName);
         const edges = rows.map((row) => {
             return {
                 cursor: null,
@@ -182,7 +188,7 @@ class Resolver {
     }
     public async resolveMutationCreate(modelId: string, opts: ResolveOpts) {
         const id = await this.createOne(modelId, opts.args);
-        const row = await this.resolveModel(modelId, {
+        const row = await this.resolveNode(modelId, {
             source: id,
             args: null,
             context: opts.context,
@@ -228,7 +234,7 @@ class Resolver {
             }
         }));
         const updated = await this.adapter.updateOne(model.id, id, updating);
-        const row = await this.resolveModel(modelId, {
+        const row = await this.resolveNode(modelId, {
             source: toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
             args: null,
             context: opts.context,

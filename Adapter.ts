@@ -12,8 +12,11 @@ class Adapter {
     public hasPreviousPage(modelId: string, findCriteria: FindCriteria): boolean | Promise<boolean> {
         throw new Error("Not implemented hasPreviousPage");
     }
-    public populate(modelId: string, source: any, attr: string): any[] | Promise<any[]> {
-        throw new Error("Not implemented populate");
+    public populateModel(modelId: string, source: any, attr: string): any[] | Promise<any[]> {
+        throw new Error("Not implemented populate model");
+    }
+    public populateCollection(modelId: string, source: any, attr: string): any[] | Promise<any[]> {
+        throw new Error("Not implemented populate collection");
     }
     public createOne(modelId: ModelID, created: any) {
         throw new Error("Not implemented createOne");

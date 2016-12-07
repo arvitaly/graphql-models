@@ -159,11 +159,14 @@ class Resolver {
         });
     }
     resolveModel(modelId, opts) {
-        return this.resolveNode(modelId, opts);
+        return __awaiter(this, void 0, void 0, function* () {
+            const row = yield this.adapter.populateModel(modelId, this.collection.get(modelId).rowFromResolve(opts.source), opts.attrName);
+            return this.collection.get(this.collection.get(modelId).attributes.find((a) => a.name === opts.attrName).model).rowToResolve(row);
+        });
     }
     resolveConnection(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const rows = yield this.adapter.populate(modelId, opts.source, opts.attrName);
+            const rows = yield this.adapter.populateCollection(modelId, this.collection.get(modelId).rowFromResolve(opts.source), opts.attrName);
             const edges = rows.map((row) => {
                 return {
                     cursor: null,
@@ -185,7 +188,7 @@ class Resolver {
     resolveMutationCreate(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = yield this.createOne(modelId, opts.args);
-            const row = yield this.resolveModel(modelId, {
+            const row = yield this.resolveNode(modelId, {
                 source: id,
                 args: null,
                 context: opts.context,
@@ -232,7 +235,7 @@ class Resolver {
                 }
             })));
             const updated = yield this.adapter.updateOne(model.id, id, updating);
-            const row = yield this.resolveModel(modelId, {
+            const row = yield this.resolveNode(modelId, {
                 source: graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
                 args: null,
                 context: opts.context,

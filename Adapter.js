@@ -12,8 +12,11 @@ class Adapter {
     hasPreviousPage(modelId, findCriteria) {
         throw new Error("Not implemented hasPreviousPage");
     }
-    populate(modelId, source, attr) {
-        throw new Error("Not implemented populate");
+    populateModel(modelId, source, attr) {
+        throw new Error("Not implemented populate model");
+    }
+    populateCollection(modelId, source, attr) {
+        throw new Error("Not implemented populate collection");
     }
     createOne(modelId, created) {
         throw new Error("Not implemented createOne");
