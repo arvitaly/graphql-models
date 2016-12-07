@@ -307,7 +307,7 @@ class Model {
         this.attributes.map((attr) => {
             if (typeof (row[attr.name]) !== "undefined") {
                 if (attr.type === AttributeTypes.Date) {
-                    row[attr.name] = (row[attr.name] as Date).toString();
+                    row[attr.name] = (row[attr.name] as Date).toUTCString();
                 }
                 if (attr.type === AttributeTypes.Model) {
                     const childModel = this.collector.get(attr.model);

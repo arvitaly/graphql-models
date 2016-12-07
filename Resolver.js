@@ -162,7 +162,8 @@ class Resolver {
             const edges = rows.map((row) => {
                 return {
                     cursor: null,
-                    node: this.collection.get(modelId).rowToResolve(row),
+                    node: this.collection.get(this.collection.get(modelId).attributes.find((a) => a.name === opts.attrName).model)
+                        .rowToResolve(row),
                 };
             });
             return {

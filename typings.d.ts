@@ -16,7 +16,7 @@ export type ModelOptions = {
 export type AttributeType = "id" | "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
     name: string;
-    realName: string;
+    realName?: string;
     type: AttributeType;
     required?: boolean | undefined;
     primaryKey?: boolean | undefined;
