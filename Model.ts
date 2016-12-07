@@ -32,9 +32,11 @@ import {
 } from "./typings";
 export const whereArgName = "where";
 export const idArgName = "id";
+export const inputArgName = "input";
 class Model {
     public id: string;
     public name: string;
+    public queryName: string;
     public attributes: Attribute[];
     protected primaryKeyAttribute: Attribute;
     protected baseType: GraphQLObjectType;
@@ -43,11 +45,13 @@ class Model {
     protected connectionType: GraphQLObjectType;
     protected whereInputType: GraphQLInputObjectType;
     protected whereArguments: Argument[];
+    protected createArguments: Argument[];
     protected resolveFn: ResolveFn;
     constructor(public config: ModelConfig, protected collector: Collection, protected opts: ModelOptions = {}) {
         this.opts.interfaces = this.opts.interfaces || [];
         this.resolveFn = this.opts.resolveFn;
         this.name = this.config.name || capitalize(this.config.id);
+        this.queryName = uncapitalize(this.name);
         this.id = this.config.id;
         let idAttr: Attribute;
         this.attributes = this.config.attributes.map((attrConfig) => {
@@ -266,10 +270,36 @@ class Model {
         }
         return this.whereArguments;
     }
+    public getCreateArguments() {
+        if (!this.createArguments) {
+            this.createArguments = this.generateCreateArguments();
+        }
+        return this.createArguments;
+    }
     public getNameForGlobalId() {
         return capitalize(this.name);
     }
-    public prepareRow(row) {
+    public rowFromResolve(row) {
+        const id = fromGlobalId(row.id).id;
+        row[this.getPrimaryKeyAttribute().realName] = id;
+        this.attributes.map((attr) => {
+            if (typeof (row[attr.name]) !== "undefined") {
+                if (attr.type === AttributeTypes.Date) {
+                    row[attr.name] = new Date(row[attr.name] as string);
+                }
+                if (attr.type === AttributeTypes.Model) {
+                    row[attr.name] = fromGlobalId(row[attr.name]).id;
+                }
+                if (attr.type === AttributeTypes.Collection) {
+                    row[attr.name] = row[attr.name].edges.map((value) => {
+                        return fromGlobalId(value.node.id).id;
+                    });
+                }
+            }
+        });
+        return row;
+    }
+    public rowToResolve(row) {
         if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
             row._id = row.id;
         }
@@ -279,9 +309,61 @@ class Model {
                 if (attr.type === AttributeTypes.Date) {
                     row[attr.name] = (row[attr.name] as Date).toString();
                 }
+                if (attr.type === AttributeTypes.Model) {
+                    const childModel = this.collector.get(attr.model);
+                    row[attr.name] = toGlobalId(childModel.getNameForGlobalId(), "" + row[attr.name]);
+                }
+                if (attr.type === AttributeTypes.Collection) {
+                    const childModelGlobalIdName = this.collector.get(attr.model).getNameForGlobalId();
+                    row[attr.name] = {
+                        edges: (row[attr.name] as any[]).map((value) => {
+                            return { node: { id: toGlobalId(childModelGlobalIdName, "" + value) } };
+                        }),
+                    };
+                }
             }
         });
         return row;
+    }
+    protected generateCreateArguments() {
+        let args: Argument[] = [];
+        this.attributes.map((attr) => {
+            if (attr.name === idArgName) {
+                return;
+            }
+            let graphQLType;
+            if (attr.type === AttributeTypes.Model) {
+                const childModel = this.collector.get(attr.model);
+                graphQLType = GraphQLID;
+                args.push({
+                    attribute: attr.name,
+                    graphQLType: childModel.getCreateType(),
+                    name: "create" + capitalize(attr.name),
+                    type: ArgumentTypes.CreateSubModel,
+                    value: undefined,
+                });
+            } else if (attr.type === AttributeTypes.Collection) {
+                const childModel = this.collector.get((attr as CollectionAttribute).model);
+                graphQLType = new GraphQLList(GraphQLID);
+                args.push({
+                    attribute: attr.name,
+                    graphQLType: new GraphQLList(childModel.getCreateType()),
+                    name: "create" + capitalize(attr.name),
+                    type: ArgumentTypes.CreateSubCollection,
+                    value: undefined,
+                });
+            } else {
+                graphQLType = scalarTypeToGraphQL(attr.type);
+            }
+            args.push({
+                attribute: attr.name,
+                name: attr.name,
+                graphQLType: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType,
+                type: ArgumentTypes.CreateArgument,
+                value: undefined,
+            });
+        });
+        return args;
     }
     protected generateWhereArguments() {
         let args: Argument[] = [];
@@ -367,8 +449,8 @@ class Model {
             } else if (attr.type === AttributeTypes.Collection) {
                 graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
                 resolve = (source, args, context, info) => {
-                    return this.resolveFn(this.id, ResolveTypes.QueryConnection,
-                        { source: attr.name, args, context, info });
+                    return this.resolveFn(this.id, ResolveTypes.Connection,
+                        { attrName: attr.name, source: this.rowFromResolve(source), args, context, info });
                 };
             } else if (attr.type === AttributeTypes.ID) {
                 graphQLType = new GraphQLNonNull(GraphQLID);
@@ -388,27 +470,8 @@ class Model {
     }
     protected generateCreationType(): GraphQLInputObjectType {
         let fields: GraphQLInputFieldConfigMap = {};
-        this.attributes.map((attr) => {
-            if (attr.name === idArgName) {
-                return;
-            }
-            let graphQLType;
-            if (attr.type === AttributeTypes.Model) {
-                const childModel = this.collector.get(attr.model);
-                graphQLType = GraphQLID;
-                // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
-                fields["create" + capitalize(attr.name)] = { type: childModel.getCreateType() };
-            } else if (attr.type === AttributeTypes.Collection) {
-                const childModel = this.collector.get((attr as CollectionAttribute).model);
-                // graphQLType = scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
-                graphQLType = new GraphQLList(GraphQLID);
-                fields["create" + capitalize(attr.name)] = {
-                    type: new GraphQLList(childModel.getCreateType()),
-                };
-            } else {
-                graphQLType = scalarTypeToGraphQL(attr.type);
-            }
-            fields[attr.name] = { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType };
+        this.getCreateArguments().map((arg) => {
+            fields[arg.name] = { type: arg.graphQLType };
         });
         return new GraphQLInputObjectType({
             name: "Create" + capitalize(this.name) + "Input",

@@ -5,6 +5,7 @@ import { AttributeTypes, Collection, ResolveOpts, Resolver, ResolveTypes, Schema
 import { animalModel, postModel, userModel } from "./../__fixtures__/collection1";
 import { callbacks, createAnimal, DataAdapter, publisher } from "./../__fixtures__/data";
 const animalId1 = toGlobalId("Animal", "1");
+const postId1 = toGlobalId("Post", "1");
 describe("Functional tests", () => {
     let adapter: DataAdapter;
     let resolver: Resolver;
@@ -39,7 +40,7 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     });
-    it("query one", async () => {
+    it("query one: animal", async () => {
         const result = await graphql(graphqlSchema, `query Q1{  
             viewer{
                 animal(id:"${animalId1}"){
@@ -52,6 +53,47 @@ describe("Functional tests", () => {
                 }
             }
         }`);
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+    });
+    it("query one: post", async () => {
+        const result = await graphql(graphqlSchema, `query Q1{  
+            viewer{
+                post(id: "${postId1}"){
+                    owner{
+                        name
+                        pets{
+                            edges{
+                                node{
+                                    ...F1
+                                }
+                            }
+                        }
+                    }
+                    animals{
+                        edges{
+                            node{
+                                ...F1
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+        fragment F1 on Animal{
+            id
+            name
+            age
+            birthday
+            Weight
+            isCat
+        }
+        `);
         if (result.errors) {
             result.errors.map((e) => {
                 console.error(e);
@@ -130,5 +172,47 @@ describe("Functional tests", () => {
         expect(publishAddSpy.calls.allArgs()).toMatchSnapshot();
         adapter.create("animal", { name: "axz" });
         expect(publishAddSpy.calls.allArgs()).toMatchSnapshot();
+    });
+    it("mutation create", async () => {
+        const result = await graphql(graphqlSchema, `mutation M1{  
+            createPost(input:{createAnimals:[{name:"animal1"},{name:"animal2"}], 
+                createOwner:{name:"user5", 
+                createPets:[{name:"pet1"}] } } ){
+                post{
+                    owner{
+                        name
+                        pets{
+                            ...FE
+                        }
+                    }
+                    animals{
+                        ...FE
+                    }
+                }
+            }
+        }
+        fragment FE on AnimalConnection{
+            edges{
+                node{
+                    ...F1
+                }
+            }
+        }
+        fragment F1 on Animal{
+            id
+            name
+            age
+            birthday
+            Weight
+            isCat
+        }        
+        `);
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
     });
 });

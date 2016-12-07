@@ -17,5 +17,8 @@ const ArgumentTypes = {
     LessThan: "lessThan" as "lessThan",
     GreaterThanOrEqual: "greaterThanOrEqual" as "greaterThanOrEqual",
     LessThanOrEqual: "lessThanOrEqual" as "lessThanOrEqual",
+    CreateArgument: "createArgument" as "createArgument",
+    CreateSubModel: "createSubModel" as "createSubModel",
+    CreateSubCollection: "createSubCollection" as "createSubCollection",
 };
 export default ArgumentTypes;

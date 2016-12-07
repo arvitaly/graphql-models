@@ -14,6 +14,7 @@ const __1 = require("./..");
 const collection1_1 = require("./../__fixtures__/collection1");
 const data_1 = require("./../__fixtures__/data");
 const animalId1 = graphql_relay_1.toGlobalId("Animal", "1");
+const postId1 = graphql_relay_1.toGlobalId("Post", "1");
 describe("Functional tests", () => {
     let adapter;
     let resolver;
@@ -48,7 +49,7 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     }));
-    it("query one", () => __awaiter(this, void 0, void 0, function* () {
+    it("query one: animal", () => __awaiter(this, void 0, void 0, function* () {
         const result = yield graphql_1.graphql(graphqlSchema, `query Q1{  
             viewer{
                 animal(id:"${animalId1}"){
@@ -61,6 +62,47 @@ describe("Functional tests", () => {
                 }
             }
         }`);
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+    }));
+    it("query one: post", () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield graphql_1.graphql(graphqlSchema, `query Q1{  
+            viewer{
+                post(id: "${postId1}"){
+                    owner{
+                        name
+                        pets{
+                            edges{
+                                node{
+                                    ...F1
+                                }
+                            }
+                        }
+                    }
+                    animals{
+                        edges{
+                            node{
+                                ...F1
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+        fragment F1 on Animal{
+            id
+            name
+            age
+            birthday
+            Weight
+            isCat
+        }
+        `);
         if (result.errors) {
             result.errors.map((e) => {
                 console.error(e);
@@ -139,6 +181,48 @@ describe("Functional tests", () => {
         expect(publishAddSpy.calls.allArgs()).toMatchSnapshot();
         adapter.create("animal", { name: "axz" });
         expect(publishAddSpy.calls.allArgs()).toMatchSnapshot();
+    }));
+    it("mutation create", () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield graphql_1.graphql(graphqlSchema, `mutation M1{  
+            createPost(input:{createAnimals:[{name:"animal1"},{name:"animal2"}], 
+                createOwner:{name:"user5", 
+                createPets:[{name:"pet1"}] } } ){
+                post{
+                    owner{
+                        name
+                        pets{
+                            ...FE
+                        }
+                    }
+                    animals{
+                        ...FE
+                    }
+                }
+            }
+        }
+        fragment FE on AnimalConnection{
+            edges{
+                node{
+                    ...F1
+                }
+            }
+        }
+        fragment F1 on Animal{
+            id
+            name
+            age
+            birthday
+            Weight
+            isCat
+        }        
+        `);
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
     }));
 });
 //# sourceMappingURL=Functional-spec.js.map

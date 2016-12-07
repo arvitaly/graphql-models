@@ -79,6 +79,10 @@ class Resolver {
                 return this.resolveQueryOne(modelId, opts);
             case ResolveTypes_1.default.QueryConnection:
                 return this.resolveQueryConnection(modelId, opts);
+            case ResolveTypes_1.default.MutationCreate:
+                return this.resolveMutationCreate(modelId, opts);
+            case ResolveTypes_1.default.MutationUpdate:
+                return this.resolveMutationUpdate(modelId, opts);
             default:
                 throw new Error("Unsupported resolve type: " + type);
         }
@@ -90,7 +94,8 @@ class Resolver {
         if (!result) {
             return null;
         }
-        return this.collection.get(modelId).prepareRow(result);
+        const row = this.collection.get(modelId).rowToResolve(result);
+        return row;
     }
     resolveViewer(opts) {
         return {};
@@ -105,7 +110,8 @@ class Resolver {
         if (opts.context && opts.context.subscriptionId) {
             this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[Model_1.idArgName], opts);
         }
-        return model.prepareRow(result);
+        const row = model.rowToResolve(result);
+        return row;
     }
     resolveQueryConnection(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -128,7 +134,7 @@ class Resolver {
                 const edges = rows.map((row) => {
                     return {
                         cursor: null,
-                        node: model.prepareRow(row),
+                        node: model.rowToResolve(row),
                     };
                 });
                 result = {
@@ -152,11 +158,11 @@ class Resolver {
     }
     resolveConnection(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const rows = yield this.adapter.populate(modelId, opts.source);
+            const rows = yield this.adapter.populate(modelId, opts.source, opts.attrName);
             const edges = rows.map((row) => {
                 return {
                     cursor: null,
-                    node: this.collection.get(modelId).prepareRow(row),
+                    node: this.collection.get(modelId).rowToResolve(row),
                 };
             });
             return {
@@ -171,10 +177,64 @@ class Resolver {
         });
     }
     resolveMutationCreate(modelId, opts) {
-        // TODO
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = yield this.createOne(modelId, opts.args);
+            const row = yield this.resolveModel(modelId, {
+                source: id,
+                args: null,
+                context: opts.context,
+                info: opts.info,
+            });
+            return {
+                [this.collection.get(modelId).queryName]: row,
+            };
+        });
     }
-    createOne() {
-        // TODO
+    resolveMutationUpdate(modelId, opts) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO
+        });
+    }
+    createOne(modelId, args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.collection.get(modelId);
+            let createArgs = Object.keys(args).map((createArgName) => {
+                let arg = model.getCreateArguments().find((a) => a.name === createArgName);
+                arg.value = args[createArgName];
+                return arg;
+            });
+            const submodels = yield Promise.all(createArgs.filter((arg) => arg.type === ArgumentTypes_1.default.CreateSubModel).map((arg) => __awaiter(this, void 0, void 0, function* () {
+                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                return {
+                    name: arg.attribute,
+                    value: graphql_relay_1.fromGlobalId(yield this.createOne(childModel, arg.value)).id,
+                    attribute: arg.attribute,
+                    type: ArgumentTypes_1.default.CreateArgument,
+                    graphQLType: null,
+                };
+            })));
+            createArgs = createArgs.concat(submodels);
+            const subcollections = yield Promise.all(createArgs.filter((arg) => arg.type === ArgumentTypes_1.default.CreateSubCollection).map((arg) => __awaiter(this, void 0, void 0, function* () {
+                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                const ids = yield Promise.all(arg.value.map((row) => __awaiter(this, void 0, void 0, function* () {
+                    return graphql_relay_1.fromGlobalId(yield this.createOne(childModel, row)).id;
+                })));
+                return {
+                    name: arg.attribute,
+                    value: ids,
+                    attribute: arg.attribute,
+                    type: ArgumentTypes_1.default.CreateArgument,
+                    graphQLType: null,
+                };
+            })));
+            createArgs = createArgs.concat(subcollections);
+            let creating = {};
+            createArgs.map((arg) => {
+                creating[arg.attribute] = arg.value;
+            });
+            const created = yield this.adapter.createOne(modelId, creating);
+            return graphql_relay_1.toGlobalId(modelId, "" + created[model.getPrimaryKeyAttribute().realName]);
+        });
     }
     /*resolveMutationCreate();
     resolveMutationUpdate();

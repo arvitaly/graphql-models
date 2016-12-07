@@ -4,6 +4,8 @@ import Model from "./../Model";
 import Publisher from "./../Publisher";
 import { Callbacks, FindCriteria, ModelID } from "./../typings";
 const animalsName = "animals";
+const usersName = "users";
+const postsName = "posts";
 export const data: { [index: string]: any[] } = {
     animals: [{
         id: 1,
@@ -45,16 +47,29 @@ export const data: { [index: string]: any[] } = {
         pets: [2, 3, 4],
     }],
 };
-export function createAnimal() {
+export function createAnimal(row?: any) {
     const newId: number = data[animalsName][data[animalsName].length - 1].id + 1;
-    return {
+    return Object.assign({
         id: newId,
         name: "Name" + newId,
         age: 1000 + newId,
         Weight: 1000.1 + newId,
         birthday: new Date(+new Date("2100/11/11") + newId),
         isCat: newId % 2 === 0,
-    };
+    }, row);
+}
+export function createUser(row?: any) {
+    const newId: number = data[usersName][data[usersName].length - 1].key + 1.17;
+    return Object.assign({
+        key: newId,
+        name: "UserName" + newId,
+    }, row);
+}
+export function createPost(row?: any) {
+    const newId: number = data[postsName][data[postsName].length - 1].id + 1;
+    return Object.assign({
+        id: newId,
+    }, row);
 }
 const subscribers: Array<{
     type: "update" | "create" | "delete";
@@ -65,7 +80,19 @@ const subscribers: Array<{
 export class DataAdapter extends Adapter {
     public create(modelId, row) {
         const newRow = Object.assign({}, row);
-        data[modelId.toLowerCase() + "s"].push(newRow);
+        switch (modelId) {
+            case "animal":
+                data[modelId.toLowerCase() + "s"].push(createAnimal(row));
+                break;
+            case "user":
+                data[modelId.toLowerCase() + "s"].push(createUser(row));
+                break;
+            case "post":
+                data[modelId.toLowerCase() + "s"].push(createPost(row));
+                break;
+            default:
+                data[modelId.toLowerCase() + "s"].push(newRow);
+        }
         subscribers.filter((s) => {
             return s.type === "create" && s.model === modelId;
         }).map((s) => s.callback(newRow));
@@ -78,7 +105,39 @@ export class DataAdapter extends Adapter {
         }).map((s) => s.callback(oldRow));
     }
     public findOne(modelId, id: number) {
-        return Object.assign({}, data[modelId.toLowerCase() + "s"].find((a) => "" + a.id === "" + id));
+        const result = Object.assign({}, data[modelId.toLowerCase() + "s"].find((a) => modelId === "user" ?
+            "" + a.key === "" + id
+            : "" + a.id === "" + id));
+        return result;
+    }
+    public populate(modelId, source, attr) {
+        if (modelId === "post" && attr === "animals") {
+            return source.animals.map((id) => {
+                return this.findOne("animal", id);
+            });
+        }
+        if (modelId === "user" && attr === "pets") {
+            return source.pets.map((id) => {
+                return this.findOne("animal", id);
+            });
+        }
+    }
+    public createOne(modelId, row: any) {
+        switch (modelId) {
+            case "animal":
+                const newRow = createAnimal(row);
+                data[modelId.toLowerCase() + "s"].push(newRow);
+                return newRow;
+            case "user":
+                const newUserRow = createUser(row);
+                data[modelId.toLowerCase() + "s"].push(newUserRow);
+                return newUserRow;
+            case "post":
+                const newPostRow = createPost(row);
+                data[modelId.toLowerCase() + "s"].push(newPostRow);
+                return newPostRow;
+            default:
+        }
     }
     public findMany(modelId, findCriteria: FindCriteria) {
         let result = data[modelId.toLowerCase() + "s"].map((row) => Object.assign({}, row));

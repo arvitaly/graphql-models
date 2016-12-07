@@ -12,8 +12,11 @@ class Adapter {
     hasPreviousPage(modelId, findCriteria) {
         throw new Error("Not implemented hasPreviousPage");
     }
-    populate(modelId, attr) {
+    populate(modelId, source, attr) {
         throw new Error("Not implemented populate");
+    }
+    createOne(modelId, created) {
+        throw new Error("Not implemented createOne");
     }
 }
 Object.defineProperty(exports, "__esModule", { value: true });

@@ -4,10 +4,10 @@ import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
-import Model, { idArgName } from "./Model";
+import Model, { idArgName, inputArgName } from "./Model";
 import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
-import { Callbacks, FindCriteria, ModelID, ResolveOpts, ResolveType, SubscriptionID } from "./typings";
+import { Argument, Callbacks, FindCriteria, ModelID, ResolveOpts, ResolveType, SubscriptionID } from "./typings";
 class Resolver {
     public collection: Collection;
     protected subscribes: {
@@ -83,6 +83,10 @@ class Resolver {
                 return this.resolveQueryOne(modelId, opts);
             case ResolveTypes.QueryConnection:
                 return this.resolveQueryConnection(modelId, opts);
+            case ResolveTypes.MutationCreate:
+                return this.resolveMutationCreate(modelId, opts);
+            case ResolveTypes.MutationUpdate:
+                return this.resolveMutationUpdate(modelId, opts);
             default:
                 throw new Error("Unsupported resolve type: " + type);
         }
@@ -90,11 +94,13 @@ class Resolver {
     public resolveNode(_: ModelID, opts: ResolveOpts) {
         const {id, type} = fromGlobalId(opts.source);
         const modelId = type.replace(/Type$/gi, "").toLowerCase();
+
         const result = this.adapter.findOne(modelId, id);
         if (!result) {
             return null;
         }
-        return this.collection.get(modelId).prepareRow(result);
+        const row = this.collection.get(modelId).rowToResolve(result);
+        return row;
     }
     public resolveViewer(opts: ResolveOpts) {
         return {};
@@ -109,7 +115,8 @@ class Resolver {
         if (opts.context && opts.context.subscriptionId) {
             this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[idArgName], opts);
         }
-        return model.prepareRow(result);
+        const row = model.rowToResolve(result);
+        return row;
     }
     public async resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
         const model = this.collection.get(modelId);
@@ -130,7 +137,7 @@ class Resolver {
             const edges = rows.map((row) => {
                 return {
                     cursor: null,
-                    node: model.prepareRow(row),
+                    node: model.rowToResolve(row),
                 };
             });
             result = {
@@ -154,11 +161,11 @@ class Resolver {
         return this.resolveNode(modelId, opts);
     }
     public async resolveConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
-        const rows = await this.adapter.populate(modelId, opts.source);
+        const rows = await this.adapter.populate(modelId, opts.source, opts.attrName);
         const edges = rows.map((row) => {
             return {
                 cursor: null,
-                node: this.collection.get(modelId).prepareRow(row),
+                node: this.collection.get(modelId).rowToResolve(row),
             };
         });
         return {
@@ -171,11 +178,63 @@ class Resolver {
             },
         };
     }
-    public resolveMutationCreate(modelId: string, opts: ResolveOpts) {
+    public async resolveMutationCreate(modelId: string, opts: ResolveOpts) {
+        const id = await this.createOne(modelId, opts.args);
+        const row = await this.resolveModel(modelId, {
+            source: id,
+            args: null,
+            context: opts.context,
+            info: opts.info,
+        });
+        return {
+            [this.collection.get(modelId).queryName]: row,
+        };
+    }
+    public async resolveMutationUpdate(modelId: string, opts: ResolveOpts) {
         // TODO
     }
-    public createOne() {
-        // TODO
+    public async createOne(modelId: string, args) {
+        const model = this.collection.get(modelId);
+        let createArgs = Object.keys(args).map((createArgName) => {
+            let arg = model.getCreateArguments().find((a) => a.name === createArgName);
+            arg.value = args[createArgName];
+            return arg;
+        });
+        const submodels = await Promise.all(
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubModel).map(async (arg) => {
+                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                return {
+                    name: arg.attribute,
+                    value: fromGlobalId(await this.createOne(childModel, arg.value)).id,
+                    attribute: arg.attribute,
+                    type: ArgumentTypes.CreateArgument,
+                    graphQLType: null,
+                };
+            }),
+        );
+        createArgs = createArgs.concat(submodels);
+        const subcollections = await Promise.all(
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async (arg) => {
+                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                const ids = await Promise.all(arg.value.map(async (row) => {
+                    return fromGlobalId(await this.createOne(childModel, row)).id;
+                }));
+                return {
+                    name: arg.attribute,
+                    value: ids,
+                    attribute: arg.attribute,
+                    type: ArgumentTypes.CreateArgument,
+                    graphQLType: null,
+                };
+            }),
+        );
+        createArgs = createArgs.concat(subcollections);
+        let creating: any = {};
+        createArgs.map((arg) => {
+            creating[arg.attribute] = arg.value;
+        });
+        const created = await this.adapter.createOne(modelId, creating);
+        return toGlobalId(modelId, "" + created[model.getPrimaryKeyAttribute().realName]);
     }
     /*resolveMutationCreate();
     resolveMutationUpdate();

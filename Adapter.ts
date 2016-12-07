@@ -1,4 +1,4 @@
-import { FindCriteria } from "./typings";
+import { FindCriteria, ModelID } from "./typings";
 class Adapter {
     public findOne(modelId: string, id: any) {
         throw new Error("Not implemented findOne");
@@ -12,8 +12,11 @@ class Adapter {
     public hasPreviousPage(modelId: string, findCriteria: FindCriteria): boolean | Promise<boolean> {
         throw new Error("Not implemented hasPreviousPage");
     }
-    public populate(modelId: string, attr: string): any[] | Promise<any[]> {
+    public populate(modelId: string, source: any, attr: string): any[] | Promise<any[]> {
         throw new Error("Not implemented populate");
+    }
+    public createOne(modelId: ModelID, created: any) {
+        throw new Error("Not implemented createOne");
     }
 }
 export default Adapter;

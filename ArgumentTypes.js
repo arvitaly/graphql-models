@@ -18,6 +18,9 @@ const ArgumentTypes = {
     LessThan: "lessThan",
     GreaterThanOrEqual: "greaterThanOrEqual",
     LessThanOrEqual: "lessThanOrEqual",
+    CreateArgument: "createArgument",
+    CreateSubModel: "createSubModel",
+    CreateSubCollection: "createSubCollection",
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ArgumentTypes;

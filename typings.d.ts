@@ -54,7 +54,7 @@ export interface GraphQLTypes {
 }
 export type ResolveType = "node" | "viewer" | "model" | "connection" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationUpdateMany" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
 export type ResolveOpts = GraphQLResolveArgs & {
-
+    attrName?: string;
 }
 export type ModelID = string;
 export type ResolveFn = (model: ModelID, type: ResolveType, opts?: ResolveOpts) => any;
@@ -82,7 +82,8 @@ export type Mutations = Array<Mutation>;
 export type WhereArgHelper = {
 
 }
-export type ArgumentType = "equal" | "notEqual" | "isNull" | "isNotNull" | "in" | "notIn" | "contains" |
+export type ArgumentType = "createArgument" | "createSubModel" | "createSubCollection" |
+    "equal" | "notEqual" | "isNull" | "isNotNull" | "in" | "notIn" | "contains" |
     "notContains" | "startsWith" | "notStartsWith" | "endsWith" | "notEndsWith" |
     "like" | "notLike" | "greaterThan" | "lessThan" | "greaterThanOrEqual" | "lessThanOrEqual";
 export type Argument = {

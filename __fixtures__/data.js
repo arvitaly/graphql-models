@@ -3,6 +3,8 @@ const Adapter_1 = require("./../Adapter");
 const ArgumentTypes_1 = require("./../ArgumentTypes");
 const Publisher_1 = require("./../Publisher");
 const animalsName = "animals";
+const usersName = "users";
+const postsName = "posts";
 exports.data = {
     animals: [{
             id: 1,
@@ -44,24 +46,51 @@ exports.data = {
             pets: [2, 3, 4],
         }],
 };
-function createAnimal() {
+function createAnimal(row) {
     const newId = exports.data[animalsName][exports.data[animalsName].length - 1].id + 1;
-    return {
+    return Object.assign({
         id: newId,
         name: "Name" + newId,
         age: 1000 + newId,
         Weight: 1000.1 + newId,
         birthday: new Date(+new Date("2100/11/11") + newId),
         isCat: newId % 2 === 0,
-    };
+    }, row);
 }
 exports.createAnimal = createAnimal;
+function createUser(row) {
+    const newId = exports.data[usersName][exports.data[usersName].length - 1].key + 1.17;
+    return Object.assign({
+        key: newId,
+        name: "UserName" + newId,
+    }, row);
+}
+exports.createUser = createUser;
+function createPost(row) {
+    const newId = exports.data[postsName][exports.data[postsName].length - 1].id + 1;
+    return Object.assign({
+        id: newId,
+    }, row);
+}
+exports.createPost = createPost;
 const subscribers = [];
 // tslint:disable max-classes-per-file
 class DataAdapter extends Adapter_1.default {
     create(modelId, row) {
         const newRow = Object.assign({}, row);
-        exports.data[modelId.toLowerCase() + "s"].push(newRow);
+        switch (modelId) {
+            case "animal":
+                exports.data[modelId.toLowerCase() + "s"].push(createAnimal(row));
+                break;
+            case "user":
+                exports.data[modelId.toLowerCase() + "s"].push(createUser(row));
+                break;
+            case "post":
+                exports.data[modelId.toLowerCase() + "s"].push(createPost(row));
+                break;
+            default:
+                exports.data[modelId.toLowerCase() + "s"].push(newRow);
+        }
         subscribers.filter((s) => {
             return s.type === "create" && s.model === modelId;
         }).map((s) => s.callback(newRow));
@@ -74,7 +103,39 @@ class DataAdapter extends Adapter_1.default {
         }).map((s) => s.callback(oldRow));
     }
     findOne(modelId, id) {
-        return Object.assign({}, exports.data[modelId.toLowerCase() + "s"].find((a) => "" + a.id === "" + id));
+        const result = Object.assign({}, exports.data[modelId.toLowerCase() + "s"].find((a) => modelId === "user" ?
+            "" + a.key === "" + id
+            : "" + a.id === "" + id));
+        return result;
+    }
+    populate(modelId, source, attr) {
+        if (modelId === "post" && attr === "animals") {
+            return source.animals.map((id) => {
+                return this.findOne("animal", id);
+            });
+        }
+        if (modelId === "user" && attr === "pets") {
+            return source.pets.map((id) => {
+                return this.findOne("animal", id);
+            });
+        }
+    }
+    createOne(modelId, row) {
+        switch (modelId) {
+            case "animal":
+                const newRow = createAnimal(row);
+                exports.data[modelId.toLowerCase() + "s"].push(newRow);
+                return newRow;
+            case "user":
+                const newUserRow = createUser(row);
+                exports.data[modelId.toLowerCase() + "s"].push(newUserRow);
+                return newUserRow;
+            case "post":
+                const newPostRow = createPost(row);
+                exports.data[modelId.toLowerCase() + "s"].push(newPostRow);
+                return newPostRow;
+            default:
+        }
     }
     findMany(modelId, findCriteria) {
         let result = exports.data[modelId.toLowerCase() + "s"].map((row) => Object.assign({}, row));
