@@ -267,7 +267,7 @@ class Model {
         return row;
     }
     rowToResolve(row) {
-        row = Object.assign({}, row);
+        row = Object.assign({ _source: row }, row);
         if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
             row._id = row.id;
         }
