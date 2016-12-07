@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -124,8 +124,7 @@ describe("Model spec", () => {
                         args: "f2",
                         context: "f3",
                         info: "f4",
-                    }
-                ]]);
+                    }]]);
         });
         it("Query connection", () => {
             const queryConnection = animalModel.getConnectionQuery();
@@ -139,8 +138,7 @@ describe("Model spec", () => {
                         args: "f2",
                         context: "f3",
                         info: "f4",
-                    }
-                ]]);
+                    }]]);
         });
         it("all queries", () => {
             const getQueryOneSpy = spyOn(animalModel, "getQueryOne").and.returnValue("q1");
@@ -179,8 +177,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: null,
-                    }
-                ]]);
+                    }]]);
         }));
         it("update mutation", () => __awaiter(this, void 0, void 0, function* () {
             const updateMutation = animalModel.getUpdateMutation();
@@ -197,8 +194,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: null,
-                    }
-                ]]);
+                    }]]);
         }));
         it("update many mutation", () => __awaiter(this, void 0, void 0, function* () {
             const updateManyMutation = animalModel.getUpdateManyMutation();
@@ -215,8 +211,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: null,
-                    }
-                ]]);
+                    }]]);
         }));
         it("delete mutation", () => __awaiter(this, void 0, void 0, function* () {
             const deleteMutation = animalModel.getDeleteMutation();
@@ -233,8 +228,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: null,
-                    }
-                ]]);
+                    }]]);
         }));
         it("getAllMutations", () => {
             const getCreateMutationSpy = spyOn(animalModel, "getCreateMutation").and.returnValue("f1");

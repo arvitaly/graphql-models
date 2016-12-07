@@ -236,6 +236,12 @@ class Model {
         }
         return this.createArguments;
     }
+    getUpdateArguments() {
+        if (!this.updateArguments) {
+            this.updateArguments = this.generateUpdateArguments();
+        }
+        return this.updateArguments;
+    }
     getNameForGlobalId() {
         return capitalize(this.name);
     }
@@ -296,7 +302,7 @@ class Model {
                 const childModel = this.collector.get(attr.model);
                 graphQLType = graphql_1.GraphQLID;
                 args.push({
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: childModel.getCreateType(),
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes_1.default.CreateSubModel,
@@ -307,7 +313,7 @@ class Model {
                 const childModel = this.collector.get(attr.model);
                 graphQLType = new graphql_1.GraphQLList(graphql_1.GraphQLID);
                 args.push({
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: new graphql_1.GraphQLList(childModel.getCreateType()),
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes_1.default.CreateSubCollection,
@@ -318,7 +324,7 @@ class Model {
                 graphQLType = scalarTypeToGraphQL(attr.type);
             }
             args.push({
-                attribute: attr.name,
+                attribute: attr,
                 name: attr.name,
                 graphQLType: attr.required ? new graphql_1.GraphQLNonNull(graphQLType) : graphQLType,
                 type: ArgumentTypes_1.default.CreateArgument,
@@ -343,13 +349,13 @@ class Model {
                 args.push({
                     name: attr.name,
                     type: ArgumentTypes_1.default.Equal,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
                 args.push({
                     name: attr.name + "NotEqual",
                     type: ArgumentTypes_1.default.NotEqual,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
             }
@@ -358,13 +364,13 @@ class Model {
                 args.push({
                     name: attr.name + "In",
                     type: ArgumentTypes_1.default.In,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
                 args.push({
                     name: attr.name + "NotIn",
                     type: ArgumentTypes_1.default.NotIn,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
             }
@@ -374,20 +380,20 @@ class Model {
                 args.push({
                     name: attr.name + "IsNull",
                     type: ArgumentTypes_1.default.IsNull,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphql_1.GraphQLBoolean,
                 });
                 args.push({
                     name: attr.name + "IsNotNull",
                     type: ArgumentTypes_1.default.IsNotNull,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphql_1.GraphQLBoolean,
                 });
             }
             if (!attr.primaryKey) {
                 exports.whereArgHelpers[attr.type](attr).map((t) => {
                     args.push({
-                        attribute: attr.name,
+                        attribute: attr,
                         name: t.name,
                         type: t.argumentType,
                         graphQLType: t.type,
@@ -441,34 +447,61 @@ class Model {
             fields,
         });
     }
-    generateUpdateType() {
-        let fields = {};
+    generateUpdateArguments() {
+        let args = [];
         this.attributes.map((attr) => {
+            if (attr.name === exports.idArgName) {
+                return;
+            }
             let graphQLType;
             if (attr.type === AttributeTypes_1.default.Model) {
                 const childModel = this.collector.get(attr.model);
-                graphQLType = graphql_1.GraphQLID; // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
-                fields["create" + capitalize(attr.name)] = { type: childModel.getCreateType() };
+                graphQLType = graphql_1.GraphQLID;
+                args.push({
+                    type: ArgumentTypes_1.default.CreateArgument,
+                    name: "create" + capitalize(attr.name),
+                    attribute: attr,
+                    graphQLType: childModel.getCreateType(),
+                });
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
                 const childModel = this.collector.get(attr.model);
-                graphQLType = graphql_1.GraphQLID; // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
+                graphQLType = graphql_1.GraphQLID;
                 graphQLType = new graphql_1.GraphQLList(graphQLType);
-                fields["create" + capitalize(attr.name)] = {
-                    type: new graphql_1.GraphQLList(childModel.getCreateType()),
-                };
+                args.push({
+                    name: "create" + capitalize(attr.name),
+                    type: ArgumentTypes_1.default.CreateSubCollection,
+                    graphQLType: new graphql_1.GraphQLList(childModel.getCreateType()),
+                    attribute: attr,
+                });
             }
             else {
                 graphQLType = scalarTypeToGraphQL(attr.type);
             }
-            fields["set" + capitalize(attr.name)] = {
-                type: new graphql_1.GraphQLInputObjectType({
+            args.push({
+                attribute: attr,
+                name: "set" + capitalize(attr.name),
+                type: ArgumentTypes_1.default.UpdateSetter,
+                graphQLType: new graphql_1.GraphQLInputObjectType({
                     name: "Update" + this.name + "InputSet" + capitalize(attr.name),
                     fields: {
                         [attr.name]: { type: attr.required ? new graphql_1.GraphQLNonNull(graphQLType) : graphQLType },
                     },
                 }),
-            };
+            });
+        });
+        args.push({
+            attribute: this.attributes.find((a) => a.name === exports.idArgName),
+            name: exports.idArgName,
+            type: ArgumentTypes_1.default.Equal,
+            graphQLType: new graphql_1.GraphQLNonNull(graphql_1.GraphQLID),
+        });
+        return args;
+    }
+    generateUpdateType() {
+        let fields = {};
+        this.getUpdateArguments().map((arg) => {
+            fields[arg.name] = { type: arg.graphQLType };
         });
         return new graphql_1.GraphQLInputObjectType({
             name: "Update" + this.name + "Input",

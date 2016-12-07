@@ -137,6 +137,11 @@ class DataAdapter extends Adapter_1.default {
             default:
         }
     }
+    updateOne(modelId, id, updated) {
+        const oldRow = this.findOne(modelId, id);
+        Object.assign(oldRow, updated);
+        return oldRow;
+    }
     findMany(modelId, findCriteria) {
         let result = exports.data[modelId.toLowerCase() + "s"].map((row) => Object.assign({}, row));
         if (findCriteria && findCriteria.where) {
@@ -144,7 +149,7 @@ class DataAdapter extends Adapter_1.default {
                 switch (arg.type) {
                     case ArgumentTypes_1.default.Contains:
                         result = result.filter((row) => {
-                            return row[arg.attribute].indexOf(arg.value) > -1;
+                            return row[arg.attribute.name].indexOf(arg.value) > -1;
                         });
                         break;
                     default:

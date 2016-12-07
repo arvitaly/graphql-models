@@ -193,7 +193,46 @@ class Resolver {
         };
     }
     public async resolveMutationUpdate(modelId: string, opts: ResolveOpts) {
-        // TODO
+        const model = this.collection.get(modelId);
+        const updating: any = {};
+        let id;
+        await Promise.all(Object.keys(opts.args).map((updateArgName) => {
+            let arg = model.getUpdateArguments().find((a) => a.name === updateArgName);
+            arg.value = opts.args[updateArgName];
+            return arg;
+        }).map(async (arg) => {
+            switch (arg.type) {
+                case ArgumentTypes.UpdateSetter:
+                    updating[arg.attribute.name] = arg.value[arg.attribute.name];
+                    break;
+                case ArgumentTypes.CreateArgument:
+                    updating[arg.attribute.name] = fromGlobalId(
+                        await this.createOne(arg.attribute.model, arg.value),
+                    ).id;
+                    break;
+                case ArgumentTypes.CreateSubCollection:
+                    const childModel = arg.attribute.model;
+                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {
+                        return fromGlobalId(await this.createOne(childModel, v)).id;
+                    }));
+                    break;
+                case ArgumentTypes.Equal:
+                    id = fromGlobalId(arg.value).id;
+                    break;
+                default:
+                    throw new Error("Unsupported argument type " + arg.type + " for update");
+            }
+        }));
+        const updated = this.adapter.updateOne(model.id, id, updating);
+        const row = await this.resolveModel(modelId, {
+            source: toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
+            args: null,
+            context: opts.context,
+            info: opts.info,
+        });
+        return {
+            [this.collection.get(modelId).queryName]: row,
+        };
     }
     public async createOne(modelId: string, args) {
         const model = this.collection.get(modelId);
@@ -204,9 +243,9 @@ class Resolver {
         });
         const submodels = await Promise.all(
             createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubModel).map(async (arg) => {
-                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                const childModel = arg.attribute.model;
                 return {
-                    name: arg.attribute,
+                    name: arg.attribute.name,
                     value: fromGlobalId(await this.createOne(childModel, arg.value)).id,
                     attribute: arg.attribute,
                     type: ArgumentTypes.CreateArgument,
@@ -217,12 +256,12 @@ class Resolver {
         createArgs = createArgs.concat(submodels);
         const subcollections = await Promise.all(
             createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async (arg) => {
-                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                const childModel = arg.attribute.model;
                 const ids = await Promise.all(arg.value.map(async (row) => {
                     return fromGlobalId(await this.createOne(childModel, row)).id;
                 }));
                 return {
-                    name: arg.attribute,
+                    name: arg.attribute.name,
                     value: ids,
                     attribute: arg.attribute,
                     type: ArgumentTypes.CreateArgument,
@@ -233,7 +272,7 @@ class Resolver {
         createArgs = createArgs.concat(subcollections);
         let creating: any = {};
         createArgs.map((arg) => {
-            creating[arg.attribute] = arg.value;
+            creating[arg.attribute.name] = arg.value;
         });
         const created = await this.adapter.createOne(modelId, creating);
         return toGlobalId(modelId, "" + created[model.getPrimaryKeyAttribute().realName]);
@@ -265,7 +304,7 @@ class Resolver {
     protected equalRowToFindCriteria(modelId: ModelID, row: any, findCriteria: FindCriteria) {
         // if all criteria not false
         return !findCriteria.where.some((arg) => {
-            const rowValue = row[arg.attribute];
+            const rowValue = row[arg.attribute.name];
             switch (arg.type) {
                 case ArgumentTypes.Contains:
                     return rowValue.indexOf(arg.value) === -1;

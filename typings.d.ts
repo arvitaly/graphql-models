@@ -82,14 +82,14 @@ export type Mutations = Array<Mutation>;
 export type WhereArgHelper = {
 
 }
-export type ArgumentType = "createArgument" | "createSubModel" | "createSubCollection" |
+export type ArgumentType = "createArgument" | "createSubModel" | "createSubCollection" | "updateSetter" |
     "equal" | "notEqual" | "isNull" | "isNotNull" | "in" | "notIn" | "contains" |
     "notContains" | "startsWith" | "notStartsWith" | "endsWith" | "notEndsWith" |
     "like" | "notLike" | "greaterThan" | "lessThan" | "greaterThanOrEqual" | "lessThanOrEqual";
 export type Argument = {
     name: string;
     type: ArgumentType;
-    attribute: string;
+    attribute: Attribute;
     graphQLType: GraphQLInputType;
     value?: any;
 }

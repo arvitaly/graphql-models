@@ -21,6 +21,7 @@ const ArgumentTypes = {
     CreateArgument: "createArgument",
     CreateSubModel: "createSubModel",
     CreateSubCollection: "createSubCollection",
+    UpdateSetter: "updateSetter",
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ArgumentTypes;

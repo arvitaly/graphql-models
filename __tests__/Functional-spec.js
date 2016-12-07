@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -216,6 +216,24 @@ describe("Functional tests", () => {
             isCat
         }        
         `);
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+    }));
+    it("update mutation: animal", () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield graphql_1.graphql(graphqlSchema, `mutation M1{  
+                updateAnimal(input:{id: "${animalId1}", 
+                setName:{name:"testName1"}}
+            ){
+                animal{
+                    name
+                }
+            }
+        }`);
         if (result.errors) {
             result.errors.map((e) => {
                 console.error(e);

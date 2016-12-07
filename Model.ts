@@ -46,6 +46,7 @@ class Model {
     protected whereInputType: GraphQLInputObjectType;
     protected whereArguments: Argument[];
     protected createArguments: Argument[];
+    protected updateArguments: Argument[];
     protected resolveFn: ResolveFn;
     constructor(public config: ModelConfig, protected collector: Collection, protected opts: ModelOptions = {}) {
         this.opts.interfaces = this.opts.interfaces || [];
@@ -276,6 +277,12 @@ class Model {
         }
         return this.createArguments;
     }
+    public getUpdateArguments() {
+        if (!this.updateArguments) {
+            this.updateArguments = this.generateUpdateArguments();
+        }
+        return this.updateArguments;
+    }
     public getNameForGlobalId() {
         return capitalize(this.name);
     }
@@ -336,7 +343,7 @@ class Model {
                 const childModel = this.collector.get(attr.model);
                 graphQLType = GraphQLID;
                 args.push({
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: childModel.getCreateType(),
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes.CreateSubModel,
@@ -346,7 +353,7 @@ class Model {
                 const childModel = this.collector.get((attr as CollectionAttribute).model);
                 graphQLType = new GraphQLList(GraphQLID);
                 args.push({
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: new GraphQLList(childModel.getCreateType()),
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes.CreateSubCollection,
@@ -356,7 +363,7 @@ class Model {
                 graphQLType = scalarTypeToGraphQL(attr.type);
             }
             args.push({
-                attribute: attr.name,
+                attribute: attr,
                 name: attr.name,
                 graphQLType: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType,
                 type: ArgumentTypes.CreateArgument,
@@ -380,13 +387,13 @@ class Model {
                 args.push({
                     name: attr.name,
                     type: ArgumentTypes.Equal,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
                 args.push({
                     name: attr.name + "NotEqual",
                     type: ArgumentTypes.NotEqual,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
             }
@@ -395,13 +402,13 @@ class Model {
                 args.push({
                     name: attr.name + "In",
                     type: ArgumentTypes.In,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
                 args.push({
                     name: attr.name + "NotIn",
                     type: ArgumentTypes.NotIn,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: graphqlType,
                 });
             }
@@ -411,20 +418,20 @@ class Model {
                 args.push({
                     name: attr.name + "IsNull",
                     type: ArgumentTypes.IsNull,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: GraphQLBoolean,
                 });
                 args.push({
                     name: attr.name + "IsNotNull",
                     type: ArgumentTypes.IsNotNull,
-                    attribute: attr.name,
+                    attribute: attr,
                     graphQLType: GraphQLBoolean,
                 });
             }
             if (!attr.primaryKey) {
                 whereArgHelpers[attr.type](attr).map((t) => {
                     args.push({
-                        attribute: attr.name,
+                        attribute: attr,
                         name: t.name,
                         type: t.argumentType,
                         graphQLType: t.type,
@@ -478,32 +485,59 @@ class Model {
             fields,
         });
     }
-    protected generateUpdateType(): GraphQLInputObjectType {
-        let fields: GraphQLInputFieldConfigMap = {};
+    protected generateUpdateArguments() {
+        let args: Argument[] = [];
         this.attributes.map((attr) => {
+            if (attr.name === idArgName) {
+                return;
+            }
             let graphQLType;
             if (attr.type === AttributeTypes.Model) {
                 const childModel = this.collector.get(attr.model);
-                graphQLType = GraphQLID; // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
-                fields["create" + capitalize(attr.name)] = { type: childModel.getCreateType() };
+                graphQLType = GraphQLID;
+                args.push({
+                    type: ArgumentTypes.CreateArgument,
+                    name: "create" + capitalize(attr.name),
+                    attribute: attr,
+                    graphQLType: childModel.getCreateType(),
+                });
             } else if (attr.type === AttributeTypes.Collection) {
                 const childModel = this.collector.get((attr as CollectionAttribute).model);
-                graphQLType = GraphQLID; // scalarTypeToGraphQL(childModel.get PrimaryKeyAttribute().type);
+                graphQLType = GraphQLID;
                 graphQLType = new GraphQLList(graphQLType);
-                fields["create" + capitalize(attr.name)] = {
-                    type: new GraphQLList(childModel.getCreateType()),
-                };
+                args.push({
+                    name: "create" + capitalize(attr.name),
+                    type: ArgumentTypes.CreateSubCollection,
+                    graphQLType: new GraphQLList(childModel.getCreateType()),
+                    attribute: attr,
+                });
             } else {
                 graphQLType = scalarTypeToGraphQL(attr.type);
             }
-            fields["set" + capitalize(attr.name)] = {
-                type: new GraphQLInputObjectType({
+            args.push({
+                attribute: attr,
+                name: "set" + capitalize(attr.name),
+                type: ArgumentTypes.UpdateSetter,
+                graphQLType: new GraphQLInputObjectType({
                     name: "Update" + this.name + "InputSet" + capitalize(attr.name),
                     fields: {
                         [attr.name]: { type: attr.required ? new GraphQLNonNull(graphQLType) : graphQLType },
                     },
                 }),
-            };
+            });
+        });
+        args.push({
+            attribute: this.attributes.find((a) => a.name === idArgName),
+            name: idArgName,
+            type: ArgumentTypes.Equal,
+            graphQLType: new GraphQLNonNull(GraphQLID),
+        });
+        return args;
+    }
+    protected generateUpdateType(): GraphQLInputObjectType {
+        let fields: GraphQLInputFieldConfigMap = {};
+        this.getUpdateArguments().map((arg) => {
+            fields[arg.name] = { type: arg.graphQLType };
         });
         return new GraphQLInputObjectType({
             name: "Update" + this.name + "Input",

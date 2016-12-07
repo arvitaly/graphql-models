@@ -268,3 +268,15 @@ Array [
   ],
 ]
 `;
+
+exports[`Functional tests update mutation: animal 1`] = `
+Object {
+  "data": Object {
+    "updateAnimal": Object {
+      "animal": Object {
+        "name": "testn",
+      },
+    },
+  },
+}
+`;

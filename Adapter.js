@@ -18,6 +18,9 @@ class Adapter {
     createOne(modelId, created) {
         throw new Error("Not implemented createOne");
     }
+    updateOne(modelId, id, updated) {
+        throw new Error("Not implemented updateOne");
+    }
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Adapter;

@@ -215,4 +215,22 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     });
+    it("update mutation: animal", async () => {
+        const result = await graphql(graphqlSchema, `mutation M1{  
+                updateAnimal(input:{id: "${animalId1}", 
+                setName:{name:"testName1"}}
+            ){
+                animal{
+                    name
+                }
+            }
+        }`);
+        if (result.errors) {
+            result.errors.map((e) => {
+                console.error(e);
+                console.error(e.stack);
+            });
+        }
+        expect(result).toMatchSnapshot();
+    });
 });

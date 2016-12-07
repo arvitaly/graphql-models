@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -193,7 +193,44 @@ class Resolver {
     }
     resolveMutationUpdate(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO
+            const model = this.collection.get(modelId);
+            const updating = {};
+            let id;
+            yield Promise.all(Object.keys(opts.args).map((updateArgName) => {
+                let arg = model.getUpdateArguments().find((a) => a.name === updateArgName);
+                arg.value = opts.args[updateArgName];
+                return arg;
+            }).map((arg) => __awaiter(this, void 0, void 0, function* () {
+                switch (arg.type) {
+                    case ArgumentTypes_1.default.UpdateSetter:
+                        updating[arg.attribute.name] = arg.value[arg.attribute.name];
+                        break;
+                    case ArgumentTypes_1.default.CreateArgument:
+                        updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(yield this.createOne(arg.attribute.model, arg.value)).id;
+                        break;
+                    case ArgumentTypes_1.default.CreateSubCollection:
+                        const childModel = arg.attribute.model;
+                        updating[arg.attribute.name] = yield Promise.all(arg.value.map((v) => __awaiter(this, void 0, void 0, function* () {
+                            return graphql_relay_1.fromGlobalId(yield this.createOne(childModel, v)).id;
+                        })));
+                        break;
+                    case ArgumentTypes_1.default.Equal:
+                        id = graphql_relay_1.fromGlobalId(arg.value).id;
+                        break;
+                    default:
+                        throw new Error("Unsupported argument type " + arg.type + " for update");
+                }
+            })));
+            const updated = this.adapter.updateOne(model.id, id, updating);
+            const row = yield this.resolveModel(modelId, {
+                source: graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
+                args: null,
+                context: opts.context,
+                info: opts.info,
+            });
+            return {
+                [this.collection.get(modelId).queryName]: row,
+            };
         });
     }
     createOne(modelId, args) {
@@ -205,9 +242,9 @@ class Resolver {
                 return arg;
             });
             const submodels = yield Promise.all(createArgs.filter((arg) => arg.type === ArgumentTypes_1.default.CreateSubModel).map((arg) => __awaiter(this, void 0, void 0, function* () {
-                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                const childModel = arg.attribute.model;
                 return {
-                    name: arg.attribute,
+                    name: arg.attribute.name,
                     value: graphql_relay_1.fromGlobalId(yield this.createOne(childModel, arg.value)).id,
                     attribute: arg.attribute,
                     type: ArgumentTypes_1.default.CreateArgument,
@@ -216,12 +253,12 @@ class Resolver {
             })));
             createArgs = createArgs.concat(submodels);
             const subcollections = yield Promise.all(createArgs.filter((arg) => arg.type === ArgumentTypes_1.default.CreateSubCollection).map((arg) => __awaiter(this, void 0, void 0, function* () {
-                const childModel = model.attributes.find((a) => a.name === arg.attribute).model;
+                const childModel = arg.attribute.model;
                 const ids = yield Promise.all(arg.value.map((row) => __awaiter(this, void 0, void 0, function* () {
                     return graphql_relay_1.fromGlobalId(yield this.createOne(childModel, row)).id;
                 })));
                 return {
-                    name: arg.attribute,
+                    name: arg.attribute.name,
                     value: ids,
                     attribute: arg.attribute,
                     type: ArgumentTypes_1.default.CreateArgument,
@@ -231,7 +268,7 @@ class Resolver {
             createArgs = createArgs.concat(subcollections);
             let creating = {};
             createArgs.map((arg) => {
-                creating[arg.attribute] = arg.value;
+                creating[arg.attribute.name] = arg.value;
             });
             const created = yield this.adapter.createOne(modelId, creating);
             return graphql_relay_1.toGlobalId(modelId, "" + created[model.getPrimaryKeyAttribute().realName]);
@@ -259,7 +296,7 @@ class Resolver {
     equalRowToFindCriteria(modelId, row, findCriteria) {
         // if all criteria not false
         return !findCriteria.where.some((arg) => {
-            const rowValue = row[arg.attribute];
+            const rowValue = row[arg.attribute.name];
             switch (arg.type) {
                 case ArgumentTypes_1.default.Contains:
                     return rowValue.indexOf(arg.value) === -1;

@@ -18,5 +18,8 @@ class Adapter {
     public createOne(modelId: ModelID, created: any) {
         throw new Error("Not implemented createOne");
     }
+    public updateOne(modelId: ModelID, id: any, updated: any) {
+        throw new Error("Not implemented updateOne");
+    }
 }
 export default Adapter;
