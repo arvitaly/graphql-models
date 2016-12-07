@@ -9,7 +9,7 @@ Object {
               "node": Object {
                 "Weight": 1008.1,
                 "age": 1008,
-                "birthday": "Wed, 10 Nov 2100 17:00:00 GMT",
+                "birthday": "Wed, 07 Dec 2016 10:42:48 GMT",
                 "id": "QW5pbWFsOjg=",
                 "isCat": true,
                 "name": "animal2",
@@ -274,7 +274,8 @@ Object {
   "data": Object {
     "updateAnimal": Object {
       "animal": Object {
-        "name": "testn",
+        "birthday": "Wed, 07 Dec 2016 10:42:48 GMT",
+        "name": "testName1",
       },
     },
   },

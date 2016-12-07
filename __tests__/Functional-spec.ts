@@ -6,6 +6,7 @@ import { animalModel, postModel, userModel } from "./../__fixtures__/collection1
 import { callbacks, createAnimal, DataAdapter, publisher } from "./../__fixtures__/data";
 const animalId1 = toGlobalId("Animal", "1");
 const postId1 = toGlobalId("Post", "1");
+const date1 = "Wed, 07 Dec 2016 10:42:48 GMT";
 describe("Functional tests", () => {
     let adapter: DataAdapter;
     let resolver: Resolver;
@@ -175,7 +176,9 @@ describe("Functional tests", () => {
     });
     it("mutation create", async () => {
         const result = await graphql(graphqlSchema, `mutation M1{  
-            createPost(input:{createAnimals:[{name:"animal1"},{name:"animal2"}], 
+            createPost(input:{createAnimals:[
+                {name:"animal1", birthday:"${date1}"},
+                {name:"animal2"}], 
                 createOwner:{name:"user5", 
                 createPets:[{name:"pet1"}] } } ){
                 post{
@@ -217,11 +220,15 @@ describe("Functional tests", () => {
     });
     it("update mutation: animal", async () => {
         const result = await graphql(graphqlSchema, `mutation M1{  
-                updateAnimal(input:{id: "${animalId1}", 
-                setName:{name:"testName1"}}
+                updateAnimal(input:{
+                    id: "${animalId1}", 
+                    setName:{name:"testName1"}
+                    setBirthday:{birthday: "${date1}"}
+                }
             ){
                 animal{
                     name
+                    birthday
                 }
             }
         }`);

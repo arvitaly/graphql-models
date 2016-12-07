@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -15,6 +15,7 @@ const collection1_1 = require("./../__fixtures__/collection1");
 const data_1 = require("./../__fixtures__/data");
 const animalId1 = graphql_relay_1.toGlobalId("Animal", "1");
 const postId1 = graphql_relay_1.toGlobalId("Post", "1");
+const date1 = "Wed, 07 Dec 2016 10:42:48 GMT";
 describe("Functional tests", () => {
     let adapter;
     let resolver;
@@ -184,7 +185,9 @@ describe("Functional tests", () => {
     }));
     it("mutation create", () => __awaiter(this, void 0, void 0, function* () {
         const result = yield graphql_1.graphql(graphqlSchema, `mutation M1{  
-            createPost(input:{createAnimals:[{name:"animal1"},{name:"animal2"}], 
+            createPost(input:{createAnimals:[
+                {name:"animal1", birthday:"${date1}"},
+                {name:"animal2"}], 
                 createOwner:{name:"user5", 
                 createPets:[{name:"pet1"}] } } ){
                 post{
@@ -226,11 +229,15 @@ describe("Functional tests", () => {
     }));
     it("update mutation: animal", () => __awaiter(this, void 0, void 0, function* () {
         const result = yield graphql_1.graphql(graphqlSchema, `mutation M1{  
-                updateAnimal(input:{id: "${animalId1}", 
-                setName:{name:"testName1"}}
+                updateAnimal(input:{
+                    id: "${animalId1}", 
+                    setName:{name:"testName1"}
+                    setBirthday:{birthday: "${date1}"}
+                }
             ){
                 animal{
                     name
+                    birthday
                 }
             }
         }`);

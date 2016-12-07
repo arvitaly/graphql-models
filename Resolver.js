@@ -2,13 +2,14 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
 const graphql_relay_1 = require("graphql-relay");
 const ArgumentTypes_1 = require("./ArgumentTypes");
+const AttributeTypes_1 = require("./AttributeTypes");
 const Model_1 = require("./Model");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Resolver {
@@ -203,7 +204,12 @@ class Resolver {
             }).map((arg) => __awaiter(this, void 0, void 0, function* () {
                 switch (arg.type) {
                     case ArgumentTypes_1.default.UpdateSetter:
-                        updating[arg.attribute.name] = arg.value[arg.attribute.name];
+                        if (arg.attribute.type === AttributeTypes_1.default.Date) {
+                            updating[arg.attribute.name] = new Date(arg.value[arg.attribute.name]);
+                        }
+                        else {
+                            updating[arg.attribute.name] = arg.value[arg.attribute.name];
+                        }
                         break;
                     case ArgumentTypes_1.default.CreateArgument:
                         updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(yield this.createOne(arg.attribute.model, arg.value)).id;
@@ -268,7 +274,12 @@ class Resolver {
             createArgs = createArgs.concat(subcollections);
             let creating = {};
             createArgs.map((arg) => {
-                creating[arg.attribute.name] = arg.value;
+                if (arg.attribute.type === AttributeTypes_1.default.Date) {
+                    creating[arg.attribute.name] = new Date(arg.value);
+                }
+                else {
+                    creating[arg.attribute.name] = arg.value;
+                }
             });
             const created = yield this.adapter.createOne(modelId, creating);
             return graphql_relay_1.toGlobalId(modelId, "" + created[model.getPrimaryKeyAttribute().realName]);

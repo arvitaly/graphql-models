@@ -12,28 +12,28 @@ export const data: { [index: string]: any[] } = {
         name: "Rex",
         age: 6,
         Weight: 10.1,
-        birthday: new Date("2010/11/11"),
+        birthday: new Date("Wed, 10 Nov 2010 17:00:00 GMT"),
         isCat: false,
     }, {
         id: 2,
         name: "Felix",
         age: 3,
         Weight: 13.1,
-        birthday: new Date("2013/3/1"),
+        birthday: new Date("Thu, 28 Feb 2013 17:00:00 GMT"),
         isCat: false,
     }, {
         id: 3,
         name: "Jeck",
         age: 8,
         Weight: 2.1,
-        birthday: new Date("2008/5/6"),
+        birthday: new Date("Mon, 05 May 2008 17:00:00 GMT"),
         isCat: false,
     }, {
         id: 4,
         name: "Morph",
         age: 7,
         Weight: 12.1,
-        birthday: new Date("2009/12/12"),
+        birthday: new Date("Fri, 11 Dec 2009 17:00:00 GMT"),
         isCat: false,
     }],
     posts: [{
@@ -54,7 +54,7 @@ export function createAnimal(row?: any) {
         name: "Name" + newId,
         age: 1000 + newId,
         Weight: 1000.1 + newId,
-        birthday: new Date(+new Date("2100/11/11") + newId),
+        birthday: new Date(+new Date("Wed, 10 Nov 2100 17:00:00 GMT") + newId),
         isCat: newId % 2 === 0,
     }, row);
 }
@@ -140,7 +140,9 @@ export class DataAdapter extends Adapter {
         }
     }
     public updateOne(modelId: ModelID, id: any, updated: any) {
-        const oldRow = this.findOne(modelId, id);
+        const oldRow = data[modelId.toLowerCase() + "s"].find((a) => modelId === "user" ?
+            "" + a.key === "" + id
+            : "" + a.id === "" + id);
         Object.assign(oldRow, updated);
         return oldRow;
     }

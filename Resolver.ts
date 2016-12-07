@@ -203,7 +203,11 @@ class Resolver {
         }).map(async (arg) => {
             switch (arg.type) {
                 case ArgumentTypes.UpdateSetter:
-                    updating[arg.attribute.name] = arg.value[arg.attribute.name];
+                    if (arg.attribute.type === AttributeTypes.Date) {
+                        updating[arg.attribute.name] = new Date(arg.value[arg.attribute.name]);
+                    } else {
+                        updating[arg.attribute.name] = arg.value[arg.attribute.name];
+                    }
                     break;
                 case ArgumentTypes.CreateArgument:
                     updating[arg.attribute.name] = fromGlobalId(
@@ -272,7 +276,11 @@ class Resolver {
         createArgs = createArgs.concat(subcollections);
         let creating: any = {};
         createArgs.map((arg) => {
-            creating[arg.attribute.name] = arg.value;
+            if (arg.attribute.type === AttributeTypes.Date) {
+                creating[arg.attribute.name] = new Date(arg.value);
+            } else {
+                creating[arg.attribute.name] = arg.value;
+            }
         });
         const created = await this.adapter.createOne(modelId, creating);
         return toGlobalId(modelId, "" + created[model.getPrimaryKeyAttribute().realName]);
