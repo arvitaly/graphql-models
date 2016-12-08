@@ -120,7 +120,7 @@ class Resolver {
                 return;
             }
             if (attr.type === AttributeTypes_1.default.Date) {
-                row[attr.name] = row[attr.name].toUTCString();
+                row[attr.name] = new Date(row[attr.name]).toUTCString();
             }
             if (attr.realName === "id") {
                 row._id = row.id;
