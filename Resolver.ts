@@ -114,11 +114,12 @@ class Resolver {
     public async resolveOne(modelId: ModelID, globalId, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
         const id = fromGlobalId(globalId).id;
         const result = await this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
-        return this.resolveRow(modelId, result);
+        return this.resolveRow(modelId, result, fields, resolveInfo);
     }
-    public resolveRow(modelId: ModelID, row) {
+    public resolveRow(modelId: ModelID, row, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
         const model = this.collection.get(modelId);
-        model.attributes.map((attr) => {
+        fields.map((field) => {
+            const attr = model.attributes.find((a) => a.name === field.name);
             if (typeof (row[attr.name]) === "undefined") {
                 return;
             }
@@ -129,13 +130,13 @@ class Resolver {
                 row._id = row.id;
             }
             if (attr.type === AttributeTypes.Model) {
-                row[attr.name] = this.resolveRow(attr.model, row[attr.name]);
+                row[attr.name] = this.resolveRow(attr.model, row[attr.name], field.fields, resolveInfo);
             }
             if (attr.type === AttributeTypes.Collection) {
                 const edges = row[attr.name].map((r) => {
                     return {
                         cursor: null,
-                        node: this.resolveRow(attr.model, r),
+                        node: this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo),
                     };
                 });
                 row[attr.name] = {
@@ -172,7 +173,7 @@ class Resolver {
             const edges = rows.map((row) => {
                 return {
                     cursor: null,
-                    node: this.resolveRow(modelId, row),
+                    node: this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(), opts.resolveInfo),
                 };
             });
             result = {

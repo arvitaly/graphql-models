@@ -110,12 +110,13 @@ class Resolver {
         return __awaiter(this, void 0, void 0, function* () {
             const id = graphql_relay_1.fromGlobalId(globalId).id;
             const result = yield this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
-            return this.resolveRow(modelId, result);
+            return this.resolveRow(modelId, result, fields, resolveInfo);
         });
     }
-    resolveRow(modelId, row) {
+    resolveRow(modelId, row, fields, resolveInfo) {
         const model = this.collection.get(modelId);
-        model.attributes.map((attr) => {
+        fields.map((field) => {
+            const attr = model.attributes.find((a) => a.name === field.name);
             if (typeof (row[attr.name]) === "undefined") {
                 return;
             }
@@ -126,13 +127,13 @@ class Resolver {
                 row._id = row.id;
             }
             if (attr.type === AttributeTypes_1.default.Model) {
-                row[attr.name] = this.resolveRow(attr.model, row[attr.name]);
+                row[attr.name] = this.resolveRow(attr.model, row[attr.name], field.fields, resolveInfo);
             }
             if (attr.type === AttributeTypes_1.default.Collection) {
                 const edges = row[attr.name].map((r) => {
                     return {
                         cursor: null,
-                        node: this.resolveRow(attr.model, r),
+                        node: this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo),
                     };
                 });
                 row[attr.name] = {
@@ -171,7 +172,7 @@ class Resolver {
                 const edges = rows.map((row) => {
                     return {
                         cursor: null,
-                        node: this.resolveRow(modelId, row),
+                        node: this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(), opts.resolveInfo),
                     };
                 });
                 result = {
