@@ -334,6 +334,14 @@ class Resolver {
         return !findCriteria.where.some((arg) => {
             const rowValue = row[arg.attribute.name];
             switch (arg.type) {
+                case ArgumentTypes.Equal:
+                    return rowValue !== arg.value;
+                case ArgumentTypes.NotEqual:
+                    return rowValue === arg.value;
+                case ArgumentTypes.IsNull:
+                    return rowValue !== null;
+                case ArgumentTypes.IsNotNull:
+                    return rowValue === null;
                 case ArgumentTypes.Contains:
                     return rowValue.indexOf(arg.value) === -1;
                 case ArgumentTypes.NotContains:
@@ -344,6 +352,12 @@ class Resolver {
                     return (rowValue as string).substr(0, arg.value.length) === arg.value;
                 case ArgumentTypes.GreaterThan:
                     return (rowValue as number) > arg.value;
+                case ArgumentTypes.LessThan:
+                    return (rowValue as number) < arg.value;
+                case ArgumentTypes.GreaterThanOrEqual:
+                    return (rowValue as number) >= arg.value;
+                case ArgumentTypes.LessThanOrEqual:
+                    return (rowValue as number) <= arg.value;
                 default:
                     throw new Error("Unsupported argument type " + arg.type);
             }
