@@ -113,7 +113,7 @@ class Resolver {
             if (!result) {
                 return null;
             }
-            let row = Object.assign({}, result);
+            let row = Object.assign({ _source: result }, result);
             return yield this.resolveRow(modelId, row, fields, resolveInfo);
         });
     }

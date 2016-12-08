@@ -114,7 +114,7 @@ class Resolver {
         if (!result) {
             return null;
         }
-        let row = Object.assign({}, result);
+        let row = Object.assign({ _source: result }, result);
         return await this.resolveRow(modelId, row, fields, resolveInfo);
     }
     public async resolveRow(modelId: ModelID, row, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
