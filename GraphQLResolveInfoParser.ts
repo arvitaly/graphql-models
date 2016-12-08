@@ -22,10 +22,10 @@ class GraphQLResolveInfoParser {
         return this.getFields()[0].fields;
     }
     public getQueryOneFields() {
-        return this.getFields()[0].fields;
+        return this.getFields().find((f) => f.name === "viewer").fields[0].fields;
     }
     public getQueryConnectionFields() {
-        return this.getFieldsForConnection(this.getFields()[0]);
+        return this.getFieldsForConnection(this.getFields().find((f) => f.name === "viewer").fields[0]);
     }
     public getMutationPayloadFields() {
         return this.getFields()[0].fields[0].fields;
@@ -34,7 +34,7 @@ class GraphQLResolveInfoParser {
         return field.fields.find((f) => f.name === "edges").fields.find((f) => f.name === "node").fields;
     }
     protected parseAllFields() {
-        return this.info.fieldNodes.map((node) => this.parseSelectionNode(node));
+        return this.parseSelectionSetNode(this.info.operation.selectionSet);
     }
     protected parseSelectionSetNode(node: SelectionSetNode): Field[] {
         let fields: Field[] = [];

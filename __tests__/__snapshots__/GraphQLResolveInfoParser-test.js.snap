@@ -12,7 +12,16 @@ Array [
 ]
 `;
 
-exports[`GraphQLResolveInfoParser get query connection fields 1`] = `
+exports[`GraphQLResolveInfoParser get query connection fields simple 1`] = `
+Array [
+  Object {
+    "fields": Array [],
+    "name": "name",
+  },
+]
+`;
+
+exports[`GraphQLResolveInfoParser get query connection fields with fragments 1`] = `
 Array [
   Object {
     "fields": Array [

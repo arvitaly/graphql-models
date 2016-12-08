@@ -22,17 +22,34 @@ fdescribe("GraphQLResolveInfoParser", () => {
         expect(parser.getNodeFields()).toMatchSnapshot();
     });
     it("get query one fields", () => {
-        const parser = new GraphQLResolveInfoParser(getInfo(`query Q1{ model1{ field1, model2{ field2 } }}`));
+        const parser = new GraphQLResolveInfoParser(getInfo(`query Q1{ viewer{ model1{ field1, model2{ field2 } }} }`));
         expect(parser.getQueryOneFields()).toMatchSnapshot();
     });
-    it("get query connection fields", () => {
+    it("get query connection fields simple", () => {
         const parser = new GraphQLResolveInfoParser(getInfo(`query Q1{
-             model1(first:10){
-                 pageInfo{
-                     hasNextPage
-                 }
-                 ...F1
-            }}
+            viewer{
+                modelName1s{
+                    edges{
+                        node{
+                            name
+                        }
+                    }
+                    
+                }
+            }
+        }`));
+        expect(parser.getQueryConnectionFields()).toMatchSnapshot();
+    });
+    it("get query connection fields with fragments", () => {
+        const parser = new GraphQLResolveInfoParser(getInfo(`query Q1{
+            viewer{
+                model1(first:10){
+                    pageInfo{
+                        hasNextPage
+                    }
+                    ...F1
+                }}
+            }
             fragment F1 on Model1Connection{
                  edges{
                      node{
@@ -64,6 +81,7 @@ function getInfo(query: string): GraphQLResolveInfo {
         .definitions.find((node) => node.kind === "OperationDefinition") as OperationDefinitionNode;
     return {
         fieldNodes: operation.selectionSet.selections,
+        operation,
         fragments,
     } as any;
 }
