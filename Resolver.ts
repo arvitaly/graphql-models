@@ -113,8 +113,8 @@ class Resolver {
     }
     public async resolveOne(modelId: ModelID, globalId, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
         const id = fromGlobalId(globalId).id;
-        const result = this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
-        return await this.resolveRow(modelId, result);
+        const result = await this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
+        return this.resolveRow(modelId, result);
     }
     public resolveRow(modelId: ModelID, row) {
         const model = this.collection.get(modelId);
@@ -205,7 +205,7 @@ class Resolver {
         const updating: any = {};
         let id;
         await Promise.all(Object.keys(opts.args).map((updateArgName) => {
-            let arg = model.getUpdateArguments().find((a) => a.name === updateArgName);
+            let arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
             arg.value = opts.args[updateArgName];
             return arg;
         }).map(async (arg) => {
@@ -247,7 +247,7 @@ class Resolver {
     public async createOne(modelId: string, args) {
         const model = this.collection.get(modelId);
         let createArgs = Object.keys(args).map((createArgName) => {
-            let arg = model.getCreateArguments().find((a) => a.name === createArgName);
+            let arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName));
             arg.value = args[createArgName];
             return arg;
         });
@@ -356,7 +356,7 @@ class Resolver {
         criteria.where = [];
         if (args.where) {
             criteria.where = Object.keys(args.where).map((whereArgName) => {
-                const arg = whereArguments.find((w) => w.name === whereArgName);
+                const arg = Object.assign({}, whereArguments.find((w) => w.name === whereArgName));
                 arg.value = args.where[whereArgName];
                 return arg;
             });

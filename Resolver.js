@@ -109,8 +109,8 @@ class Resolver {
     resolveOne(modelId, globalId, fields, resolveInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = graphql_relay_1.fromGlobalId(globalId).id;
-            const result = this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
-            return yield this.resolveRow(modelId, result);
+            const result = yield this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
+            return this.resolveRow(modelId, result);
         });
     }
     resolveRow(modelId, row) {
@@ -205,7 +205,7 @@ class Resolver {
             const updating = {};
             let id;
             yield Promise.all(Object.keys(opts.args).map((updateArgName) => {
-                let arg = model.getUpdateArguments().find((a) => a.name === updateArgName);
+                let arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
                 arg.value = opts.args[updateArgName];
                 return arg;
             }).map((arg) => __awaiter(this, void 0, void 0, function* () {
@@ -245,7 +245,7 @@ class Resolver {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.collection.get(modelId);
             let createArgs = Object.keys(args).map((createArgName) => {
-                let arg = model.getCreateArguments().find((a) => a.name === createArgName);
+                let arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName));
                 arg.value = args[createArgName];
                 return arg;
             });
@@ -347,7 +347,7 @@ class Resolver {
         criteria.where = [];
         if (args.where) {
             criteria.where = Object.keys(args.where).map((whereArgName) => {
-                const arg = whereArguments.find((w) => w.name === whereArgName);
+                const arg = Object.assign({}, whereArguments.find((w) => w.name === whereArgName));
                 arg.value = args.where[whereArgName];
                 return arg;
             });
