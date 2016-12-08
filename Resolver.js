@@ -96,7 +96,7 @@ class Resolver {
     }
     resolveQueryOne(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = this.resolveOne(modelId, opts.args[Model_1.idArgName], opts.resolveInfo.getQueryOneFields(), opts.resolveInfo);
+            const result = yield this.resolveOne(modelId, opts.args[Model_1.idArgName], opts.resolveInfo.getQueryOneFields(), opts.resolveInfo);
             if (!result) {
                 return null;
             }
@@ -310,6 +310,8 @@ class Resolver {
         const model = this.collection.get(modelId);
         return model.attributes.filter((attr) => {
             return attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection;
+        }).filter((attr) => {
+            return !!fields.find((f) => f.name === attr.name);
         }).map((attr) => {
             const field = fields.find((f) => f.name === attr.name);
             return {

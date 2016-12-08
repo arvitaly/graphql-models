@@ -100,7 +100,7 @@ class Resolver {
         return this.resolveOne(modelId, opts.source, opts.resolveInfo.getNodeFields(), opts.resolveInfo);
     }
     public async resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
-        const result = this.resolveOne(modelId, opts.args[idArgName],
+        const result = await this.resolveOne(modelId, opts.args[idArgName],
             opts.resolveInfo.getQueryOneFields(),
             opts.resolveInfo);
         if (!result) {
@@ -319,6 +319,8 @@ class Resolver {
         const model = this.collection.get(modelId);
         return model.attributes.filter((attr) => {
             return attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection;
+        }).filter((attr) => {
+            return !!fields.find((f) => f.name === attr.name);
         }).map((attr) => {
             const field = fields.find((f) => f.name === attr.name);
             return {
