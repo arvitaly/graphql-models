@@ -1,9 +1,9 @@
 "use strict";
 class Adapter {
-    findOne(modelId, id) {
+    findOne(modelId, id, populates) {
         throw new Error("Not implemented findOne");
     }
-    findMany(modelId, findCriteria) {
+    findMany(modelId, findCriteria, populates) {
         throw new Error("Not implemented findMany");
     }
     hasNextPage(modelId, findCriteria) {
@@ -11,12 +11,6 @@ class Adapter {
     }
     hasPreviousPage(modelId, findCriteria) {
         throw new Error("Not implemented hasPreviousPage");
-    }
-    populateModel(modelId, source, attr) {
-        throw new Error("Not implemented populate model");
-    }
-    populateCollection(modelId, source, attr) {
-        throw new Error("Not implemented populate collection");
     }
     createOne(modelId, created) {
         throw new Error("Not implemented createOne");

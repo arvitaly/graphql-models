@@ -2,7 +2,7 @@ import Adapter from "./../Adapter";
 import ArgumentTypes from "./../ArgumentTypes";
 import Model from "./../Model";
 import Publisher from "./../Publisher";
-import { Callbacks, FindCriteria, ModelID } from "./../typings";
+import { Callbacks, FindCriteria, ModelID, PopulateFields } from "./../typings";
 const animalsName = "animals";
 const usersName = "users";
 const postsName = "posts";
@@ -104,38 +104,37 @@ export class DataAdapter extends Adapter {
             return s.type === "update" && s.model === modelId;
         }).map((s) => s.callback(oldRow));
     }
-    public findOne(modelId, id: number, populate = false) {
+    public findOne(modelId, id: number, populates: PopulateFields) {
         const result = Object.assign({}, data[modelId.toLowerCase() + "s"].find((a) => modelId === "user" ?
             "" + a.key === "" + id
             : "" + a.id === "" + id));
-        if (modelId === "post" && !populate) {
-            delete result.owner;
-            delete result.animals;
+        if (modelId === "post") {
+            const ownerPopulate = populates.find((p) => p.attribute.name === "owner");
+            if (ownerPopulate) {
+                result.owner = this.findOne("user", result.owner, ownerPopulate.fields);
+            } else {
+                delete result.owner;
+            }
+            const animalsPopulate = populates.find((p) => p.attribute.name === "animals");
+            if (animalsPopulate) {
+                result.animals = result.animals.map((animalId) => {
+                    return this.findOne("animal", animalId, animalsPopulate.fields);
+                });
+            } else {
+                delete result.animals;
+            }
         }
-        if (modelId === "user" && !populate) {
-            delete result.pets;
+        if (modelId === "user") {
+            const petsPopulate = populates.find((p) => p.attribute.name === "pets");
+            if (petsPopulate) {
+                result.pets = result.pets.map((petId) => {
+                    return this.findOne("animal", petId, petsPopulate.fields);
+                });
+            } else {
+                delete result.pets;
+            }
         }
         return result;
-    }
-    public populateModel(modelId, source, attr) {
-        if (modelId === "post" && attr === "owner") {
-            source = this.findOne(modelId, source.id, true);
-            return this.findOne("user", source.owner);
-        }
-    }
-    public populateCollection(modelId, source, attr) {
-        if (modelId === "post" && attr === "animals") {
-            source = this.findOne(modelId, source.id, true);
-            return source.animals.map((id) => {
-                return this.findOne("animal", id);
-            });
-        }
-        if (modelId === "user" && attr === "pets") {
-            source = this.findOne(modelId, source.key, true);
-            return source.pets.map((id) => {
-                return this.findOne("animal", id);
-            });
-        }
     }
     public createOne(modelId, row: any) {
         switch (modelId) {
@@ -161,7 +160,7 @@ export class DataAdapter extends Adapter {
         Object.assign(oldRow, updated);
         return oldRow;
     }
-    public findMany(modelId, findCriteria: FindCriteria) {
+    public findMany(modelId, findCriteria: FindCriteria, populates: PopulateFields) {
         let result = data[modelId.toLowerCase() + "s"].map((row) => Object.assign({}, row));
         if (findCriteria && findCriteria.where) {
             findCriteria.where.map((arg) => {
@@ -176,7 +175,9 @@ export class DataAdapter extends Adapter {
                 }
             });
         }
-        return result;
+        return result.map((row) => {
+            return this.findOne(modelId, modelId === "user" ? row.key : row.id, populates);
+        });
     }
     public hasNextPage(modelId, findCriteria: FindCriteria) {
         return true;

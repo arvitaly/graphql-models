@@ -109,57 +109,52 @@ class Resolver {
     resolveOne(modelId, globalId, fields, resolveInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = graphql_relay_1.fromGlobalId(globalId).id;
-            const result = yield this.adapter.findOne(modelId, id);
-            if (!result) {
-                return null;
-            }
-            let row = Object.assign({ _source: result }, result);
-            return yield this.resolveRow(modelId, row, fields, resolveInfo);
+            const result = this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
+            return yield this.resolveRow(modelId, result);
         });
     }
-    resolveRow(modelId, row, fields, resolveInfo) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const model = this.collection.get(modelId);
-            yield Promise.all(fields.map((field) => __awaiter(this, void 0, void 0, function* () {
-                const attr = model.attributes.find((a) => a.name === field.name);
-                if (attr.type === AttributeTypes_1.default.Model) {
-                    const childModel = attr.model;
-                    row[attr.name] = this.resolveRow(attr.model, this.adapter.populateModel(modelId, row, attr.name), field.fields, resolveInfo);
-                }
-                if (attr.type === AttributeTypes_1.default.Collection) {
-                    const rows = yield this.adapter.populateCollection(modelId, row, attr.name);
-                    const edges = yield Promise.all(rows.map((r) => __awaiter(this, void 0, void 0, function* () {
-                        return {
-                            cursor: null,
-                            node: yield this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo),
-                        };
-                    })));
-                    row[attr.name] = {
-                        edges,
-                        pageInfo: {
-                            hasNextPage: false,
-                            hasPreviousPage: false,
-                            startCursor: edges[0].node.id,
-                            endCursor: edges[edges.length - 1].node.id,
-                        },
+    resolveRow(modelId, row) {
+        const model = this.collection.get(modelId);
+        model.attributes.map((attr) => {
+            if (typeof (row[attr.name]) === "undefined") {
+                return;
+            }
+            if (attr.type === AttributeTypes_1.default.Date) {
+                row[attr.name] = row[attr.name].toUTCString();
+            }
+            if (attr.realName === "id") {
+                row._id = row.id;
+            }
+            if (attr.type === AttributeTypes_1.default.Model) {
+                row[attr.name] = this.resolveRow(attr.model, row[attr.name]);
+            }
+            if (attr.type === AttributeTypes_1.default.Collection) {
+                const edges = row[attr.name].map((r) => {
+                    return {
+                        cursor: null,
+                        node: this.resolveRow(attr.model, r),
                     };
-                }
-                if (attr.type === AttributeTypes_1.default.Date) {
-                    row[attr.name] = row[attr.name].toUTCString();
-                }
-                if (attr.realName === "id") {
-                    row._id = row.id;
-                }
-            })));
-            row[Model_1.idArgName] = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
-            return row;
+                });
+                row[attr.name] = {
+                    edges,
+                    pageInfo: {
+                        hasNextPage: false,
+                        hasPreviousPage: false,
+                        startCursor: edges[0].node.id,
+                        endCursor: edges[edges.length - 1].node.id,
+                    },
+                };
+            }
         });
+        row[Model_1.idArgName] = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
+        return row;
     }
     resolveQueryConnection(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.collection.get(modelId);
             const findCriteria = this.argsToFindCriteria(modelId, opts.args);
-            const rows = yield this.adapter.findMany(modelId, findCriteria);
+            const fields = opts.resolveInfo.getQueryConnectionFields();
+            const rows = yield this.adapter.findMany(modelId, findCriteria, this.getPopulates(modelId, fields));
             let result;
             if (!rows || rows.length === 0) {
                 result = {
@@ -173,12 +168,12 @@ class Resolver {
                 };
             }
             else {
-                const edges = yield Promise.all(rows.map((row) => __awaiter(this, void 0, void 0, function* () {
+                const edges = rows.map((row) => {
                     return {
                         cursor: null,
-                        node: yield this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(), opts.resolveInfo),
+                        node: this.resolveRow(modelId, row),
                     };
-                })));
+                });
                 result = {
                     edges,
                     pageInfo: {
@@ -310,6 +305,18 @@ class Resolver {
             modelId,
             opts,
         };
+    }
+    getPopulates(modelId, fields) {
+        const model = this.collection.get(modelId);
+        return model.attributes.filter((attr) => {
+            return attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection;
+        }).map((attr) => {
+            const field = fields.find((f) => f.name === attr.name);
+            return {
+                attribute: attr,
+                fields: this.getPopulates(attr.model, field.fields),
+            };
+        });
     }
     equalRowToFindCriteria(modelId, row, findCriteria) {
         // if all criteria not false

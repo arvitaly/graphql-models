@@ -8,7 +8,10 @@ import InfoParser, { Field as ResolveSelectionField } from "./GraphQLResolveInfo
 import Model, { idArgName, inputArgName } from "./Model";
 import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
-import { Argument, Callbacks, FindCriteria, ModelID, ResolveOpts, ResolveType, SubscriptionID } from "./typings";
+import {
+    Argument, Callbacks, FindCriteria, ModelID, PopulateFields,
+    ResolveOpts, ResolveType, SubscriptionID,
+} from "./typings";
 class Resolver {
     public collection: Collection;
     protected subscribes: {
@@ -110,37 +113,31 @@ class Resolver {
     }
     public async resolveOne(modelId: ModelID, globalId, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
         const id = fromGlobalId(globalId).id;
-        const result = await this.adapter.findOne(modelId, id);
-        if (!result) {
-            return null;
-        }
-        let row = Object.assign({ _source: result }, result);
-        return await this.resolveRow(modelId, row, fields, resolveInfo);
+        const result = this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
+        return await this.resolveRow(modelId, result);
     }
-    public async resolveRow(modelId: ModelID, row, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
+    public resolveRow(modelId: ModelID, row) {
         const model = this.collection.get(modelId);
-        await Promise.all(fields.map(async (field) => {
-            const attr = model.attributes.find((a) => a.name === field.name);
-
+        model.attributes.map((attr) => {
+            if (typeof (row[attr.name]) === "undefined") {
+                return;
+            }
+            if (attr.type === AttributeTypes.Date) {
+                row[attr.name] = (row[attr.name] as Date).toUTCString();
+            }
+            if (attr.realName === "id") {
+                row._id = row.id;
+            }
             if (attr.type === AttributeTypes.Model) {
-                const childModel = attr.model;
-                row[attr.name] = this.resolveRow(
-                    attr.model,
-                    this.adapter.populateModel(modelId, row, attr.name),
-                    field.fields,
-                    resolveInfo);
+                row[attr.name] = this.resolveRow(attr.model, row[attr.name]);
             }
             if (attr.type === AttributeTypes.Collection) {
-                const rows = await this.adapter.populateCollection(modelId, row, attr.name);
-                const edges = await Promise.all(rows.map(async (r) => {
+                const edges = row[attr.name].map((r) => {
                     return {
                         cursor: null,
-                        node: await this.resolveRow(attr.model, r,
-                            resolveInfo.getFieldsForConnection(field),
-                            resolveInfo,
-                        ),
+                        node: this.resolveRow(attr.model, r),
                     };
-                }));
+                });
                 row[attr.name] = {
                     edges,
                     pageInfo: {
@@ -151,20 +148,15 @@ class Resolver {
                     },
                 };
             }
-            if (attr.type === AttributeTypes.Date) {
-                row[attr.name] = (row[attr.name] as Date).toUTCString();
-            }
-            if (attr.realName === "id") {
-                row._id = row.id;
-            }
-        }));
+        });
         row[idArgName] = toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
         return row;
     }
     public async resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
         const model = this.collection.get(modelId);
         const findCriteria: FindCriteria = this.argsToFindCriteria(modelId, opts.args);
-        const rows = await this.adapter.findMany(modelId, findCriteria);
+        const fields = opts.resolveInfo.getQueryConnectionFields();
+        const rows = await this.adapter.findMany(modelId, findCriteria, this.getPopulates(modelId, fields));
         let result: Connection<any>;
         if (!rows || rows.length === 0) {
             result = {
@@ -177,14 +169,12 @@ class Resolver {
                 },
             };
         } else {
-            const edges = await Promise.all(rows.map(async (row) => {
+            const edges = rows.map((row) => {
                 return {
                     cursor: null,
-                    node: await this.resolveRow(modelId, row,
-                        opts.resolveInfo.getQueryConnectionFields()
-                        , opts.resolveInfo),
+                    node: this.resolveRow(modelId, row),
                 };
-            }));
+            });
             result = {
                 edges,
                 pageInfo: {
@@ -324,6 +314,18 @@ class Resolver {
             modelId,
             opts,
         };
+    }
+    protected getPopulates(modelId: ModelID, fields: ResolveSelectionField[]): PopulateFields {
+        const model = this.collection.get(modelId);
+        return model.attributes.filter((attr) => {
+            return attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection;
+        }).map((attr) => {
+            const field = fields.find((f) => f.name === attr.name);
+            return {
+                attribute: attr,
+                fields: this.getPopulates(attr.model, field.fields),
+            };
+        });
     }
     protected equalRowToFindCriteria(modelId: ModelID, row: any, findCriteria: FindCriteria) {
         // if all criteria not false

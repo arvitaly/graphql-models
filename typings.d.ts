@@ -107,3 +107,9 @@ export interface Callbacks {
     onDelete(modelId: string, cb: (deleted) => any): any;
 }
 export type SubscriptionID = any;
+
+export type PopulateField = {
+    attribute: Attribute;
+    fields:  PopulateFields
+}
+export type PopulateFields = PopulateField[];
