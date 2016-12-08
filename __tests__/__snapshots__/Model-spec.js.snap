@@ -3338,7 +3338,7 @@ Object {
       "description": undefined,
       "isDeprecated": false,
       "name": "pets",
-      "resolve": "function",
+      "resolve": "undefined",
       "type": Object {
         "description": "A connection to a list of items.",
         "fields": Array [
@@ -3560,7 +3560,7 @@ Object {
       "description": undefined,
       "isDeprecated": false,
       "name": "owner",
-      "resolve": "function",
+      "resolve": "undefined",
       "type": Object {
         "description": undefined,
         "fields": Array [
@@ -3588,7 +3588,7 @@ Object {
             "description": undefined,
             "isDeprecated": false,
             "name": "pets",
-            "resolve": "function",
+            "resolve": "undefined",
             "type": Object {
               "description": "A connection to a list of items.",
               "fields": Array [
@@ -3796,7 +3796,7 @@ Object {
       "description": undefined,
       "isDeprecated": false,
       "name": "animals",
-      "resolve": "function",
+      "resolve": "undefined",
       "type": Object {
         "description": "A connection to a list of items.",
         "fields": Array [

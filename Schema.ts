@@ -4,6 +4,7 @@ import {
 } from "graphql";
 import { fromGlobalId, GraphQLNodeDefinitions, nodeDefinitions } from "graphql-relay";
 import Collection from "./Collection";
+import GraphQLResolveInfoParser from "./GraphQLResolveInfoParser";
 import Resolver from "./Resolver";
 import ResolveTypes from "./ResolveTypes";
 import { Mutations, Queries, ResolveFn } from "./typings";
@@ -46,7 +47,10 @@ class Schema {
                 viewer: {
                     type: this.getQueryViewerType(),
                     resolve: (source, args, context, info) => {
-                        return this.resolver.resolve(null, ResolveTypes.Viewer, { source, args, context, info });
+                        return this.resolver.resolve(null, ResolveTypes.Viewer, {
+                            source, args, context, info,
+                            resolveInfo: new GraphQLResolveInfoParser(info),
+                        });
                     },
                 },
             },
@@ -60,8 +64,11 @@ class Schema {
     }
     public getNodeDefinition() {
         if (!this.nodeDefinition) {
-            this.nodeDefinition = nodeDefinitions((id: string, info: GraphQLResolveInfo) => {
-                return this.resolver.resolve(null, ResolveTypes.Node, { source: id, args: null, context: null, info });
+            this.nodeDefinition = nodeDefinitions((id: string, context, info: GraphQLResolveInfo) => {
+                return this.resolver.resolve(null, ResolveTypes.Node, {
+                    source: id, args: null, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser(info),
+                });
             }, (value: any, context: any, info: GraphQLResolveInfo) => {
                 return this.collection.get(fromGlobalId(value.id).type.replace(/Type$/gi, "").toLowerCase())
                     .getBaseType();

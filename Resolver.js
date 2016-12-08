@@ -72,10 +72,6 @@ class Resolver {
                 return this.resolveViewer(opts);
             case ResolveTypes_1.default.Node:
                 return this.resolveNode(modelId, opts);
-            case ResolveTypes_1.default.Model:
-                return this.resolveModel(modelId, opts);
-            case ResolveTypes_1.default.Connection:
-                return this.resolveConnection(modelId, opts);
             case ResolveTypes_1.default.QueryOne:
                 return this.resolveQueryOne(modelId, opts);
             case ResolveTypes_1.default.QueryConnection:
@@ -88,33 +84,74 @@ class Resolver {
                 throw new Error("Unsupported resolve type: " + type);
         }
     }
+    resolveViewer(opts) {
+        return {};
+    }
     resolveNode(_, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, type } = graphql_relay_1.fromGlobalId(opts.source);
             const modelId = type.replace(/Type$/gi, "").toLowerCase();
-            const result = yield this.adapter.findOne(modelId, id);
-            if (!result) {
-                return null;
-            }
-            const row = this.collection.get(modelId).rowToResolve(result);
-            return row;
+            return this.resolveOne(modelId, opts.source, opts.resolveInfo.getNodeFields(), opts.resolveInfo);
         });
-    }
-    resolveViewer(opts) {
-        return {};
     }
     resolveQueryOne(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = graphql_relay_1.fromGlobalId(opts.args[Model_1.idArgName]).id;
-            const model = this.collection.get(modelId);
-            const result = yield this.adapter.findOne(modelId, id);
+            const result = this.resolveOne(modelId, opts.args[Model_1.idArgName], opts.resolveInfo.getQueryOneFields(), opts.resolveInfo);
             if (!result) {
                 return null;
             }
             if (opts.context && opts.context.subscriptionId) {
                 this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[Model_1.idArgName], opts);
             }
-            const row = model.rowToResolve(result);
+            return result;
+        });
+    }
+    resolveOne(modelId, globalId, fields, resolveInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = graphql_relay_1.fromGlobalId(globalId).id;
+            const result = yield this.adapter.findOne(modelId, id);
+            if (!result) {
+                return null;
+            }
+            let row = Object.assign({}, result);
+            return yield this.resolveRow(modelId, row, fields, resolveInfo);
+        });
+    }
+    resolveRow(modelId, row, fields, resolveInfo) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.collection.get(modelId);
+            yield Promise.all(fields.map((field) => __awaiter(this, void 0, void 0, function* () {
+                const attr = model.attributes.find((a) => a.name === field.name);
+                if (attr.type === AttributeTypes_1.default.Model) {
+                    const childModel = attr.model;
+                    row[attr.name] = this.resolveRow(attr.model, this.adapter.populateModel(modelId, row, attr.name), field.fields, resolveInfo);
+                }
+                if (attr.type === AttributeTypes_1.default.Collection) {
+                    const rows = yield this.adapter.populateCollection(modelId, row, attr.name);
+                    const edges = yield Promise.all(rows.map((r) => __awaiter(this, void 0, void 0, function* () {
+                        return {
+                            cursor: null,
+                            node: yield this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo),
+                        };
+                    })));
+                    row[attr.name] = {
+                        edges,
+                        pageInfo: {
+                            hasNextPage: false,
+                            hasPreviousPage: false,
+                            startCursor: edges[0].node.id,
+                            endCursor: edges[edges.length - 1].node.id,
+                        },
+                    };
+                }
+                if (attr.type === AttributeTypes_1.default.Date) {
+                    row[attr.name] = row[attr.name].toUTCString();
+                }
+                if (attr.realName === "id") {
+                    row._id = row.id;
+                }
+            })));
+            row[Model_1.idArgName] = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
             return row;
         });
     }
@@ -136,12 +173,12 @@ class Resolver {
                 };
             }
             else {
-                const edges = rows.map((row) => {
+                const edges = yield Promise.all(rows.map((row) => __awaiter(this, void 0, void 0, function* () {
                     return {
                         cursor: null,
-                        node: model.rowToResolve(row),
+                        node: yield this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(), opts.resolveInfo),
                     };
-                });
+                })));
                 result = {
                     edges,
                     pageInfo: {
@@ -158,42 +195,10 @@ class Resolver {
             return result;
         });
     }
-    resolveModel(modelId, opts) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const row = yield this.adapter.populateModel(modelId, this.collection.get(modelId).rowFromResolve(opts.source), opts.attrName);
-            return this.collection.get(this.collection.get(modelId).attributes.find((a) => a.name === opts.attrName).model).rowToResolve(row);
-        });
-    }
-    resolveConnection(modelId, opts) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const rows = yield this.adapter.populateCollection(modelId, this.collection.get(modelId).rowFromResolve(opts.source), opts.attrName);
-            const edges = rows.map((row) => {
-                return {
-                    cursor: null,
-                    node: this.collection.get(this.collection.get(modelId).attributes.find((a) => a.name === opts.attrName).model)
-                        .rowToResolve(row),
-                };
-            });
-            return {
-                edges,
-                pageInfo: {
-                    hasNextPage: false,
-                    hasPreviousPage: false,
-                    startCursor: edges[0].node.id,
-                    endCursor: edges[edges.length - 1].node.id,
-                },
-            };
-        });
-    }
     resolveMutationCreate(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = yield this.createOne(modelId, opts.args);
-            const row = yield this.resolveNode(modelId, {
-                source: id,
-                args: null,
-                context: opts.context,
-                info: opts.info,
-            });
+            const row = yield this.resolveOne(modelId, id, opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
             return {
                 [this.collection.get(modelId).queryName]: row,
             };
@@ -235,12 +240,7 @@ class Resolver {
                 }
             })));
             const updated = yield this.adapter.updateOne(model.id, id, updating);
-            const row = yield this.resolveNode(modelId, {
-                source: graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
-                args: null,
-                context: opts.context,
-                info: opts.info,
-            });
+            const row = yield this.resolveOne(modelId, graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]), opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
             return {
                 [this.collection.get(modelId).queryName]: row,
             };

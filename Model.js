@@ -3,6 +3,7 @@ const graphql_1 = require("graphql");
 const graphql_relay_1 = require("graphql-relay");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
+const GraphQLResolveInfoParser_1 = require("./GraphQLResolveInfoParser");
 const ResolveTypes_1 = require("./ResolveTypes");
 exports.whereArgName = "where";
 exports.idArgName = "id";
@@ -94,7 +95,10 @@ class Model {
             args: this.getOneArgs(),
             type: this.getBaseType(),
             resolve: (source, args, context, info) => {
-                return this.resolveFn(this.id, ResolveTypes_1.default.QueryOne, { source, args, context, info });
+                return this.resolveFn(this.id, ResolveTypes_1.default.QueryOne, {
+                    source, args, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                });
             },
         };
     }
@@ -103,7 +107,10 @@ class Model {
             args: this.getConnectionArgs(),
             type: this.getConnectionType(),
             resolve: (source, args, context, info) => {
-                return this.resolveFn(this.id, ResolveTypes_1.default.QueryConnection, { source, args, context, info });
+                return this.resolveFn(this.id, ResolveTypes_1.default.QueryConnection, {
+                    source, args, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                });
             },
         };
     }
@@ -140,8 +147,11 @@ class Model {
             name: this.name + "CreateMutation",
             inputFields: this.getCreateType().getFields(),
             outputFields,
-            mutateAndGetPayload: (object, context) => {
-                return this.resolveFn(this.id, ResolveTypes_1.default.MutationCreate, { source: null, args: object, context, info: null });
+            mutateAndGetPayload: (object, context, info) => {
+                return this.resolveFn(this.id, ResolveTypes_1.default.MutationCreate, {
+                    source: null, args: object, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                });
             },
         });
     }
@@ -166,8 +176,11 @@ class Model {
             name: this.name + "DeleteMutation",
             inputFields: this.getOneArgs(),
             outputFields,
-            mutateAndGetPayload: (object, context) => {
-                return this.resolveFn(this.id, ResolveTypes_1.default.MutationDelete, { source: null, args: object, context, info: null });
+            mutateAndGetPayload: (object, context, info) => {
+                return this.resolveFn(this.id, ResolveTypes_1.default.MutationDelete, {
+                    source: null, args: object, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                });
             },
         });
     }
@@ -180,8 +193,11 @@ class Model {
             name: this.name + "UpdateMutation",
             inputFields: this.getUpdateType().getFields(),
             outputFields,
-            mutateAndGetPayload: (object, context) => {
-                return this.resolveFn(this.id, ResolveTypes_1.default.MutationUpdate, { source: null, args: object, context, info: null });
+            mutateAndGetPayload: (object, context, info) => {
+                return this.resolveFn(this.id, ResolveTypes_1.default.MutationUpdate, {
+                    source: null, args: object, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                });
             },
         });
     }
@@ -199,8 +215,11 @@ class Model {
             name: this.name + "sUpdateMutation",
             inputFields,
             outputFields,
-            mutateAndGetPayload: (object, context) => {
-                return this.resolveFn(this.id, ResolveTypes_1.default.MutationUpdateMany, { source: null, args: object, context, info: null });
+            mutateAndGetPayload: (object, context, info) => {
+                return this.resolveFn(this.id, ResolveTypes_1.default.MutationUpdateMany, {
+                    source: null, args: object, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                });
             },
         });
     }
@@ -244,48 +263,6 @@ class Model {
     }
     getNameForGlobalId() {
         return capitalize(this.name);
-    }
-    rowFromResolve(row) {
-        row = Object.assign({}, row);
-        const id = graphql_relay_1.fromGlobalId(row.id).id;
-        row[this.getPrimaryKeyAttribute().realName] = id;
-        this.attributes.map((attr) => {
-            if (typeof (row[attr.name]) !== "undefined") {
-                if (attr.type === AttributeTypes_1.default.Date) {
-                    row[attr.name] = new Date(row[attr.name]);
-                }
-                if (attr.type === AttributeTypes_1.default.Model && typeof (row[attr.name]) === "string") {
-                    row[attr.name] = graphql_relay_1.fromGlobalId(row[attr.name]).id;
-                }
-                if (attr.type === AttributeTypes_1.default.Collection && row[attr.name] && row[attr.name].edges) {
-                    row[attr.name] = row[attr.name].edges.map((value) => {
-                        return graphql_relay_1.fromGlobalId(value.node.id).id;
-                    });
-                }
-            }
-        });
-        return row;
-    }
-    rowToResolve(row) {
-        row = Object.assign({ _source: row }, row);
-        if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
-            row._id = row.id;
-        }
-        row.id = graphql_relay_1.toGlobalId(this.getNameForGlobalId(), row[this.getPrimaryKeyAttribute().name]);
-        this.attributes.map((attr) => {
-            if (typeof (row[attr.name]) !== "undefined") {
-                if (attr.type === AttributeTypes_1.default.Date) {
-                    row[attr.name] = row[attr.name].toUTCString();
-                }
-            }
-            if (attr.type === AttributeTypes_1.default.Model) {
-                row[attr.name] = row[attr.name] || {};
-            }
-            if (attr.type === AttributeTypes_1.default.Collection) {
-                row[attr.name] = row[attr.name] || { edges: [] };
-            }
-        });
-        return row;
     }
     generateCreateArguments() {
         let args = [];
@@ -406,15 +383,9 @@ class Model {
             let resolve;
             if (attr.type === AttributeTypes_1.default.Model) {
                 graphQLType = this.collector.get(attr.model).getBaseType();
-                resolve = (source, args, context, info) => {
-                    return this.collector.get(attr.model).resolveFn(this.id, ResolveTypes_1.default.Model, { attrName: attr.name, source, args, context, info });
-                };
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
                 graphQLType = this.collector.get(attr.model).getConnectionType();
-                resolve = (source, args, context, info) => {
-                    return this.resolveFn(this.id, ResolveTypes_1.default.Connection, { attrName: attr.name, source, args, context, info });
-                };
             }
             else if (attr.type === AttributeTypes_1.default.ID) {
                 graphQLType = new graphql_1.GraphQLNonNull(graphql_1.GraphQLID);

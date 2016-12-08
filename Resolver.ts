@@ -1,9 +1,10 @@
-import { } from "graphql";
+import { FieldNode, GraphQLResolveInfo, SelectionSetNode } from "graphql";
 import { Connection, fromGlobalId, toGlobalId } from "graphql-relay";
 import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
+import InfoParser, { Field as ResolveSelectionField } from "./GraphQLResolveInfoParser";
 import Model, { idArgName, inputArgName } from "./Model";
 import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
@@ -75,10 +76,6 @@ class Resolver {
                 return this.resolveViewer(opts);
             case ResolveTypes.Node:
                 return this.resolveNode(modelId, opts);
-            case ResolveTypes.Model:
-                return this.resolveModel(modelId, opts);
-            case ResolveTypes.Connection:
-                return this.resolveConnection(modelId, opts);
             case ResolveTypes.QueryOne:
                 return this.resolveQueryOne(modelId, opts);
             case ResolveTypes.QueryConnection:
@@ -91,31 +88,77 @@ class Resolver {
                 throw new Error("Unsupported resolve type: " + type);
         }
     }
-    public async resolveNode(_: ModelID, opts: ResolveOpts) {
-        const {id, type} = fromGlobalId(opts.source);
-        const modelId = type.replace(/Type$/gi, "").toLowerCase();
-
-        const result = await this.adapter.findOne(modelId, id);
-        if (!result) {
-            return null;
-        }
-        const row = this.collection.get(modelId).rowToResolve(result);
-        return row;
-    }
     public resolveViewer(opts: ResolveOpts) {
         return {};
     }
+    public async resolveNode(_: ModelID, opts: ResolveOpts) {
+        const {id, type} = fromGlobalId(opts.source);
+        const modelId = type.replace(/Type$/gi, "").toLowerCase();
+        return this.resolveOne(modelId, opts.source, opts.resolveInfo.getNodeFields(), opts.resolveInfo);
+    }
     public async resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
-        const id = fromGlobalId(opts.args[idArgName]).id;
-        const model = this.collection.get(modelId);
-        const result = await this.adapter.findOne(modelId, id);
+        const result = this.resolveOne(modelId, opts.args[idArgName],
+            opts.resolveInfo.getQueryOneFields(),
+            opts.resolveInfo);
         if (!result) {
             return null;
         }
         if (opts.context && opts.context.subscriptionId) {
             this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[idArgName], opts);
         }
-        const row = model.rowToResolve(result);
+        return result;
+    }
+    public async resolveOne(modelId: ModelID, globalId, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
+        const id = fromGlobalId(globalId).id;
+        const result = await this.adapter.findOne(modelId, id);
+        if (!result) {
+            return null;
+        }
+        let row = Object.assign({}, result);
+        return await this.resolveRow(modelId, row, fields, resolveInfo);
+    }
+    public async resolveRow(modelId: ModelID, row, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
+        const model = this.collection.get(modelId);
+        await Promise.all(fields.map(async (field) => {
+            const attr = model.attributes.find((a) => a.name === field.name);
+
+            if (attr.type === AttributeTypes.Model) {
+                const childModel = attr.model;
+                row[attr.name] = this.resolveRow(
+                    attr.model,
+                    this.adapter.populateModel(modelId, row, attr.name),
+                    field.fields,
+                    resolveInfo);
+            }
+            if (attr.type === AttributeTypes.Collection) {
+                const rows = await this.adapter.populateCollection(modelId, row, attr.name);
+                const edges = await Promise.all(rows.map(async (r) => {
+                    return {
+                        cursor: null,
+                        node: await this.resolveRow(attr.model, r,
+                            resolveInfo.getFieldsForConnection(field),
+                            resolveInfo,
+                        ),
+                    };
+                }));
+                row[attr.name] = {
+                    edges,
+                    pageInfo: {
+                        hasNextPage: false,
+                        hasPreviousPage: false,
+                        startCursor: edges[0].node.id,
+                        endCursor: edges[edges.length - 1].node.id,
+                    },
+                };
+            }
+            if (attr.type === AttributeTypes.Date) {
+                row[attr.name] = (row[attr.name] as Date).toUTCString();
+            }
+            if (attr.realName === "id") {
+                row._id = row.id;
+            }
+        }));
+        row[idArgName] = toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
         return row;
     }
     public async resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
@@ -134,12 +177,14 @@ class Resolver {
                 },
             };
         } else {
-            const edges = rows.map((row) => {
+            const edges = await Promise.all(rows.map(async (row) => {
                 return {
                     cursor: null,
-                    node: model.rowToResolve(row),
+                    node: await this.resolveRow(modelId, row,
+                        opts.resolveInfo.getQueryConnectionFields()
+                        , opts.resolveInfo),
                 };
-            });
+            }));
             result = {
                 edges,
                 pageInfo: {
@@ -157,43 +202,10 @@ class Resolver {
         }
         return result;
     }
-    public async resolveModel(modelId: ModelID, opts: ResolveOpts) {
-        const row = await this.adapter.populateModel(modelId,
-            this.collection.get(modelId).rowFromResolve(opts.source), opts.attrName);
-        return this.collection.get(
-            this.collection.get(modelId).attributes.find((a) => a.name === opts.attrName).model,
-        ).rowToResolve(row);
-    }
-    public async resolveConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
-        const rows = await this.adapter.populateCollection(modelId,
-            this.collection.get(modelId).rowFromResolve(opts.source),
-            opts.attrName);
-        const edges = rows.map((row) => {
-            return {
-                cursor: null,
-                node: this.collection.get(
-                    this.collection.get(modelId).attributes.find((a) => a.name === opts.attrName).model)
-                    .rowToResolve(row),
-            };
-        });
-        return {
-            edges,
-            pageInfo: {
-                hasNextPage: false,
-                hasPreviousPage: false,
-                startCursor: edges[0].node.id,
-                endCursor: edges[edges.length - 1].node.id,
-            },
-        };
-    }
     public async resolveMutationCreate(modelId: string, opts: ResolveOpts) {
         const id = await this.createOne(modelId, opts.args);
-        const row = await this.resolveNode(modelId, {
-            source: id,
-            args: null,
-            context: opts.context,
-            info: opts.info,
-        });
+        const row = await this.resolveOne(modelId, id,
+            opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
         return {
             [this.collection.get(modelId).queryName]: row,
         };
@@ -234,12 +246,10 @@ class Resolver {
             }
         }));
         const updated = await this.adapter.updateOne(model.id, id, updating);
-        const row = await this.resolveNode(modelId, {
-            source: toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
-            args: null,
-            context: opts.context,
-            info: opts.info,
-        });
+
+        const row = await this.resolveOne(modelId,
+            toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
+            opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
         return {
             [this.collection.get(modelId).queryName]: row,
         };

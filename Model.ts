@@ -25,6 +25,7 @@ import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
+import GraphQLResolveInfoParser from "./GraphQLResolveInfoParser";
 import ResolveTypes from "./ResolveTypes";
 import {
     Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute,
@@ -131,7 +132,10 @@ class Model {
             args: this.getOneArgs(),
             type: this.getBaseType(),
             resolve: (source, args, context, info) => {
-                return this.resolveFn(this.id, ResolveTypes.QueryOne, { source, args, context, info });
+                return this.resolveFn(this.id, ResolveTypes.QueryOne, {
+                    source, args, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser(info),
+                });
             },
         };
     }
@@ -140,7 +144,10 @@ class Model {
             args: this.getConnectionArgs(),
             type: this.getConnectionType(),
             resolve: (source, args, context, info) => {
-                return this.resolveFn(this.id, ResolveTypes.QueryConnection, { source, args, context, info });
+                return this.resolveFn(this.id, ResolveTypes.QueryConnection, {
+                    source, args, context, info,
+                    resolveInfo: new GraphQLResolveInfoParser(info),
+                });
             },
         };
     }
@@ -177,9 +184,12 @@ class Model {
             name: this.name + "CreateMutation",
             inputFields: this.getCreateType().getFields(),
             outputFields,
-            mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
+            mutateAndGetPayload: (object, context, info: GraphQLResolveInfo) => {
                 return this.resolveFn(this.id,
-                    ResolveTypes.MutationCreate, { source: null, args: object, context, info: null });
+                    ResolveTypes.MutationCreate, {
+                        source: null, args: object, context, info,
+                        resolveInfo: new GraphQLResolveInfoParser(info),
+                    });
             },
         });
     }
@@ -204,9 +214,12 @@ class Model {
             name: this.name + "DeleteMutation",
             inputFields: this.getOneArgs(),
             outputFields,
-            mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
+            mutateAndGetPayload: (object, context, info: GraphQLResolveInfo) => {
                 return this.resolveFn(this.id,
-                    ResolveTypes.MutationDelete, { source: null, args: object, context, info: null });
+                    ResolveTypes.MutationDelete, {
+                        source: null, args: object, context, info,
+                        resolveInfo: new GraphQLResolveInfoParser(info),
+                    });
             },
         });
     }
@@ -219,9 +232,12 @@ class Model {
             name: this.name + "UpdateMutation",
             inputFields: this.getUpdateType().getFields(),
             outputFields,
-            mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
+            mutateAndGetPayload: (object, context, info: GraphQLResolveInfo) => {
                 return this.resolveFn(this.id,
-                    ResolveTypes.MutationUpdate, { source: null, args: object, context, info: null });
+                    ResolveTypes.MutationUpdate, {
+                        source: null, args: object, context, info,
+                        resolveInfo: new GraphQLResolveInfoParser(info),
+                    });
             },
         });
     }
@@ -239,9 +255,12 @@ class Model {
             name: this.name + "sUpdateMutation",
             inputFields,
             outputFields,
-            mutateAndGetPayload: (object, context: GraphQLResolveInfo) => {
+            mutateAndGetPayload: (object, context, info: GraphQLResolveInfo) => {
                 return this.resolveFn(this.id, ResolveTypes.MutationUpdateMany,
-                    { source: null, args: object, context, info: null });
+                    {
+                        source: null, args: object, context, info,
+                        resolveInfo: new GraphQLResolveInfoParser(info),
+                    });
             },
         });
     }
@@ -285,48 +304,6 @@ class Model {
     }
     public getNameForGlobalId() {
         return capitalize(this.name);
-    }
-    public rowFromResolve(row) {
-        row = Object.assign({}, row);
-        const id = fromGlobalId(row.id).id;
-        row[this.getPrimaryKeyAttribute().realName] = id;
-        this.attributes.map((attr) => {
-            if (typeof (row[attr.name]) !== "undefined") {
-                if (attr.type === AttributeTypes.Date) {
-                    row[attr.name] = new Date(row[attr.name] as string);
-                }
-                if (attr.type === AttributeTypes.Model && typeof (row[attr.name]) === "string") {
-                    row[attr.name] = fromGlobalId(row[attr.name]).id;
-                }
-                if (attr.type === AttributeTypes.Collection && row[attr.name] && row[attr.name].edges) {
-                    row[attr.name] = row[attr.name].edges.map((value) => {
-                        return fromGlobalId(value.node.id).id;
-                    });
-                }
-            }
-        });
-        return row;
-    }
-    public rowToResolve(row) {
-        row = Object.assign({ _source: row }, row);
-        if (this.getPrimaryKeyAttribute().name.toLowerCase() === "_id") {
-            row._id = row.id;
-        }
-        row.id = toGlobalId(this.getNameForGlobalId(), row[this.getPrimaryKeyAttribute().name]);
-        this.attributes.map((attr) => {
-            if (typeof (row[attr.name]) !== "undefined") {
-                if (attr.type === AttributeTypes.Date) {
-                    row[attr.name] = (row[attr.name] as Date).toUTCString();
-                }
-            }
-            if (attr.type === AttributeTypes.Model) {
-                row[attr.name] = row[attr.name] || {};
-            }
-            if (attr.type === AttributeTypes.Collection) {
-                row[attr.name] = row[attr.name] || { edges: [] };
-            }
-        });
-        return row;
     }
     protected generateCreateArguments() {
         let args: Argument[] = [];
@@ -444,16 +421,16 @@ class Model {
             let resolve;
             if (attr.type === AttributeTypes.Model) {
                 graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
-                resolve = (source, args, context, info) => {
+                /*resolve = (source, args, context, info) => {
                     return this.collector.get(attr.model).resolveFn(this.id,
                         ResolveTypes.Model, { attrName: attr.name, source, args, context, info });
-                };
+                };*/
             } else if (attr.type === AttributeTypes.Collection) {
                 graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
-                resolve = (source, args, context, info) => {
+                /*resolve = (source, args, context, info) => {
                     return this.resolveFn(this.id, ResolveTypes.Connection,
                         { attrName: attr.name, source, args, context, info });
-                };
+                };*/
             } else if (attr.type === AttributeTypes.ID) {
                 graphQLType = new GraphQLNonNull(GraphQLID);
             } else {

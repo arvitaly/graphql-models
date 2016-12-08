@@ -1,0 +1,82 @@
+exports[`GraphQLResolveInfoParser get node fields 1`] = `
+Array [
+  Object {
+    "fields": Array [
+      Object {
+        "fields": Array [],
+        "name": "field1",
+      },
+    ],
+    "name": "model1",
+  },
+]
+`;
+
+exports[`GraphQLResolveInfoParser get query connection fields 1`] = `
+Array [
+  Object {
+    "fields": Array [
+      Object {
+        "fields": Array [],
+        "name": "field1",
+      },
+      Object {
+        "fields": Array [
+          Object {
+            "fields": Array [],
+            "name": "field2",
+          },
+        ],
+        "name": "model2",
+      },
+    ],
+    "name": "model1",
+  },
+]
+`;
+
+exports[`GraphQLResolveInfoParser get query one fields 1`] = `
+Array [
+  Object {
+    "fields": Array [],
+    "name": "field1",
+  },
+  Object {
+    "fields": Array [
+      Object {
+        "fields": Array [],
+        "name": "field2",
+      },
+    ],
+    "name": "model2",
+  },
+]
+`;
+
+exports[`GraphQLResolveInfoParser parse all fields 1`] = `
+Array [
+  Object {
+    "fields": Array [
+      Object {
+        "fields": Array [
+          Object {
+            "fields": Array [],
+            "name": "field1",
+          },
+        ],
+        "name": "model1",
+      },
+      Object {
+        "fields": Array [
+          Object {
+            "fields": Array [],
+            "name": "field2",
+          },
+        ],
+        "name": "model2",
+      },
+    ],
+    "name": "node",
+  },
+]
+`;

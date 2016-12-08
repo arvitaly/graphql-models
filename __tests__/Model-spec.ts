@@ -136,6 +136,7 @@ describe("Model spec", () => {
                     args: "f2",
                     context: "f3",
                     info: "f4",
+                    resolveInfo: { info: "f4" },
                 }]]);
         });
         it("Query connection", () => {
@@ -150,6 +151,7 @@ describe("Model spec", () => {
                     args: "f2",
                     context: "f3",
                     info: "f4",
+                    resolveInfo: { info: "f4" },
                 }]]);
         });
         it("all queries", () => {
@@ -188,7 +190,8 @@ describe("Model spec", () => {
                     args: args.input,
                     source: null,
                     context: "f3",
-                    info: null,
+                    info: "f4",
+                    resolveInfo: { info: "f4" },
                 }]]);
         });
         it("update mutation", async () => {
@@ -205,7 +208,8 @@ describe("Model spec", () => {
                     args: args.input,
                     source: null,
                     context: "f3",
-                    info: null,
+                    info: "f4",
+                    resolveInfo: { info: "f4" },
                 }]]);
         });
         it("update many mutation", async () => {
@@ -222,7 +226,8 @@ describe("Model spec", () => {
                     args: args.input,
                     source: null,
                     context: "f3",
-                    info: null,
+                    info: "f4",
+                    resolveInfo: { info: "f4" },
                 }]]);
         });
         it("delete mutation", async () => {
@@ -239,7 +244,8 @@ describe("Model spec", () => {
                     args: args.input,
                     source: null,
                     context: "f3",
-                    info: null,
+                    info: "f4",
+                    resolveInfo: { info: "f4" },
                 }]]);
         });
         it("getAllMutations", () => {

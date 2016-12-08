@@ -1,9 +1,14 @@
 import {
+    ArgumentNode,
+    DirectiveNode, FieldNode, FragmentDefinitionNode,
     GraphQLArgumentConfig, GraphQLEnumType, GraphQLField, GraphQLFieldConfig,
     GraphQLFieldConfigArgumentMap, GraphQLInputField, GraphQLInputFieldMap, GraphQLInputObjectType,
     GraphQLInputType, GraphQLInterfaceType, GraphQLList,
-    GraphQLNonNull, GraphQLObjectType, GraphQLScalarType, GraphQLSchema,
+    GraphQLNonNull, GraphQLObjectType, GraphQLResolveInfo, GraphQLScalarType, GraphQLSchema,
     GraphQLType, GraphQLUnionType,
+    Location, NamedTypeNode, NameNode,
+    SelectionNode, SelectionSetNode, Source, Token,
+    ValueNode,
 } from "graphql";
 /*
     export type GraphQLInputType =
@@ -169,6 +174,116 @@ export function printGraphQLSchema(schema: GraphQLSchema) {
         mutationType: mutationType ? printGraphQLObjectType(mutationType) : undefined,
         queryType: queryType ? printGraphQLObjectType(schema.getQueryType()) : undefined,
         subscriptionType: subscriptionType ? printGraphQLObjectType(schema.getSubscriptionType()) : undefined,
+    };
+}
+export function printFieldNode(fieldNode: FieldNode) {
+    return {
+        alias: fieldNode.alias ? printNameNode(fieldNode.alias) : null,
+        arguments: fieldNode.arguments.map(printArgumentNode),
+        directives: fieldNode.directives.map(printDirectiveNode),
+        kind: fieldNode.kind,
+        loc: printLocation(fieldNode.loc),
+        name: printNameNode(fieldNode.name),
+        selectionSet: printSelectionSetNode(fieldNode.selectionSet),
+    };
+}
+export function printValueNode(node: ValueNode) {
+    return {
+        kind: node.kind,
+        loc: printLocation(node.loc),
+    };
+}
+export function printArgumentNode(node: ArgumentNode) {
+    return {
+        kind: node.kind,
+        loc: printLocation(node.loc),
+        name: printNameNode(node.name),
+        value: node.value,
+    };
+}
+export function printDirectiveNode(node: DirectiveNode) {
+    return {
+        kind: node.kind,
+        loc: printLocation(node.loc),
+        name: printNameNode(node.name),
+        arguments: node.arguments.map(printArgumentNode),
+    };
+}
+export function printToken(token: Token) {
+    return {
+        column: token.column,
+        start: token.start,
+        end: token.end,
+        kine: token.kind,
+        line: token.line,
+        next: token.next ? printToken(token.next) : null,
+        prev: token.prev ? "prevToken" : null,
+        value: token.value,
+    };
+}
+export function printSource(source: Source) {
+    return {
+        body: source.body,
+        name: source.name,
+    };
+}
+export function printLocation(location: Location) {
+    return {
+        start: location.start,
+        end: location.end,
+        startToken: printToken(location.startToken),
+        endToken: printToken(location.endToken),
+        source: printSource(location.source),
+    };
+}
+export function printNameNode(node: NameNode) {
+    return {
+        kind: node.kind,
+        loc: printLocation(node.loc),
+        value: node.value,
+    };
+}
+export function printSelectionNode(node: SelectionNode) {
+    return {
+        kind: node.kind,
+        directives: node.directives.map(printDirectiveNode),
+        loc: printLocation(node.loc),
+    };
+}
+export function printSelectionSetNode(node: SelectionSetNode) {
+    return {
+        kind: node.kind,
+        loc: printLocation(node.loc),
+        selections: node.selections.map(printSelectionNode),
+    };
+}
+export function printNamedTypeNode(node: NamedTypeNode) {
+    return {
+        kind: node.kind,
+        loc: printLocation(node.loc),
+        name: printNameNode(node.name),
+    };
+}
+export function printFragmentDefinitionNode(node: FragmentDefinitionNode) {
+    return {
+        directives: node.directives.map(printDirectiveNode),
+        kind: node.kind,
+        loc: printLocation(node.loc),
+        name: printNameNode(node.name),
+        selectionSet: printSelectionSetNode(node.selectionSet),
+        typeCondition: printNamedTypeNode(node.typeCondition),
+    };
+}
+export function printGraphQLResolveInfo(info: GraphQLResolveInfo) {
+    return {
+        fieldName: info.fieldName,
+        fieldNodes: info.fieldNodes.map(printFieldNode),
+        fragments: Object.keys(info.fragments).map((fragmentName) => {
+            return {
+                fragmentName,
+                fragment: printFragmentDefinitionNode(info.fragments[fragmentName]),
+            };
+        }),
     };
 }
 function _<T, F>(obj: { [index: string]: T }, cb: (field: T) => F): Array<{ name: string; field: F }> {

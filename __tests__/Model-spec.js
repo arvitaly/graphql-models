@@ -124,6 +124,7 @@ describe("Model spec", () => {
                         args: "f2",
                         context: "f3",
                         info: "f4",
+                        resolveInfo: { info: "f4" },
                     }
                 ]]);
         });
@@ -139,6 +140,7 @@ describe("Model spec", () => {
                         args: "f2",
                         context: "f3",
                         info: "f4",
+                        resolveInfo: { info: "f4" },
                     }
                 ]]);
         });
@@ -178,7 +180,8 @@ describe("Model spec", () => {
                         args: args.input,
                         source: null,
                         context: "f3",
-                        info: null,
+                        info: "f4",
+                        resolveInfo: { info: "f4" },
                     }
                 ]]);
         }));
@@ -196,7 +199,8 @@ describe("Model spec", () => {
                         args: args.input,
                         source: null,
                         context: "f3",
-                        info: null,
+                        info: "f4",
+                        resolveInfo: { info: "f4" },
                     }
                 ]]);
         }));
@@ -214,7 +218,8 @@ describe("Model spec", () => {
                         args: args.input,
                         source: null,
                         context: "f3",
-                        info: null,
+                        info: "f4",
+                        resolveInfo: { info: "f4" },
                     }
                 ]]);
         }));
@@ -232,7 +237,8 @@ describe("Model spec", () => {
                         args: args.input,
                         source: null,
                         context: "f3",
-                        info: null,
+                        info: "f4",
+                        resolveInfo: { info: "f4" },
                     }
                 ]]);
         }));
