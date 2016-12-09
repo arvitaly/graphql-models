@@ -117,6 +117,9 @@ class Resolver {
         return this.resolveRow(modelId, result, fields, resolveInfo);
     }
     public resolveRow(modelId: ModelID, row, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
+        if (!row) {
+            return row;
+        }
         const model = this.collection.get(modelId);
         fields.map((field) => {
             const attr = model.attributes.find((a) => a.name === field.name);

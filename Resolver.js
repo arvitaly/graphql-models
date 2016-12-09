@@ -114,6 +114,9 @@ class Resolver {
         });
     }
     resolveRow(modelId, row, fields, resolveInfo) {
+        if (!row) {
+            return row;
+        }
         const model = this.collection.get(modelId);
         fields.map((field) => {
             const attr = model.attributes.find((a) => a.name === field.name);
