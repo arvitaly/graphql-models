@@ -415,46 +415,42 @@ class Model {
         return args;
     }
     protected generateBaseType(): GraphQLObjectType {
-        let fields: GraphQLFieldConfigMap<any, any> = {};
-        this.attributes.map((attr) => {
-            let graphQLType;
-            let resolve;
-            if (attr.type === AttributeTypes.Model) {
-                graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
-                /*resolve = (source, args, context, info) => {
-                    return this.collector.get(attr.model).resolveFn(this.id,
-                        ResolveTypes.Model, { attrName: attr.name, source, args, context, info });
-                };*/
-            } else if (attr.type === AttributeTypes.Collection) {
-                graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
-                /*resolve = (source, args, context, info) => {
-                    return this.resolveFn(this.id, ResolveTypes.Connection,
-                        { attrName: attr.name, source, args, context, info });
-                };*/
-            } else if (attr.type === AttributeTypes.ID) {
-                graphQLType = new GraphQLNonNull(GraphQLID);
-            } else {
-                graphQLType = scalarTypeToGraphQL(attr.type);
-            }
-            fields[attr.name] = { type: graphQLType };
-            if (resolve) {
-                fields[attr.name].resolve = resolve;
-            }
-        });
         return new GraphQLObjectType({
             name: capitalize(this.name),
-            fields,
+            fields: () => {
+                let fields: GraphQLFieldConfigMap<any, any> = {};
+                this.attributes.map((attr) => {
+                    let graphQLType;
+                    let resolve;
+                    if (attr.type === AttributeTypes.Model) {
+                        graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
+                    } else if (attr.type === AttributeTypes.Collection) {
+                        graphQLType = this.collector.get((attr as CollectionAttribute).model).getConnectionType();
+                    } else if (attr.type === AttributeTypes.ID) {
+                        graphQLType = new GraphQLNonNull(GraphQLID);
+                    } else {
+                        graphQLType = scalarTypeToGraphQL(attr.type);
+                    }
+                    fields[attr.name] = { type: graphQLType };
+                    if (resolve) {
+                        fields[attr.name].resolve = resolve;
+                    }
+                });
+                return fields;
+            },
             interfaces: this.opts.interfaces,
         });
     }
     protected generateCreationType(): GraphQLInputObjectType {
-        let fields: GraphQLInputFieldConfigMap = {};
-        this.getCreateArguments().map((arg) => {
-            fields[arg.name] = { type: arg.graphQLType };
-        });
         return new GraphQLInputObjectType({
             name: "Create" + capitalize(this.name) + "Input",
-            fields,
+            fields: () => {
+                let fields: GraphQLInputFieldConfigMap = {};
+                this.getCreateArguments().map((arg) => {
+                    fields[arg.name] = { type: arg.graphQLType };
+                });
+                return fields;
+            },
         });
     }
     protected generateUpdateArguments() {
@@ -507,13 +503,15 @@ class Model {
         return args;
     }
     protected generateUpdateType(): GraphQLInputObjectType {
-        let fields: GraphQLInputFieldConfigMap = {};
-        this.getUpdateArguments().map((arg) => {
-            fields[arg.name] = { type: arg.graphQLType };
-        });
         return new GraphQLInputObjectType({
             name: "Update" + this.name + "Input",
-            fields,
+            fields: () => {
+                let fields: GraphQLInputFieldConfigMap = {};
+                this.getUpdateArguments().map((arg) => {
+                    fields[arg.name] = { type: arg.graphQLType };
+                });
+                return fields;
+            },
         });
     }
     protected generateWhereInputType(): GraphQLInputObjectType {

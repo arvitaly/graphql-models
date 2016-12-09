@@ -1,3 +1,113 @@
+exports[`Schema spec circular dependencies 1`] = `
+GraphQLSchema {
+  "_directives": Array [
+    GraphQLDirective {
+      "args": Array [
+        Object {
+          "defaultValue": undefined,
+          "description": "Included when true.",
+          "name": "if",
+          "type": "Boolean!",
+        },
+      ],
+      "description": "Directs the executor to include this field or fragment only when the \`if\` argument is true.",
+      "locations": Array [
+        "FIELD",
+        "FRAGMENT_SPREAD",
+        "INLINE_FRAGMENT",
+      ],
+      "name": "include",
+    },
+    GraphQLDirective {
+      "args": Array [
+        Object {
+          "defaultValue": undefined,
+          "description": "Skipped when true.",
+          "name": "if",
+          "type": "Boolean!",
+        },
+      ],
+      "description": "Directs the executor to skip this field or fragment when the \`if\` argument is true.",
+      "locations": Array [
+        "FIELD",
+        "FRAGMENT_SPREAD",
+        "INLINE_FRAGMENT",
+      ],
+      "name": "skip",
+    },
+    GraphQLDirective {
+      "args": Array [
+        Object {
+          "defaultValue": "No longer supported",
+          "description": "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted in [Markdown](https://daringfireball.net/projects/markdown/).",
+          "name": "reason",
+          "type": "String",
+        },
+      ],
+      "description": "Marks an element of a GraphQL schema as no longer supported.",
+      "locations": Array [
+        "FIELD_DEFINITION",
+        "ENUM_VALUE",
+      ],
+      "name": "deprecated",
+    },
+  ],
+  "_implementations": Object {},
+  "_mutationType": "Mutation",
+  "_queryType": "Query",
+  "_subscriptionType": undefined,
+  "_typeMap": Object {
+    "Boolean": "Boolean",
+    "CreateModel1Input": "CreateModel1Input",
+    "CreateModel2Input": "CreateModel2Input",
+    "ID": "ID",
+    "Int": "Int",
+    "Model1": "Model1",
+    "Model1Connection": "Model1Connection",
+    "Model1CreateMutationInput": "Model1CreateMutationInput",
+    "Model1CreateMutationPayload": "Model1CreateMutationPayload",
+    "Model1DeleteMutationInput": "Model1DeleteMutationInput",
+    "Model1DeleteMutationPayload": "Model1DeleteMutationPayload",
+    "Model1Edge": "Model1Edge",
+    "Model1UpdateMutationInput": "Model1UpdateMutationInput",
+    "Model1UpdateMutationPayload": "Model1UpdateMutationPayload",
+    "Model1WhereInput": "Model1WhereInput",
+    "Model1sUpdateMutationInput": "Model1sUpdateMutationInput",
+    "Model1sUpdateMutationPayload": "Model1sUpdateMutationPayload",
+    "Model2": "Model2",
+    "Model2Connection": "Model2Connection",
+    "Model2CreateMutationInput": "Model2CreateMutationInput",
+    "Model2CreateMutationPayload": "Model2CreateMutationPayload",
+    "Model2DeleteMutationInput": "Model2DeleteMutationInput",
+    "Model2DeleteMutationPayload": "Model2DeleteMutationPayload",
+    "Model2Edge": "Model2Edge",
+    "Model2UpdateMutationInput": "Model2UpdateMutationInput",
+    "Model2UpdateMutationPayload": "Model2UpdateMutationPayload",
+    "Model2WhereInput": "Model2WhereInput",
+    "Model2sUpdateMutationInput": "Model2sUpdateMutationInput",
+    "Model2sUpdateMutationPayload": "Model2sUpdateMutationPayload",
+    "Mutation": "Mutation",
+    "Node": "Node",
+    "PageInfo": "PageInfo",
+    "Query": "Query",
+    "String": "String",
+    "UpdateModel1Input": "UpdateModel1Input",
+    "UpdateModel1InputSetField1": "UpdateModel1InputSetField1",
+    "UpdateModel2Input": "UpdateModel2Input",
+    "UpdateModel2InputSetField2": "UpdateModel2InputSetField2",
+    "Viewer": "Viewer",
+    "__Directive": "__Directive",
+    "__DirectiveLocation": "__DirectiveLocation",
+    "__EnumValue": "__EnumValue",
+    "__Field": "__Field",
+    "__InputValue": "__InputValue",
+    "__Schema": "__Schema",
+    "__Type": "__Type",
+    "__TypeKind": "__TypeKind",
+  },
+}
+`;
+
 exports[`Schema spec getGraphQLSchema 1`] = `
 Object {
   "directives": Array [

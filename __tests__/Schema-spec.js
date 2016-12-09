@@ -1,5 +1,7 @@
 "use strict";
 const graphql_1 = require("graphql");
+const AttributeTypes_1 = require("./../AttributeTypes");
+const Collection_1 = require("./../Collection");
 const Schema_1 = require("./../Schema");
 const test_util_1 = require("./../test-util");
 const fields1 = { f1: { type: graphql_1.GraphQLString } };
@@ -31,6 +33,31 @@ describe("Schema spec", () => {
         expect(test_util_1.printGraphQLSchema(schema.getGraphQLSchema())).toMatchSnapshot();
         getQueryTypeSpy.and.callThrough();
         getMutationTypeSpy.and.callThrough();
+    });
+    it("circular dependencies", () => {
+        const collection = new Collection_1.default([{
+                attributes: [{
+                        name: "field1",
+                        required: false,
+                        realName: "field1",
+                        type: AttributeTypes_1.default.Model,
+                        model: "model2",
+                    }],
+                id: "model1",
+                name: "Model1",
+            }, {
+                attributes: [{
+                        name: "field2",
+                        required: false,
+                        realName: "field2",
+                        type: AttributeTypes_1.default.Model,
+                        model: "model1",
+                    }],
+                id: "model2",
+                name: "Model2",
+            }]);
+        schema.setCollection(collection);
+        expect(schema.getGraphQLSchema()).toMatchSnapshot();
     });
 });
 //# sourceMappingURL=Schema-spec.js.map

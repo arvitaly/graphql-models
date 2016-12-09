@@ -1,5 +1,7 @@
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import collection1 from "./../__fixtures__/collection1";
+import AttributeTypes from "./../AttributeTypes";
+import Collection from "./../Collection";
 import Schema from "./../Schema";
 import { printGraphQLObjectType, printGraphQLSchema } from "./../test-util";
 const fields1 = { f1: { type: GraphQLString } };
@@ -31,5 +33,30 @@ describe("Schema spec", () => {
         expect(printGraphQLSchema(schema.getGraphQLSchema())).toMatchSnapshot();
         getQueryTypeSpy.and.callThrough();
         getMutationTypeSpy.and.callThrough();
+    });
+    it("circular dependencies", () => {
+        const collection = new Collection([{
+            attributes: [{
+                name: "field1",
+                required: false,
+                realName: "field1",
+                type: AttributeTypes.Model,
+                model: "model2",
+            }],
+            id: "model1",
+            name: "Model1",
+        }, {
+            attributes: [{
+                name: "field2",
+                required: false,
+                realName: "field2",
+                type: AttributeTypes.Model,
+                model: "model1",
+            }],
+            id: "model2",
+            name: "Model2",
+        }]);
+        schema.setCollection(collection);
+        expect(schema.getGraphQLSchema()).toMatchSnapshot();
     });
 });
