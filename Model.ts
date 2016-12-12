@@ -16,6 +16,7 @@ import {
     GraphQLScalarType,
     GraphQLString,
 } from "graphql";
+import { fromResolveInfo } from "graphql-fields-info";
 import {
     connectionArgs, connectionDefinitions,
     fromGlobalId, mutationWithClientMutationId,
@@ -25,7 +26,6 @@ import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
-import GraphQLResolveInfoParser from "./GraphQLResolveInfoParser";
 import ResolveTypes from "./ResolveTypes";
 import {
     Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute,
@@ -134,7 +134,7 @@ class Model {
             resolve: (source, args, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes.QueryOne, {
                     source, args, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser(info),
+                    resolveInfo: fromResolveInfo(info),
                 });
             },
         };
@@ -146,7 +146,7 @@ class Model {
             resolve: (source, args, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes.QueryConnection, {
                     source, args, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser(info),
+                    resolveInfo: fromResolveInfo(info),
                 });
             },
         };
@@ -188,7 +188,7 @@ class Model {
                 return this.resolveFn(this.id,
                     ResolveTypes.MutationCreate, {
                         source: null, args: object, context, info,
-                        resolveInfo: new GraphQLResolveInfoParser(info),
+                        resolveInfo: fromResolveInfo(info),
                     });
             },
         });
@@ -218,7 +218,7 @@ class Model {
                 return this.resolveFn(this.id,
                     ResolveTypes.MutationDelete, {
                         source: null, args: object, context, info,
-                        resolveInfo: new GraphQLResolveInfoParser(info),
+                        resolveInfo: fromResolveInfo(info),
                     });
             },
         });
@@ -236,7 +236,7 @@ class Model {
                 return this.resolveFn(this.id,
                     ResolveTypes.MutationUpdate, {
                         source: null, args: object, context, info,
-                        resolveInfo: new GraphQLResolveInfoParser(info),
+                        resolveInfo: fromResolveInfo(info),
                     });
             },
         });
@@ -259,7 +259,7 @@ class Model {
                 return this.resolveFn(this.id, ResolveTypes.MutationUpdateMany,
                     {
                         source: null, args: object, context, info,
-                        resolveInfo: new GraphQLResolveInfoParser(info),
+                        resolveInfo: fromResolveInfo(info),
                     });
             },
         });

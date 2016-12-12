@@ -1,9 +1,9 @@
 "use strict";
 const graphql_1 = require("graphql");
+const graphql_fields_info_1 = require("graphql-fields-info");
 const graphql_relay_1 = require("graphql-relay");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
-const GraphQLResolveInfoParser_1 = require("./GraphQLResolveInfoParser");
 const ResolveTypes_1 = require("./ResolveTypes");
 exports.whereArgName = "where";
 exports.idArgName = "id";
@@ -97,7 +97,7 @@ class Model {
             resolve: (source, args, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes_1.default.QueryOne, {
                     source, args, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                    resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
             },
         };
@@ -109,7 +109,7 @@ class Model {
             resolve: (source, args, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes_1.default.QueryConnection, {
                     source, args, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                    resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
             },
         };
@@ -150,7 +150,7 @@ class Model {
             mutateAndGetPayload: (object, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes_1.default.MutationCreate, {
                     source: null, args: object, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                    resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
             },
         });
@@ -179,7 +179,7 @@ class Model {
             mutateAndGetPayload: (object, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes_1.default.MutationDelete, {
                     source: null, args: object, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                    resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
             },
         });
@@ -196,7 +196,7 @@ class Model {
             mutateAndGetPayload: (object, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes_1.default.MutationUpdate, {
                     source: null, args: object, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                    resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
             },
         });
@@ -218,7 +218,7 @@ class Model {
             mutateAndGetPayload: (object, context, info) => {
                 return this.resolveFn(this.id, ResolveTypes_1.default.MutationUpdateMany, {
                     source: null, args: object, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                    resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
             },
         });

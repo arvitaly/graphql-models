@@ -2,9 +2,9 @@ import {
     GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType,
     GraphQLResolveInfo, GraphQLSchema,
 } from "graphql";
+import { fromResolveInfo } from "graphql-fields-info";
 import { fromGlobalId, GraphQLNodeDefinitions, nodeDefinitions } from "graphql-relay";
 import Collection from "./Collection";
-import GraphQLResolveInfoParser from "./GraphQLResolveInfoParser";
 import Resolver from "./Resolver";
 import ResolveTypes from "./ResolveTypes";
 import { Mutations, Queries, ResolveFn } from "./typings";
@@ -49,7 +49,7 @@ class Schema {
                     resolve: (source, args, context, info) => {
                         return this.resolver.resolve(null, ResolveTypes.Viewer, {
                             source, args, context, info,
-                            resolveInfo: new GraphQLResolveInfoParser(info),
+                            resolveInfo: fromResolveInfo(info),
                         });
                     },
                 },
@@ -67,7 +67,7 @@ class Schema {
             this.nodeDefinition = nodeDefinitions((id: string, context, info: GraphQLResolveInfo) => {
                 return this.resolver.resolve(null, ResolveTypes.Node, {
                     source: id, args: null, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser(info),
+                    resolveInfo: fromResolveInfo(info),
                 });
             }, (value: any, context: any, info: GraphQLResolveInfo) => {
                 return this.collection.get(fromGlobalId(value.id).type.replace(/Type$/gi, "").toLowerCase())

@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const graphql_1 = require("graphql");
+const graphql_fields_info_1 = require("graphql-fields-info");
 const collection1_1 = require("./../__fixtures__/collection1");
 const AttributeTypes_1 = require("./../AttributeTypes");
 const Model_1 = require("./../Model");
@@ -124,7 +125,7 @@ describe("Model spec", () => {
                         args: "f2",
                         context: "f3",
                         info: "f4",
-                        resolveInfo: { info: "f4" },
+                        resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
                     }
                 ]]);
         });
@@ -140,7 +141,7 @@ describe("Model spec", () => {
                         args: "f2",
                         context: "f3",
                         info: "f4",
-                        resolveInfo: { info: "f4" },
+                        resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
                     }
                 ]]);
         });
@@ -181,7 +182,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: "f4",
-                        resolveInfo: { info: "f4" },
+                        resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
                     }
                 ]]);
         }));
@@ -200,7 +201,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: "f4",
-                        resolveInfo: { info: "f4" },
+                        resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
                     }
                 ]]);
         }));
@@ -219,7 +220,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: "f4",
-                        resolveInfo: { info: "f4" },
+                        resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
                     }
                 ]]);
         }));
@@ -238,7 +239,7 @@ describe("Model spec", () => {
                         source: null,
                         context: "f3",
                         info: "f4",
-                        resolveInfo: { info: "f4" },
+                        resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
                     }
                 ]]);
         }));

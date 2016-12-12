@@ -3,7 +3,7 @@ import {
     GraphQLFieldConfig, GraphQLInputType,
 } from "graphql";
 import { ConnectionArguments } from "graphql-relay";
-import GraphQLResolveInfoParser from "./GraphQLResolveInfoParser";
+import { GraphQLFieldsInfo } from "graphql-fields-info";
 import Model from "./Model";
 export interface ModelConfig {
     id: string;
@@ -56,7 +56,7 @@ export interface GraphQLTypes {
 export type ResolveType = "node" | "viewer" | "model" | "connection" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationUpdateMany" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
 export type ResolveOpts = GraphQLResolveArgs & {
     attrName?: string;
-    resolveInfo: GraphQLResolveInfoParser,
+    resolveInfo: GraphQLFieldsInfo,
 }
 export type ModelID = string;
 export type ResolveFn = (model: ModelID, type: ResolveType, opts?: ResolveOpts) => any;
@@ -110,6 +110,6 @@ export type SubscriptionID = any;
 
 export type PopulateField = {
     attribute: Attribute;
-    fields:  PopulateFields
+    fields: PopulateFields
 }
 export type PopulateFields = PopulateField[];

@@ -12,6 +12,7 @@ import {
     GraphQLObjectType,
     GraphQLString,
 } from "graphql";
+import { fromResolveInfo } from "graphql-fields-info";
 import { connectionArgs, mutationWithClientMutationId } from "graphql-relay";
 import collection1 from "./../__fixtures__/collection1";
 import AttributeTypes from "./../AttributeTypes";
@@ -136,7 +137,7 @@ describe("Model spec", () => {
                     args: "f2",
                     context: "f3",
                     info: "f4",
-                    resolveInfo: { info: "f4" },
+                    resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
         it("Query connection", () => {
@@ -151,7 +152,7 @@ describe("Model spec", () => {
                     args: "f2",
                     context: "f3",
                     info: "f4",
-                    resolveInfo: { info: "f4" },
+                    resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
         it("all queries", () => {
@@ -191,7 +192,7 @@ describe("Model spec", () => {
                     source: null,
                     context: "f3",
                     info: "f4",
-                    resolveInfo: { info: "f4" },
+                    resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
         it("update mutation", async () => {
@@ -209,7 +210,7 @@ describe("Model spec", () => {
                     source: null,
                     context: "f3",
                     info: "f4",
-                    resolveInfo: { info: "f4" },
+                    resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
         it("update many mutation", async () => {
@@ -227,7 +228,7 @@ describe("Model spec", () => {
                     source: null,
                     context: "f3",
                     info: "f4",
-                    resolveInfo: { info: "f4" },
+                    resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
         it("delete mutation", async () => {
@@ -245,7 +246,7 @@ describe("Model spec", () => {
                     source: null,
                     context: "f3",
                     info: "f4",
-                    resolveInfo: { info: "f4" },
+                    resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
         it("getAllMutations", () => {

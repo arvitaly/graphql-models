@@ -1,7 +1,7 @@
 "use strict";
 const graphql_1 = require("graphql");
+const graphql_fields_info_1 = require("graphql-fields-info");
 const graphql_relay_1 = require("graphql-relay");
-const GraphQLResolveInfoParser_1 = require("./GraphQLResolveInfoParser");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Schema {
     constructor(resolver) {
@@ -44,7 +44,7 @@ class Schema {
                     resolve: (source, args, context, info) => {
                         return this.resolver.resolve(null, ResolveTypes_1.default.Viewer, {
                             source, args, context, info,
-                            resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                            resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                         });
                     },
                 },
@@ -62,7 +62,7 @@ class Schema {
             this.nodeDefinition = graphql_relay_1.nodeDefinitions((id, context, info) => {
                 return this.resolver.resolve(null, ResolveTypes_1.default.Node, {
                     source: id, args: null, context, info,
-                    resolveInfo: new GraphQLResolveInfoParser_1.default(info),
+                    resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
             }, (value, context, info) => {
                 return this.collection.get(graphql_relay_1.fromGlobalId(value.id).type.replace(/Type$/gi, "").toLowerCase())
