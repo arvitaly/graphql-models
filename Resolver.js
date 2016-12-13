@@ -31,21 +31,21 @@ class Resolver {
                         const isExists = subscribe.ids.indexOf(globalId) > -1;
                         if (isExists && isCriteriaEqual) {
                             // publish update
-                            this.publisher.publishUpdate(subscriptionId, model.id, updated, subscribe.opts.context);
+                            this.publisher.publishUpdate(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
                         }
                         if (isExists && !isCriteriaEqual) {
                             // publish remove
-                            this.publisher.publishRemove(subscriptionId, model.id, updated, subscribe.opts.context);
+                            this.publisher.publishRemove(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
                         }
                         if (!isExists && isCriteriaEqual) {
                             // publish add
-                            this.publisher.publishAdd(subscriptionId, model.id, updated, subscribe.opts.context);
+                            this.publisher.publishAdd(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
                         }
                     }
                     else {
                         if (globalId === subscribe.ids[0]) {
                             // publish update
-                            this.publisher.publishUpdate(subscriptionId, model.id, updated, subscribe.opts.context);
+                            this.publisher.publishUpdate(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
                         }
                     }
                 });
@@ -60,7 +60,7 @@ class Resolver {
                     const isCriteriaEqual = this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
                     if (isCriteriaEqual) {
                         // publish add
-                        this.publisher.publishAdd(subscriptionId, model.id, created, subscribe.opts.context);
+                        this.publisher.publishAdd(subscriptionId, model.id, globalId, created, subscribe.opts.context);
                     }
                 });
             });
