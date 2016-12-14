@@ -14,11 +14,12 @@ import {
 } from "graphql";
 import { fromResolveInfo } from "graphql-fields-info";
 import { connectionArgs, mutationWithClientMutationId } from "graphql-relay";
+import { idArgName, whereArgName } from "./..";
 import collection1 from "./../__fixtures__/collection1";
 import AttributeTypes from "./../AttributeTypes";
 import Model, {
-    capitalize, idArgName, scalarTypeToGraphQL,
-    uncapitalize, whereArgHelpers, whereArgName,
+    capitalize, scalarTypeToGraphQL,
+    uncapitalize, whereArgHelpers,
 } from "./../Model";
 import ResolveTypes from "./../ResolveTypes";
 import { printGraphQLFieldConfig, printGraphQLInputObjectType, printGraphQLObjectType } from "./../test-util";

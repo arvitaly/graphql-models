@@ -8,9 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const graphql_relay_1 = require("graphql-relay");
+const _1 = require(".");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
-const Model_1 = require("./Model");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Resolver {
     constructor(adapter, callbacks, publisher) {
@@ -96,12 +96,12 @@ class Resolver {
     }
     resolveQueryOne(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.resolveOne(modelId, opts.args[Model_1.idArgName], opts.resolveInfo.getQueryOneFields(), opts.resolveInfo);
+            const result = yield this.resolveOne(modelId, opts.args[_1.idArgName], opts.resolveInfo.getQueryOneFields(), opts.resolveInfo);
             if (!result) {
                 return null;
             }
             if (opts.context && opts.context.subscriptionId) {
-                this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[Model_1.idArgName], opts);
+                this.subscribeOne(opts.context.subscriptionId, modelId, opts.args[_1.idArgName], opts);
             }
             return result;
         });
@@ -150,7 +150,7 @@ class Resolver {
                 };
             }
         });
-        row[Model_1.idArgName] = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
+        row[_1.idArgName] = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
         return row;
     }
     resolveQueryConnection(modelId, opts) {

@@ -22,6 +22,7 @@ import {
     fromGlobalId, mutationWithClientMutationId,
     toGlobalId,
 } from "graphql-relay";
+import { idArgName, inputArgName, whereArgName } from ".";
 import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
@@ -31,9 +32,6 @@ import {
     Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute,
     ModelAttribute, ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
 } from "./typings";
-export const whereArgName = "where";
-export const idArgName = "id";
-export const inputArgName = "input";
 class Model {
     public id: string;
     public name: string;

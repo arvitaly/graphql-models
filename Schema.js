@@ -2,6 +2,7 @@
 const graphql_1 = require("graphql");
 const graphql_fields_info_1 = require("graphql-fields-info");
 const graphql_relay_1 = require("graphql-relay");
+const _1 = require(".");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Schema {
     constructor(resolver) {
@@ -28,9 +29,12 @@ class Schema {
         // TODO
     }
     getQueryViewerType() {
+        let queries = this.queriesToMap();
+        queries[_1.idArgName] = { type: new graphql_1.GraphQLNonNull(graphql_1.GraphQLID) };
         const queryViewer = new graphql_1.GraphQLObjectType({
             name: "Viewer",
-            fields: this.queriesToMap(),
+            fields: queries,
+            interfaces: [this.getNodeDefinition().nodeInterface],
         });
         return queryViewer;
     }

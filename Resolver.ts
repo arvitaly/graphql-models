@@ -1,11 +1,12 @@
 import { FieldNode, GraphQLResolveInfo, SelectionSetNode } from "graphql";
 import { Field as ResolveSelectionField, GraphQLFieldsInfo as InfoParser } from "graphql-fields-info";
 import { Connection, fromGlobalId, toGlobalId } from "graphql-relay";
+import { idArgName, inputArgName } from ".";
 import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
-import Model, { idArgName, inputArgName } from "./Model";
+import Model from "./Model";
 import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
 import {

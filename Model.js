@@ -2,12 +2,10 @@
 const graphql_1 = require("graphql");
 const graphql_fields_info_1 = require("graphql-fields-info");
 const graphql_relay_1 = require("graphql-relay");
+const _1 = require(".");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
 const ResolveTypes_1 = require("./ResolveTypes");
-exports.whereArgName = "where";
-exports.idArgName = "id";
-exports.inputArgName = "input";
 class Model {
     constructor(config, collector, opts = {}) {
         this.config = config;
@@ -80,7 +78,7 @@ class Model {
     }
     getOneArgs() {
         let args = {};
-        args[exports.idArgName] = { type: new graphql_1.GraphQLNonNull(graphql_1.GraphQLID) };
+        args[_1.idArgName] = { type: new graphql_1.GraphQLNonNull(graphql_1.GraphQLID) };
         return args;
     }
     getWhereArgument(name) {
@@ -116,7 +114,7 @@ class Model {
     }
     getConnectionArgs() {
         let args = graphql_relay_1.connectionArgs;
-        args[exports.whereArgName] = { type: this.getWhereInputType() };
+        args[_1.whereArgName] = { type: this.getWhereInputType() };
         return args;
     }
     getWhereInputType() {
@@ -207,7 +205,7 @@ class Model {
             type: new graphql_1.GraphQLList(this.getBaseType()),
         };
         let inputFields = {};
-        inputFields[exports.whereArgName] = { type: this.getWhereInputType() };
+        inputFields[_1.whereArgName] = { type: this.getWhereInputType() };
         inputFields[uncapitalize(this.name)] = {
             type: this.getUpdateType(),
         };
@@ -267,7 +265,7 @@ class Model {
     generateCreateArguments() {
         let args = [];
         this.attributes.map((attr) => {
-            if (attr.name === exports.idArgName) {
+            if (attr.name === _1.idArgName) {
                 return;
             }
             let graphQLType;
@@ -318,7 +316,7 @@ class Model {
             }
             let graphqlType = scalarTypeToGraphQL(type);
             // EQUALS
-            if (attr.type !== AttributeTypes_1.default.Collection && !attr.primaryKey && attr.name !== exports.idArgName) {
+            if (attr.type !== AttributeTypes_1.default.Collection && !attr.primaryKey && attr.name !== _1.idArgName) {
                 args.push({
                     name: attr.name,
                     type: ArgumentTypes_1.default.Equal,
@@ -349,7 +347,7 @@ class Model {
             }
             // IS NULL
             if (attr.type !== AttributeTypes_1.default.Collection &&
-                !attr.required && !attr.primaryKey && attr.name !== exports.idArgName) {
+                !attr.required && !attr.primaryKey && attr.name !== _1.idArgName) {
                 args.push({
                     name: attr.name + "IsNull",
                     type: ArgumentTypes_1.default.IsNull,
@@ -421,7 +419,7 @@ class Model {
     generateUpdateArguments() {
         let args = [];
         this.attributes.map((attr) => {
-            if (attr.name === exports.idArgName) {
+            if (attr.name === _1.idArgName) {
                 return;
             }
             let graphQLType;
@@ -462,8 +460,8 @@ class Model {
             });
         });
         args.push({
-            attribute: this.attributes.find((a) => a.name === exports.idArgName),
-            name: exports.idArgName,
+            attribute: this.attributes.find((a) => a.name === _1.idArgName),
+            name: _1.idArgName,
             type: ArgumentTypes_1.default.Equal,
             graphQLType: new graphql_1.GraphQLNonNull(graphql_1.GraphQLID),
         });

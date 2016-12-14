@@ -1,9 +1,11 @@
 import {
-    GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType,
+    GraphQLFieldConfigMap, GraphQLID, GraphQLInputFieldConfigMap,
+    GraphQLNonNull, GraphQLObjectType,
     GraphQLResolveInfo, GraphQLSchema,
 } from "graphql";
 import { fromResolveInfo } from "graphql-fields-info";
 import { fromGlobalId, GraphQLNodeDefinitions, nodeDefinitions } from "graphql-relay";
+import { idArgName } from ".";
 import Collection from "./Collection";
 import Resolver from "./Resolver";
 import ResolveTypes from "./ResolveTypes";
@@ -33,9 +35,12 @@ class Schema {
         // TODO
     }
     public getQueryViewerType() {
+        let queries = this.queriesToMap();
+        queries[idArgName] = { type: new GraphQLNonNull(GraphQLID) };
         const queryViewer = new GraphQLObjectType({
             name: "Viewer",
-            fields: this.queriesToMap(),
+            fields: queries,
+            interfaces: [this.getNodeDefinition().nodeInterface],
         });
         return queryViewer;
     }
