@@ -21,6 +21,7 @@ class Resolver {
             ids: string[];
             findCriteria?: FindCriteria;
             opts: ResolveOpts;
+            type: "one" | "connection";
         };
     } = {};
     constructor(public adapter: Adapter, protected callbacks: Callbacks, public publisher: Publisher) {
@@ -64,16 +65,19 @@ class Resolver {
             this.callbacks.onCreate(model.id, (created) => {
                 const globalId = toGlobalId(model.getNameForGlobalId(),
                     created[model.getPrimaryKeyAttribute().realName]);
-                Object.keys(this.subscribes).map((subscriptionId) => {
+                Object.keys(this.subscribes).map(async (subscriptionId) => {
                     const subscribe = this.subscribes[subscriptionId];
-                    if (!subscribe.findCriteria) {
-                        return;
-                    }
-                    const isCriteriaEqual = this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                    const data = await this.resolveOne(model.id, globalId,
+                        subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
+                            subscribe.opts.resolveInfo.getQueryConnectionFields(),
+                        subscribe.opts.resolveInfo);
+
+                    const isCriteriaEqual = !subscribe.findCriteria ||
+                        this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
                     if (isCriteriaEqual) {
                         // publish add
                         this.publisher.publishAdd(subscriptionId, model.id, globalId,
-                            created, subscribe.opts.context);
+                            data, subscribe.opts.context);
                     }
                 });
             });
@@ -310,6 +314,7 @@ class Resolver {
             modelId,
             ids: [globalId],
             opts,
+            type: "one",
         };
     }
     public subscribeConnection(
@@ -323,6 +328,7 @@ class Resolver {
             findCriteria,
             modelId,
             opts,
+            type: "connection",
         };
     }
     protected getPopulates(modelId: ModelID, fields: ResolveSelectionField[]): PopulateFields {

@@ -52,17 +52,17 @@ class Resolver {
             });
             this.callbacks.onCreate(model.id, (created) => {
                 const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), created[model.getPrimaryKeyAttribute().realName]);
-                Object.keys(this.subscribes).map((subscriptionId) => {
+                Object.keys(this.subscribes).map((subscriptionId) => __awaiter(this, void 0, void 0, function* () {
                     const subscribe = this.subscribes[subscriptionId];
-                    if (!subscribe.findCriteria) {
-                        return;
-                    }
-                    const isCriteriaEqual = this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                    const data = yield this.resolveOne(model.id, globalId, subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
+                        subscribe.opts.resolveInfo.getQueryConnectionFields(), subscribe.opts.resolveInfo);
+                    const isCriteriaEqual = !subscribe.findCriteria ||
+                        this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
                     if (isCriteriaEqual) {
                         // publish add
-                        this.publisher.publishAdd(subscriptionId, model.id, globalId, created, subscribe.opts.context);
+                        this.publisher.publishAdd(subscriptionId, model.id, globalId, data, subscribe.opts.context);
                     }
-                });
+                }));
             });
         });
     }
@@ -300,6 +300,7 @@ class Resolver {
             modelId,
             ids: [globalId],
             opts,
+            type: "one",
         };
     }
     subscribeConnection(subscriptionId, modelId, ids, findCriteria, opts) {
@@ -308,6 +309,7 @@ class Resolver {
             findCriteria,
             modelId,
             opts,
+            type: "connection",
         };
     }
     getPopulates(modelId, fields) {

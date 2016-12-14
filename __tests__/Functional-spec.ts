@@ -165,14 +165,16 @@ describe("Functional tests", () => {
             });
         }
         expect(result).toMatchSnapshot();
-        const publishUpdateSpy = spyOn(publisher, "publishUpdate");
+        const publishUpdateSpy = jest.fn(); // spyOn(publisher, "publishUpdate");
+        publisher.publishUpdate = publishUpdateSpy;
         adapter.update("animal", 1, { name: "testn" });
-        expect(publishUpdateSpy.calls.allArgs()).toMatchSnapshot();
-        const publishAddSpy = spyOn(publisher, "publishAdd");
+        expect(publishUpdateSpy.mock.calls).toMatchSnapshot();
+        const publishAddSpy = jest.fn(); // spyOn(publisher, "publishAdd");
+        publisher.publishAdd = publishAddSpy;
         adapter.create("animal", { name: "y" });
-        expect(publishAddSpy.calls.allArgs()).toMatchSnapshot();
+        expect(publishAddSpy.mock.calls).toMatchSnapshot();
         adapter.create("animal", { name: "axz" });
-        expect(publishAddSpy.calls.allArgs()).toMatchSnapshot();
+        expect(publishAddSpy.mock.calls).toMatchSnapshot();
     });
     it("mutation create", async () => {
         const result = await graphql(graphqlSchema, `mutation M1{  

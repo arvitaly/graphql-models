@@ -22,7 +22,7 @@
     "@types/graphql": "^0.8.2",
     "@types/graphql-relay": "^0.4.0",
     "graphql": "^0.8.2",
-    "graphql-fields-info": "^0.0.3",
+    "graphql-fields-info": "^0.0.8",
     "graphql-relay": "^0.4.4"
   },
   "devDependencies": {
