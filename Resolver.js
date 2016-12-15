@@ -26,27 +26,20 @@ class Resolver {
                 const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]);
                 Object.keys(this.subscribes).map((subscriptionId) => {
                     const subscribe = this.subscribes[subscriptionId];
-                    if (subscribe.findCriteria) {
-                        const isCriteriaEqual = this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
-                        const isExists = subscribe.ids.indexOf(globalId) > -1;
-                        if (isExists && isCriteriaEqual) {
-                            // publish update
-                            this.publisher.publishUpdate(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
-                        }
-                        if (isExists && !isCriteriaEqual) {
-                            // publish remove
-                            this.publisher.publishRemove(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
-                        }
-                        if (!isExists && isCriteriaEqual) {
-                            // publish add
-                            this.publisher.publishAdd(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
-                        }
+                    const isCriteriaEqual = !subscribe.findCriteria ||
+                        this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
+                    const isExists = subscribe.ids.indexOf(globalId) > -1;
+                    if (isExists && isCriteriaEqual) {
+                        // publish update
+                        this.publisher.publishUpdate(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
                     }
-                    else {
-                        if (globalId === subscribe.ids[0]) {
-                            // publish update
-                            this.publisher.publishUpdate(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
-                        }
+                    if (isExists && !isCriteriaEqual) {
+                        // publish remove
+                        this.publisher.publishRemove(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
+                    }
+                    if (!isExists && isCriteriaEqual) {
+                        // publish add
+                        this.publisher.publishAdd(subscriptionId, model.id, globalId, updated, subscribe.opts.context);
                     }
                 });
             });
@@ -59,6 +52,7 @@ class Resolver {
                     const isCriteriaEqual = !subscribe.findCriteria ||
                         this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
                     if (isCriteriaEqual) {
+                        subscribe.ids.push(globalId);
                         // publish add
                         this.publisher.publishAdd(subscriptionId, model.id, globalId, data, subscribe.opts.context);
                     }
