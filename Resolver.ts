@@ -95,7 +95,8 @@ class Resolver {
         }
     }
     public resolveViewer(opts: ResolveOpts) {
-        return {};
+        // TODO this resolve should make adapter
+        return { id: "1" };
     }
     public async resolveNode(_: ModelID, opts: ResolveOpts) {
         const {id, type} = fromGlobalId(opts.source);

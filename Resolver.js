@@ -79,7 +79,8 @@ class Resolver {
         }
     }
     resolveViewer(opts) {
-        return {};
+        // TODO this resolve should make adapter
+        return { id: "1" };
     }
     resolveNode(_, opts) {
         return __awaiter(this, void 0, void 0, function* () {
