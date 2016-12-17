@@ -97,7 +97,7 @@ export type Argument = {
 }
 
 export type FindCriteria = ConnectionArguments & {
-    where?: FindCriteriaWhere
+    where?: FindCriteriaWhere;
 }
 export type FindCriteriaWhere = Argument[];
 

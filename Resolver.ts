@@ -385,6 +385,10 @@ class Resolver {
                 return arg;
             });
         }
+        criteria.first = args.first;
+        criteria.after = args.after;
+        criteria.before = args.before;
+        criteria.last = args.last;
         return criteria;
     }
 }
