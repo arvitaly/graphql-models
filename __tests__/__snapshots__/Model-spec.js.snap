@@ -12,6 +12,9 @@ Object {
   "last": Object {
     "type": "Int",
   },
+  "sort": Object {
+    "type": "String",
+  },
   "where": Object {
     "type": "AnimalWhereInput",
   },
@@ -32,6 +35,9 @@ Object {
   "last": Object {
     "type": "Int",
   },
+  "sort": Object {
+    "type": "String",
+  },
   "where": Object {
     "type": "PostWhereInput",
   },
@@ -51,6 +57,9 @@ Object {
   },
   "last": Object {
     "type": "Int",
+  },
+  "sort": Object {
+    "type": "String",
   },
   "where": Object {
     "type": "userWhereInput",
@@ -2866,6 +2875,14 @@ Object {
         },
       },
       "name": "where",
+    },
+    Object {
+      "field": Object {
+        "defaultValue": undefined,
+        "description": undefined,
+        "type": "String",
+      },
+      "name": "sort",
     },
   ],
   "deprecationReason": undefined,

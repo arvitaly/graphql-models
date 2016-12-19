@@ -22,7 +22,7 @@ import {
     fromGlobalId, mutationWithClientMutationId,
     toGlobalId,
 } from "graphql-relay";
-import { idArgName, inputArgName, whereArgName } from ".";
+import { idArgName, inputArgName, sortArgName, whereArgName } from ".";
 import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
@@ -152,6 +152,7 @@ class Model {
     public getConnectionArgs(): GraphQLFieldConfigArgumentMap {
         let args = connectionArgs;
         args[whereArgName] = { type: this.getWhereInputType() };
+        args[sortArgName] = { type: GraphQLString };
         return args;
     }
     public getWhereInputType() {

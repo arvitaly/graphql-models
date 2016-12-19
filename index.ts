@@ -8,6 +8,7 @@ export { default as ResolveTypes } from "./ResolveTypes";
 export * from "./typings";
 export { default as Resolver } from "./Resolver";
 export { default as Publisher } from "./Publisher";
+export const sortArgName = "sort";
 export const whereArgName = "where";
 export const idArgName = "id";
 export const inputArgName = "input";

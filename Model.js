@@ -115,6 +115,7 @@ class Model {
     getConnectionArgs() {
         let args = graphql_relay_1.connectionArgs;
         args[_1.whereArgName] = { type: this.getWhereInputType() };
+        args[_1.sortArgName] = { type: graphql_1.GraphQLString };
         return args;
     }
     getWhereInputType() {
