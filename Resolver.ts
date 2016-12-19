@@ -332,6 +332,9 @@ class Resolver {
             type: "connection",
         };
     }
+    public unsubscribe(id: string) {
+        delete this.subscribes[id];
+    }
     protected getPopulates(modelId: ModelID, fields: ResolveSelectionField[]): PopulateFields {
         const model = this.collection.get(modelId);
         return model.attributes.filter((attr) => {

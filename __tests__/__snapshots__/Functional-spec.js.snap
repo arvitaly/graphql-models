@@ -210,33 +210,25 @@ Object {
 }
 `;
 
-exports[`Functional tests subscribe connection 2`] = `
+exports[`Functional tests subscribe connection 2`] = `Array []`;
+
+exports[`Functional tests subscribe connection 3`] = `Array []`;
+
+exports[`Functional tests subscribe connection 4`] = `
 Array [
   Array [
-    "123",
+    "1234",
     "animal",
-    "QW5pbWFsOjE=",
+    "QW5pbWFsOg==",
     Object {
-      "Weight": 10.1,
-      "age": 6,
-      "birthday": 2010-11-10T17:00:00.000Z,
-      "id": 1,
-      "isCat": false,
-      "name": "testn",
-      "some": Object {
-        "test": "Duck",
-      },
+      "id": "QW5pbWFsOg==",
     },
     Object {
-      "subscriptionId": "123",
+      "subscriptionId": "1234",
     },
   ],
 ]
 `;
-
-exports[`Functional tests subscribe connection 3`] = `Array []`;
-
-exports[`Functional tests subscribe connection 4`] = `Array []`;
 
 exports[`Functional tests subscribe one 1`] = `
 Object {
@@ -263,6 +255,30 @@ Array [
       "id": 1,
       "isCat": false,
       "name": "testn",
+      "some": Object {
+        "test": "Duck",
+      },
+    },
+    Object {
+      "subscriptionId": "123",
+    },
+  ],
+]
+`;
+
+exports[`Functional tests subscribe one 3`] = `
+Array [
+  Array [
+    "123",
+    "animal",
+    "QW5pbWFsOjE=",
+    Object {
+      "Weight": 10.1,
+      "age": 6,
+      "birthday": 2010-11-10T17:00:00.000Z,
+      "id": 1,
+      "isCat": false,
+      "name": "testn2",
       "some": Object {
         "test": "Duck",
       },

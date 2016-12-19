@@ -151,9 +151,12 @@ describe("Functional tests", () => {
         const publishUpdateSpy = spyOn(data_1.publisher, "publishUpdate");
         adapter.update("animal", 1, { name: "testn" });
         expect(publishUpdateSpy.calls.allArgs()).toMatchSnapshot();
+        resolver.unsubscribe(subscriptionId);
+        adapter.update("animal", 1, { name: "testn2" });
+        expect(publishUpdateSpy.calls.allArgs()).toMatchSnapshot();
     }));
-    it("subscribe connection", () => __awaiter(this, void 0, void 0, function* () {
-        const subscriptionId = "123";
+    it("subscribe connection", (done) => __awaiter(this, void 0, void 0, function* () {
+        const subscriptionId = "1234";
         const result = yield graphql_1.graphql(graphqlSchema, `query Q1{
             viewer{            
                 animals(where:{nameContains:"x"}){
@@ -180,12 +183,16 @@ describe("Functional tests", () => {
         data_1.publisher.publishUpdate = publishUpdateSpy;
         adapter.update("animal", 1, { name: "testn" });
         expect(publishUpdateSpy.mock.calls).toMatchSnapshot();
-        const publishAddSpy = jest.fn(); // spyOn(publisher, "publishAdd");
+        let publishAddSpy = jest.fn(() => { }); // spyOn(publisher, "publishAdd");
         data_1.publisher.publishAdd = publishAddSpy;
         adapter.create("animal", { name: "y" });
         expect(publishAddSpy.mock.calls).toMatchSnapshot();
+        publishAddSpy = jest.fn(() => {
+            expect(publishAddSpy.mock.calls).toMatchSnapshot();
+            done();
+        });
+        data_1.publisher.publishAdd = publishAddSpy;
         adapter.create("animal", { name: "axz" });
-        expect(publishAddSpy.mock.calls).toMatchSnapshot();
     }));
     it("mutation create", () => __awaiter(this, void 0, void 0, function* () {
         const result = yield graphql_1.graphql(graphqlSchema, `mutation M1{  

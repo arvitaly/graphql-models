@@ -316,6 +316,9 @@ class Resolver {
             type: "connection",
         };
     }
+    unsubscribe(id) {
+        delete this.subscribes[id];
+    }
     getPopulates(modelId, fields) {
         const model = this.collection.get(modelId);
         return model.attributes.filter((attr) => {
