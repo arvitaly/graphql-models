@@ -12,6 +12,7 @@ exports.data = {
             age: 6,
             Weight: 10.1,
             birthday: new Date("Wed, 10 Nov 2010 17:00:00 GMT"),
+            some: { test: "Duck" },
             isCat: false,
         }, {
             id: 2,
@@ -19,6 +20,7 @@ exports.data = {
             age: 3,
             Weight: 13.1,
             birthday: new Date("Thu, 28 Feb 2013 17:00:00 GMT"),
+            some: { test: "Mickey" },
             isCat: false,
         }, {
             id: 3,
@@ -26,6 +28,7 @@ exports.data = {
             age: 8,
             Weight: 2.1,
             birthday: new Date("Mon, 05 May 2008 17:00:00 GMT"),
+            some: { test: "Luk" },
             isCat: false,
         }, {
             id: 4,
@@ -33,6 +36,7 @@ exports.data = {
             age: 7,
             Weight: 12.1,
             birthday: new Date("Fri, 11 Dec 2009 17:00:00 GMT"),
+            some: { test: "Pussy" },
             isCat: false,
         }],
     posts: [{

@@ -58,6 +58,7 @@ describe("Functional tests", () => {
                     name
                     age
                     birthday
+                    some
                     Weight
                     isCat
                 }
@@ -100,6 +101,7 @@ describe("Functional tests", () => {
             name
             age
             birthday
+            some
             Weight
             isCat
         }
@@ -217,6 +219,7 @@ describe("Functional tests", () => {
             name
             age
             birthday
+            some
             Weight
             isCat
         }        
@@ -235,10 +238,12 @@ describe("Functional tests", () => {
                     id: "${animalId1}", 
                     setName:{name:"testName1"}
                     setBirthday:{birthday: "${date1}"}
+                    setSome:{ some: "{\\"What\\":\\"Yepp\\"}" }
                 }
             ){
                 animal{
                     name
+                    some
                     birthday
                 }
             }

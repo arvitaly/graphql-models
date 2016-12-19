@@ -65,6 +65,10 @@ export const animalModel: ModelConfig = {
         name: "birthday",
         realName: "birthday",
     }, {
+        type: AttributeTypes.JSON,
+        name: "some",
+        realName: "some",
+    }, {
         type: AttributeTypes.Boolean,
         name: "isCat",
         realName: "isCat",

@@ -4,6 +4,7 @@ const AttributeTypes = {
     Collection: "collection",
     Date: "date",
     Float: "float",
+    JSON: "json",
     ID: "id",
     Integer: "integer",
     Model: "model",

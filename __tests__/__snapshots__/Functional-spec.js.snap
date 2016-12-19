@@ -13,6 +13,7 @@ Object {
                 "id": "QW5pbWFsOjg=",
                 "isCat": true,
                 "name": "animal1",
+                "some": null,
               },
             },
             Object {
@@ -23,6 +24,7 @@ Object {
                 "id": "QW5pbWFsOjk=",
                 "isCat": false,
                 "name": "animal2",
+                "some": null,
               },
             },
           ],
@@ -39,6 +41,7 @@ Object {
                   "id": "QW5pbWFsOjc=",
                   "isCat": false,
                   "name": "pet1",
+                  "some": null,
                 },
               },
             ],
@@ -94,6 +97,7 @@ Object {
         "id": "QW5pbWFsOjE=",
         "isCat": false,
         "name": "Rex",
+        "some": "{\"test\":\"Duck\"}",
       },
     },
   },
@@ -115,6 +119,7 @@ Object {
                 "id": "QW5pbWFsOjE=",
                 "isCat": false,
                 "name": "Rex",
+                "some": "{\"test\":\"Duck\"}",
               },
             },
             Object {
@@ -125,6 +130,7 @@ Object {
                 "id": "QW5pbWFsOjI=",
                 "isCat": false,
                 "name": "Felix",
+                "some": "{\"test\":\"Mickey\"}",
               },
             },
             Object {
@@ -135,6 +141,7 @@ Object {
                 "id": "QW5pbWFsOjM=",
                 "isCat": false,
                 "name": "Jeck",
+                "some": "{\"test\":\"Luk\"}",
               },
             },
           ],
@@ -151,6 +158,7 @@ Object {
                   "id": "QW5pbWFsOjI=",
                   "isCat": false,
                   "name": "Felix",
+                  "some": "{\"test\":\"Mickey\"}",
                 },
               },
               Object {
@@ -161,6 +169,7 @@ Object {
                   "id": "QW5pbWFsOjM=",
                   "isCat": false,
                   "name": "Jeck",
+                  "some": "{\"test\":\"Luk\"}",
                 },
               },
               Object {
@@ -171,6 +180,7 @@ Object {
                   "id": "QW5pbWFsOjQ=",
                   "isCat": false,
                   "name": "Morph",
+                  "some": "{\"test\":\"Pussy\"}",
                 },
               },
             ],
@@ -213,6 +223,9 @@ Array [
       "id": 1,
       "isCat": false,
       "name": "testn",
+      "some": Object {
+        "test": "Duck",
+      },
     },
     Object {
       "subscriptionId": "123",
@@ -250,6 +263,9 @@ Array [
       "id": 1,
       "isCat": false,
       "name": "testn",
+      "some": Object {
+        "test": "Duck",
+      },
     },
     Object {
       "subscriptionId": "123",
@@ -265,6 +281,7 @@ Object {
       "animal": Object {
         "birthday": "Wed, 07 Dec 2016 10:42:48 GMT",
         "name": "testName1",
+        "some": "{\"What\":\"Yepp\"}",
       },
     },
   },

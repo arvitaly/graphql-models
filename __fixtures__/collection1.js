@@ -65,6 +65,10 @@ exports.animalModel = {
             name: "birthday",
             realName: "birthday",
         }, {
+            type: AttributeTypes_1.default.JSON,
+            name: "some",
+            realName: "some",
+        }, {
             type: AttributeTypes_1.default.Boolean,
             name: "isCat",
             realName: "isCat",

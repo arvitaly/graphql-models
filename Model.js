@@ -497,6 +497,7 @@ function scalarTypeToGraphQL(type) {
         case AttributeTypes_1.default.ID:
             graphQLType = graphql_1.GraphQLID;
             break;
+        case AttributeTypes_1.default.JSON:
         case AttributeTypes_1.default.Date:
         case AttributeTypes_1.default.String:
             graphQLType = graphql_1.GraphQLString;
@@ -529,6 +530,17 @@ const stringFunctions = ["contains", "notContains", "startsWith", "notStartsWith
 const numberFunctions = ["greaterThan", "lessThan", "greaterThanOrEqual", "lessThanOrEqual"];
 exports.whereArgHelpers = {
     [AttributeTypes_1.default.String]: (attr) => {
+        const types = [];
+        stringFunctions.map((f) => {
+            types.push({
+                name: attr.name + capitalize(f),
+                type: graphql_1.GraphQLString,
+                argumentType: f,
+            });
+        });
+        return types;
+    },
+    [AttributeTypes_1.default.JSON]: (attr) => {
         const types = [];
         stringFunctions.map((f) => {
             types.push({

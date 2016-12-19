@@ -121,6 +121,9 @@ class Resolver {
             if (attr.type === AttributeTypes_1.default.Date) {
                 row[attr.name] = new Date(row[attr.name]).toUTCString();
             }
+            if (attr.type === AttributeTypes_1.default.JSON) {
+                row[attr.name] = JSON.stringify(row[attr.name]);
+            }
             if (attr.realName === "id") {
                 row._id = row.id;
             }
@@ -213,6 +216,9 @@ class Resolver {
                         if (arg.attribute.type === AttributeTypes_1.default.Date) {
                             updating[arg.attribute.name] = new Date(arg.value[arg.attribute.name]);
                         }
+                        else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
+                            updating[arg.attribute.name] = JSON.parse(arg.value[arg.attribute.name]);
+                        }
                         else {
                             updating[arg.attribute.name] = arg.value[arg.attribute.name];
                         }
@@ -277,6 +283,9 @@ class Resolver {
             createArgs.map((arg) => {
                 if (arg.attribute.type === AttributeTypes_1.default.Date) {
                     creating[arg.attribute.name] = new Date(arg.value);
+                }
+                else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
+                    creating[arg.attribute.name] = JSON.parse(arg.value);
                 }
                 else {
                     creating[arg.attribute.name] = arg.value;

@@ -456,6 +456,174 @@ Array [
   Object {
     "attribute": Object {
       "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "some",
+    "type": "equal",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someNotEqual",
+    "type": "notEqual",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someIn",
+    "type": "in",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someNotIn",
+    "type": "notIn",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "Boolean",
+    "name": "someIsNull",
+    "type": "isNull",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "Boolean",
+    "name": "someIsNotNull",
+    "type": "isNotNull",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someContains",
+    "type": "contains",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someNotContains",
+    "type": "notContains",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someStartsWith",
+    "type": "startsWith",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someNotStartsWith",
+    "type": "notStartsWith",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someEndsWith",
+    "type": "endsWith",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someNotEndsWith",
+    "type": "notEndsWith",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someLike",
+    "type": "like",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "some",
+      "realName": "some",
+      "required": false,
+      "type": "json",
+    },
+    "graphQLType": "String",
+    "name": "someNotLike",
+    "type": "notLike",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
       "name": "isCat",
       "realName": "isCat",
       "required": false,
@@ -852,6 +1020,15 @@ Object {
       "field": Object {
         "defaultValue": undefined,
         "description": undefined,
+        "name": "some",
+        "type": "String",
+      },
+      "name": "some",
+    },
+    Object {
+      "field": Object {
+        "defaultValue": undefined,
+        "description": undefined,
         "name": "isCat",
         "type": "Boolean",
       },
@@ -966,6 +1143,15 @@ Object {
                         "field": Object {
                           "defaultValue": undefined,
                           "description": undefined,
+                          "name": "some",
+                          "type": "String",
+                        },
+                        "name": "some",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
                           "name": "isCat",
                           "type": "Boolean",
                         },
@@ -1064,6 +1250,15 @@ Object {
                   "type": "String",
                 },
                 "name": "birthday",
+              },
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "name": "some",
+                  "type": "String",
+                },
+                "name": "some",
               },
               Object {
                 "field": Object {
@@ -1187,6 +1382,15 @@ Object {
                 "field": Object {
                   "defaultValue": undefined,
                   "description": undefined,
+                  "name": "some",
+                  "type": "String",
+                },
+                "name": "some",
+              },
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
                   "name": "isCat",
                   "type": "Boolean",
                 },
@@ -1282,6 +1486,15 @@ Object {
                 "field": Object {
                   "defaultValue": undefined,
                   "description": undefined,
+                  "name": "some",
+                  "type": "String",
+                },
+                "name": "some",
+              },
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
                   "name": "isCat",
                   "type": "Boolean",
                 },
@@ -1364,6 +1577,15 @@ Object {
               "description": undefined,
               "isDeprecated": false,
               "name": "birthday",
+              "resolve": "undefined",
+              "type": "String",
+            },
+            Object {
+              "args": Array [],
+              "deprecationReason": undefined,
+              "description": undefined,
+              "isDeprecated": false,
+              "name": "some",
               "resolve": "undefined",
               "type": "String",
             },
@@ -1511,6 +1733,15 @@ Object {
               "description": undefined,
               "isDeprecated": false,
               "name": "birthday",
+              "resolve": "undefined",
+              "type": "String",
+            },
+            Object {
+              "args": Array [],
+              "deprecationReason": undefined,
+              "description": undefined,
+              "isDeprecated": false,
+              "name": "some",
               "resolve": "undefined",
               "type": "String",
             },
@@ -1851,6 +2082,132 @@ Object {
                         "field": Object {
                           "defaultValue": undefined,
                           "description": undefined,
+                          "name": "some",
+                          "type": "String",
+                        },
+                        "name": "some",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someNotEqual",
+                          "type": "String",
+                        },
+                        "name": "someNotEqual",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someIn",
+                          "type": "String",
+                        },
+                        "name": "someIn",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someNotIn",
+                          "type": "String",
+                        },
+                        "name": "someNotIn",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someIsNull",
+                          "type": "Boolean",
+                        },
+                        "name": "someIsNull",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someIsNotNull",
+                          "type": "Boolean",
+                        },
+                        "name": "someIsNotNull",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someContains",
+                          "type": "String",
+                        },
+                        "name": "someContains",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someNotContains",
+                          "type": "String",
+                        },
+                        "name": "someNotContains",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someStartsWith",
+                          "type": "String",
+                        },
+                        "name": "someStartsWith",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someNotStartsWith",
+                          "type": "String",
+                        },
+                        "name": "someNotStartsWith",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someEndsWith",
+                          "type": "String",
+                        },
+                        "name": "someEndsWith",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someNotEndsWith",
+                          "type": "String",
+                        },
+                        "name": "someNotEndsWith",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someLike",
+                          "type": "String",
+                        },
+                        "name": "someLike",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "someNotLike",
+                          "type": "String",
+                        },
+                        "name": "someNotLike",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
                           "name": "isCat",
                           "type": "Boolean",
                         },
@@ -2043,6 +2400,30 @@ Object {
                         "field": Object {
                           "defaultValue": undefined,
                           "description": undefined,
+                          "name": "setSome",
+                          "type": Object {
+                            "description": undefined,
+                            "fields": Array [
+                              Object {
+                                "field": Object {
+                                  "defaultValue": undefined,
+                                  "description": undefined,
+                                  "name": "some",
+                                  "type": "String",
+                                },
+                                "name": "some",
+                              },
+                            ],
+                            "name": "UpdateAnimalInputSetSome",
+                            "type": "GraphQLInputObjectType",
+                          },
+                        },
+                        "name": "setSome",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
                           "name": "setIsCat",
                           "type": Object {
                             "description": undefined,
@@ -2160,6 +2541,15 @@ Object {
                 "description": undefined,
                 "isDeprecated": false,
                 "name": "birthday",
+                "resolve": "undefined",
+                "type": "String",
+              },
+              Object {
+                "args": Array [],
+                "deprecationReason": undefined,
+                "description": undefined,
+                "isDeprecated": false,
+                "name": "some",
                 "resolve": "undefined",
                 "type": "String",
               },
@@ -2347,6 +2737,30 @@ Object {
                 "field": Object {
                   "defaultValue": undefined,
                   "description": undefined,
+                  "name": "setSome",
+                  "type": Object {
+                    "description": undefined,
+                    "fields": Array [
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "some",
+                          "type": "String",
+                        },
+                        "name": "some",
+                      },
+                    ],
+                    "name": "UpdateAnimalInputSetSome",
+                    "type": "GraphQLInputObjectType",
+                  },
+                },
+                "name": "setSome",
+              },
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
                   "name": "setIsCat",
                   "type": Object {
                     "description": undefined,
@@ -2456,6 +2870,15 @@ Object {
               "description": undefined,
               "isDeprecated": false,
               "name": "birthday",
+              "resolve": "undefined",
+              "type": "String",
+            },
+            Object {
+              "args": Array [],
+              "deprecationReason": undefined,
+              "description": undefined,
+              "isDeprecated": false,
+              "name": "some",
               "resolve": "undefined",
               "type": "String",
             },
@@ -2819,6 +3242,132 @@ Object {
               "field": Object {
                 "defaultValue": undefined,
                 "description": undefined,
+                "name": "some",
+                "type": "String",
+              },
+              "name": "some",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someNotEqual",
+                "type": "String",
+              },
+              "name": "someNotEqual",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someIn",
+                "type": "String",
+              },
+              "name": "someIn",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someNotIn",
+                "type": "String",
+              },
+              "name": "someNotIn",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someIsNull",
+                "type": "Boolean",
+              },
+              "name": "someIsNull",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someIsNotNull",
+                "type": "Boolean",
+              },
+              "name": "someIsNotNull",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someContains",
+                "type": "String",
+              },
+              "name": "someContains",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someNotContains",
+                "type": "String",
+              },
+              "name": "someNotContains",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someStartsWith",
+                "type": "String",
+              },
+              "name": "someStartsWith",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someNotStartsWith",
+                "type": "String",
+              },
+              "name": "someNotStartsWith",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someEndsWith",
+                "type": "String",
+              },
+              "name": "someEndsWith",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someNotEndsWith",
+                "type": "String",
+              },
+              "name": "someNotEndsWith",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someLike",
+                "type": "String",
+              },
+              "name": "someLike",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "someNotLike",
+                "type": "String",
+              },
+              "name": "someNotLike",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
                 "name": "isCat",
                 "type": "Boolean",
               },
@@ -3023,6 +3572,15 @@ Object {
                       "deprecationReason": undefined,
                       "description": undefined,
                       "isDeprecated": false,
+                      "name": "some",
+                      "resolve": "undefined",
+                      "type": "String",
+                    },
+                    Object {
+                      "args": Array [],
+                      "deprecationReason": undefined,
+                      "description": undefined,
+                      "isDeprecated": false,
                       "name": "isCat",
                       "resolve": "undefined",
                       "type": "Boolean",
@@ -3136,6 +3694,15 @@ Object {
         "description": undefined,
         "isDeprecated": false,
         "name": "birthday",
+        "resolve": "undefined",
+        "type": "String",
+      },
+      Object {
+        "args": Array [],
+        "deprecationReason": undefined,
+        "description": undefined,
+        "isDeprecated": false,
+        "name": "some",
         "resolve": "undefined",
         "type": "String",
       },
@@ -3296,6 +3863,15 @@ Object {
       "description": undefined,
       "isDeprecated": false,
       "name": "birthday",
+      "resolve": "undefined",
+      "type": "String",
+    },
+    Object {
+      "args": Array [],
+      "deprecationReason": undefined,
+      "description": undefined,
+      "isDeprecated": false,
+      "name": "some",
       "resolve": "undefined",
       "type": "String",
     },
@@ -3483,6 +4059,15 @@ Object {
                           "description": undefined,
                           "isDeprecated": false,
                           "name": "birthday",
+                          "resolve": "undefined",
+                          "type": "String",
+                        },
+                        Object {
+                          "args": Array [],
+                          "deprecationReason": undefined,
+                          "description": undefined,
+                          "isDeprecated": false,
+                          "name": "some",
                           "resolve": "undefined",
                           "type": "String",
                         },
@@ -3741,6 +4326,15 @@ Object {
                                 "deprecationReason": undefined,
                                 "description": undefined,
                                 "isDeprecated": false,
+                                "name": "some",
+                                "resolve": "undefined",
+                                "type": "String",
+                              },
+                              Object {
+                                "args": Array [],
+                                "deprecationReason": undefined,
+                                "description": undefined,
+                                "isDeprecated": false,
                                 "name": "isCat",
                                 "resolve": "undefined",
                                 "type": "Boolean",
@@ -3941,6 +4535,15 @@ Object {
                           "description": undefined,
                           "isDeprecated": false,
                           "name": "birthday",
+                          "resolve": "undefined",
+                          "type": "String",
+                        },
+                        Object {
+                          "args": Array [],
+                          "deprecationReason": undefined,
+                          "description": undefined,
+                          "isDeprecated": false,
+                          "name": "some",
                           "resolve": "undefined",
                           "type": "String",
                         },

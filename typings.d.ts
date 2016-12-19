@@ -14,7 +14,7 @@ export type ModelOptions = {
     interfaces?: Array<GraphQLInterfaceType>;
     resolveFn?: ResolveFn;
 }
-export type AttributeType = "id" | "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
+export type AttributeType = "id" | "string" | "integer" | "float" | "json" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
     name: string;
     realName?: string;

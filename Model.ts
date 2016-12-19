@@ -530,6 +530,7 @@ export function scalarTypeToGraphQL(type: AttributeType): GraphQLScalarType {
         case AttributeTypes.ID:
             graphQLType = GraphQLID;
             break;
+        case AttributeTypes.JSON:
         case AttributeTypes.Date:
         case AttributeTypes.String:
             graphQLType = GraphQLString;
@@ -566,6 +567,17 @@ export const whereArgHelpers: {
     }>;
 } = {
         [AttributeTypes.String]: (attr: Attribute) => {
+            const types = [];
+            stringFunctions.map((f) => {
+                types.push({
+                    name: attr.name + capitalize(f),
+                    type: GraphQLString,
+                    argumentType: f,
+                });
+            });
+            return types;
+        },
+        [AttributeTypes.JSON]: (attr: Attribute) => {
             const types = [];
             stringFunctions.map((f) => {
                 types.push({
