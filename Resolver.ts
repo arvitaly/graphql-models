@@ -35,8 +35,8 @@ class Resolver {
                     updated[model.getPrimaryKeyAttribute().realName]);
                 Object.keys(this.subscribes).map((subscriptionId) => {
                     const subscribe = this.subscribes[subscriptionId];
-                    const isCriteriaEqual = !subscribe.findCriteria ||
-                        this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
+                    const isCriteriaEqual = model.id === subscribe.modelId && (!subscribe.findCriteria ||
+                        this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria));
                     const isExists = subscribe.ids.indexOf(globalId) > -1;
                     if (isExists && isCriteriaEqual) {
                         // publish update
@@ -60,13 +60,13 @@ class Resolver {
                     created[model.getPrimaryKeyAttribute().realName]);
                 Object.keys(this.subscribes).map(async (subscriptionId) => {
                     const subscribe = this.subscribes[subscriptionId];
-                    const data = await this.resolveOne(model.id, globalId,
-                        subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
-                            subscribe.opts.resolveInfo.getQueryConnectionFields(),
-                        subscribe.opts.resolveInfo);
-                    const isCriteriaEqual = !subscribe.findCriteria ||
-                        this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                    const isCriteriaEqual = model.id === subscribe.modelId && (!subscribe.findCriteria ||
+                        this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria));
                     if (isCriteriaEqual) {
+                        const data = await this.resolveOne(model.id, globalId,
+                            subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
+                                subscribe.opts.resolveInfo.getQueryConnectionFields(),
+                            subscribe.opts.resolveInfo);
                         subscribe.ids.push(globalId);
                         // publish add
                         this.publisher.publishAdd(subscriptionId, model.id, globalId,
@@ -389,6 +389,7 @@ class Resolver {
         criteria.after = args.after;
         criteria.before = args.before;
         criteria.last = args.last;
+        criteria.sort = args.sort;
         return criteria;
     }
 }

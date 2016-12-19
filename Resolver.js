@@ -26,8 +26,8 @@ class Resolver {
                 const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]);
                 Object.keys(this.subscribes).map((subscriptionId) => {
                     const subscribe = this.subscribes[subscriptionId];
-                    const isCriteriaEqual = !subscribe.findCriteria ||
-                        this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria);
+                    const isCriteriaEqual = model.id === subscribe.modelId && (!subscribe.findCriteria ||
+                        this.equalRowToFindCriteria(model.id, updated, subscribe.findCriteria));
                     const isExists = subscribe.ids.indexOf(globalId) > -1;
                     if (isExists && isCriteriaEqual) {
                         // publish update
@@ -47,11 +47,11 @@ class Resolver {
                 const globalId = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), created[model.getPrimaryKeyAttribute().realName]);
                 Object.keys(this.subscribes).map((subscriptionId) => __awaiter(this, void 0, void 0, function* () {
                     const subscribe = this.subscribes[subscriptionId];
-                    const data = yield this.resolveOne(model.id, globalId, subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
-                        subscribe.opts.resolveInfo.getQueryConnectionFields(), subscribe.opts.resolveInfo);
-                    const isCriteriaEqual = !subscribe.findCriteria ||
-                        this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria);
+                    const isCriteriaEqual = model.id === subscribe.modelId && (!subscribe.findCriteria ||
+                        this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria));
                     if (isCriteriaEqual) {
+                        const data = yield this.resolveOne(model.id, globalId, subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
+                            subscribe.opts.resolveInfo.getQueryConnectionFields(), subscribe.opts.resolveInfo);
                         subscribe.ids.push(globalId);
                         // publish add
                         this.publisher.publishAdd(subscriptionId, model.id, globalId, data, subscribe.opts.context);
@@ -371,6 +371,7 @@ class Resolver {
         criteria.after = args.after;
         criteria.before = args.before;
         criteria.last = args.last;
+        criteria.sort = args.sort;
         return criteria;
     }
 }
