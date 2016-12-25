@@ -150,7 +150,10 @@ class Model {
         };
     }
     public getConnectionArgs(): GraphQLFieldConfigArgumentMap {
-        let args = connectionArgs;
+        let args = {};
+        Object.keys(connectionArgs).map((argName) => {
+            args[argName] = connectionArgs[argName];
+        });
         args[whereArgName] = { type: this.getWhereInputType() };
         args[sortArgName] = { type: GraphQLString };
         return args;

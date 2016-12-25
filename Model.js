@@ -113,7 +113,10 @@ class Model {
         };
     }
     getConnectionArgs() {
-        let args = graphql_relay_1.connectionArgs;
+        let args = {};
+        Object.keys(graphql_relay_1.connectionArgs).map((argName) => {
+            args[argName] = graphql_relay_1.connectionArgs[argName];
+        });
         args[_1.whereArgName] = { type: this.getWhereInputType() };
         args[_1.sortArgName] = { type: graphql_1.GraphQLString };
         return args;
