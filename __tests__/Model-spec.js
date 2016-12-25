@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -126,8 +126,7 @@ describe("Model spec", () => {
                         context: "f3",
                         info: "f4",
                         resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
-                    }
-                ]]);
+                    }]]);
         });
         it("Query connection", () => {
             const queryConnection = animalModel.getConnectionQuery();
@@ -142,8 +141,7 @@ describe("Model spec", () => {
                         context: "f3",
                         info: "f4",
                         resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
-                    }
-                ]]);
+                    }]]);
         });
         it("all queries", () => {
             const getQueryOneSpy = spyOn(animalModel, "getQueryOne").and.returnValue("q1");
@@ -183,8 +181,7 @@ describe("Model spec", () => {
                         context: "f3",
                         info: "f4",
                         resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
-                    }
-                ]]);
+                    }]]);
         }));
         it("update mutation", () => __awaiter(this, void 0, void 0, function* () {
             const updateMutation = animalModel.getUpdateMutation();
@@ -202,8 +199,7 @@ describe("Model spec", () => {
                         context: "f3",
                         info: "f4",
                         resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
-                    }
-                ]]);
+                    }]]);
         }));
         it("update many mutation", () => __awaiter(this, void 0, void 0, function* () {
             const updateManyMutation = animalModel.getUpdateManyMutation();
@@ -221,8 +217,7 @@ describe("Model spec", () => {
                         context: "f3",
                         info: "f4",
                         resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
-                    }
-                ]]);
+                    }]]);
         }));
         it("delete mutation", () => __awaiter(this, void 0, void 0, function* () {
             const deleteMutation = animalModel.getDeleteMutation();
@@ -240,8 +235,7 @@ describe("Model spec", () => {
                         context: "f3",
                         info: "f4",
                         resolveInfo: graphql_fields_info_1.fromResolveInfo({}),
-                    }
-                ]]);
+                    }]]);
         }));
         it("getAllMutations", () => {
             const getCreateMutationSpy = spyOn(animalModel, "getCreateMutation").and.returnValue("f1");

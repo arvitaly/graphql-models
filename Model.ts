@@ -378,13 +378,13 @@ class Model {
                     name: attr.name + "In",
                     type: ArgumentTypes.In,
                     attribute: attr,
-                    graphQLType: graphqlType,
+                    graphQLType: new GraphQLList(graphqlType),
                 });
                 args.push({
                     name: attr.name + "NotIn",
                     type: ArgumentTypes.NotIn,
                     attribute: attr,
-                    graphQLType: graphqlType,
+                    graphQLType: new GraphQLList(graphqlType),
                 });
             }
             // IS NULL

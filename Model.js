@@ -340,13 +340,13 @@ class Model {
                     name: attr.name + "In",
                     type: ArgumentTypes_1.default.In,
                     attribute: attr,
-                    graphQLType: graphqlType,
+                    graphQLType: new graphql_1.GraphQLList(graphqlType),
                 });
                 args.push({
                     name: attr.name + "NotIn",
                     type: ArgumentTypes_1.default.NotIn,
                     attribute: attr,
-                    graphQLType: graphqlType,
+                    graphQLType: new graphql_1.GraphQLList(graphqlType),
                 });
             }
             // IS NULL
