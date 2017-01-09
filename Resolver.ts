@@ -204,20 +204,25 @@ class Resolver {
         return result;
     }
     public async resolveMutationCreate(modelId: string, opts: ResolveOpts) {
-        const id = await this.createOne(modelId, opts.args);
+        const created: any = Object.assign({}, opts.args);
+        delete created.clientMutationId;
+        const id = await this.createOne(modelId, created);
         const row = await this.resolveOne(modelId, id,
             opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
         return {
+            clientMutationId: (opts.args as any).clientMutationId,
             [this.collection.get(modelId).queryName]: row,
         };
     }
     public async resolveMutationUpdate(modelId: string, opts: ResolveOpts) {
         const model = this.collection.get(modelId);
+        const argsForUpdate: any = Object.assign({}, opts.args);
+        delete argsForUpdate.clientMutationId;
         const updating: any = {};
         let id;
-        await Promise.all(Object.keys(opts.args).map((updateArgName) => {
+        await Promise.all(Object.keys(argsForUpdate).map((updateArgName) => {
             const arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
-            arg.value = opts.args[updateArgName];
+            arg.value = argsForUpdate[updateArgName];
             return arg;
         }).map(async(arg) => {
             switch (arg.type) {
@@ -254,6 +259,7 @@ class Resolver {
             toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
             opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
         return {
+            clientMutationId: (opts.args as any).clientMutationId,
             [this.collection.get(modelId).queryName]: row,
         };
     }

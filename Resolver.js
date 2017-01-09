@@ -194,9 +194,12 @@ class Resolver {
     }
     resolveMutationCreate(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = yield this.createOne(modelId, opts.args);
+            const created = Object.assign({}, opts.args);
+            delete created.clientMutationId;
+            const id = yield this.createOne(modelId, created);
             const row = yield this.resolveOne(modelId, id, opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
             return {
+                clientMutationId: opts.args.clientMutationId,
                 [this.collection.get(modelId).queryName]: row,
             };
         });
@@ -204,11 +207,13 @@ class Resolver {
     resolveMutationUpdate(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.collection.get(modelId);
+            const argsForUpdate = Object.assign({}, opts.args);
+            delete argsForUpdate.clientMutationId;
             const updating = {};
             let id;
-            yield Promise.all(Object.keys(opts.args).map((updateArgName) => {
+            yield Promise.all(Object.keys(argsForUpdate).map((updateArgName) => {
                 const arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
-                arg.value = opts.args[updateArgName];
+                arg.value = argsForUpdate[updateArgName];
                 return arg;
             }).map((arg) => __awaiter(this, void 0, void 0, function* () {
                 switch (arg.type) {
@@ -242,6 +247,7 @@ class Resolver {
             const updated = yield this.adapter.updateOne(model.id, id, updating);
             const row = yield this.resolveOne(modelId, graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]), opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
             return {
+                clientMutationId: opts.args.clientMutationId,
                 [this.collection.get(modelId).queryName]: row,
             };
         });
