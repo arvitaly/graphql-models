@@ -25,7 +25,7 @@ describe("Functional tests", () => {
         resolver.setCollection(collection);
         graphqlSchema = schema.getGraphQLSchema();
     });
-    it("node", async () => {
+    it("node", async() => {
         const result = await graphql(graphqlSchema, `query Q1{  
             node(id:"${animalId1}"){
                 ... on Animal{
@@ -41,7 +41,7 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     });
-    it("query one: animal", async () => {
+    it("query one: animal", async() => {
         const result = await graphql(graphqlSchema, `query Q1{  
             viewer{
                 animal(id:"${animalId1}"){
@@ -63,7 +63,7 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     });
-    it("query one: post", async () => {
+    it("query one: post", async() => {
         const result = await graphql(graphqlSchema, `query Q1{  
             viewer{
                 post(id: "${postId1}"){
@@ -105,7 +105,7 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     });
-    it("query connection", async () => {
+    it("query connection", async() => {
         const result = await graphql(graphqlSchema, `query Q1{
             viewer{            
                 animals(where:{nameContains:"x"}){
@@ -121,7 +121,7 @@ describe("Functional tests", () => {
         }`);
         expect(result).toMatchSnapshot();
     });
-    it("subscribe one", async () => {
+    it("subscribe one", async() => {
         const subscriptionId = "123";
         const result = await graphql(graphqlSchema, `query Q1{  
             viewer{
@@ -146,7 +146,7 @@ describe("Functional tests", () => {
         adapter.update("animal", 1, { name: "testn2" });
         expect(publishUpdateSpy.calls.allArgs()).toMatchSnapshot();
     });
-    it("subscribe connection", async (done) => {
+    it("subscribe connection", async(done) => {
         const subscriptionId = "1234";
         const result = await graphql(graphqlSchema, `query Q1{
             viewer{            
@@ -185,7 +185,7 @@ describe("Functional tests", () => {
         publisher.publishAdd = publishAddSpy;
         adapter.create("animal", { name: "axz" });
     });
-    it("mutation create", async () => {
+    it("mutation create", async() => {
         const result = await graphql(graphqlSchema, `mutation M1{  
             createPost(input:{createAnimals:[
                 {name:"animal1", birthday:"${date1}"},
@@ -230,7 +230,7 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     });
-    it("update mutation: animal", async () => {
+    it("update mutation: animal", async() => {
         const result = await graphql(graphqlSchema, `mutation M1{  
                 updateAnimal(input:{
                     id: "${animalId1}", 

@@ -102,7 +102,7 @@ export class DataAdapter extends Adapter {
         }).map((s) => s.callback(newRow));
     }
     public update(modelId, id: number, row) {
-        let oldRow = data[modelId.toLowerCase() + "s"].find((r) => r.id === id);
+        const oldRow = data[modelId.toLowerCase() + "s"].find((r) => r.id === id);
         Object.assign(oldRow, row);
         subscribers.filter((s) => {
             return s.type === "update" && s.model === modelId;

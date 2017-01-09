@@ -2,7 +2,7 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
@@ -133,7 +133,7 @@ class Resolver {
             if (attr.type === AttributeTypes_1.default.Collection) {
                 const edges = row[attr.name].map((r) => {
                     return {
-                        cursor: null,
+                        cursor: "",
                         node: this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo),
                     };
                 });
@@ -207,7 +207,7 @@ class Resolver {
             const updating = {};
             let id;
             yield Promise.all(Object.keys(opts.args).map((updateArgName) => {
-                let arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
+                const arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
                 arg.value = opts.args[updateArgName];
                 return arg;
             }).map((arg) => __awaiter(this, void 0, void 0, function* () {
@@ -250,7 +250,7 @@ class Resolver {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.collection.get(modelId);
             let createArgs = Object.keys(args).map((createArgName) => {
-                let arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName));
+                const arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName));
                 arg.value = args[createArgName];
                 return arg;
             });
@@ -279,7 +279,7 @@ class Resolver {
                 };
             })));
             createArgs = createArgs.concat(subcollections);
-            let creating = {};
+            const creating = {};
             createArgs.map((arg) => {
                 if (arg.attribute.type === AttributeTypes_1.default.Date) {
                     creating[arg.attribute.name] = new Date(arg.value);

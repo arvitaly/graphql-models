@@ -58,7 +58,7 @@ class Resolver {
             this.callbacks.onCreate(model.id, (created) => {
                 const globalId = toGlobalId(model.getNameForGlobalId(),
                     created[model.getPrimaryKeyAttribute().realName]);
-                Object.keys(this.subscribes).map(async (subscriptionId) => {
+                Object.keys(this.subscribes).map(async(subscriptionId) => {
                     const subscribe = this.subscribes[subscriptionId];
                     const isCriteriaEqual = model.id === subscribe.modelId && (!subscribe.findCriteria ||
                         this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria));
@@ -145,7 +145,7 @@ class Resolver {
             if (attr.type === AttributeTypes.Collection) {
                 const edges = row[attr.name].map((r) => {
                     return {
-                        cursor: null,
+                        cursor: "",
                         node: this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo),
                     };
                 });
@@ -216,10 +216,10 @@ class Resolver {
         const updating: any = {};
         let id;
         await Promise.all(Object.keys(opts.args).map((updateArgName) => {
-            let arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
+            const arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
             arg.value = opts.args[updateArgName];
             return arg;
-        }).map(async (arg) => {
+        }).map(async(arg) => {
             switch (arg.type) {
                 case ArgumentTypes.UpdateSetter:
                     if (arg.attribute.type === AttributeTypes.Date) {
@@ -237,7 +237,7 @@ class Resolver {
                     break;
                 case ArgumentTypes.CreateSubCollection:
                     const childModel = arg.attribute.model;
-                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {
+                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async(v) => {
                         return fromGlobalId(await this.createOne(childModel, v)).id;
                     }));
                     break;
@@ -260,12 +260,12 @@ class Resolver {
     public async createOne(modelId: string, args) {
         const model = this.collection.get(modelId);
         let createArgs = Object.keys(args).map((createArgName) => {
-            let arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName));
+            const arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName));
             arg.value = args[createArgName];
             return arg;
         });
         const submodels = await Promise.all(
-            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubModel).map(async (arg) => {
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubModel).map(async(arg) => {
                 const childModel = arg.attribute.model;
                 return {
                     name: arg.attribute.name,
@@ -278,9 +278,9 @@ class Resolver {
         );
         createArgs = createArgs.concat(submodels);
         const subcollections = await Promise.all(
-            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async (arg) => {
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async(arg) => {
                 const childModel = arg.attribute.model;
-                const ids = await Promise.all(arg.value.map(async (row) => {
+                const ids = await Promise.all(arg.value.map(async(row) => {
                     return fromGlobalId(await this.createOne(childModel, row)).id;
                 }));
                 return {
@@ -293,7 +293,7 @@ class Resolver {
             }),
         );
         createArgs = createArgs.concat(subcollections);
-        let creating: any = {};
+        const creating: any = {};
         createArgs.map((arg) => {
             if (arg.attribute.type === AttributeTypes.Date) {
                 creating[arg.attribute.name] = new Date(arg.value);

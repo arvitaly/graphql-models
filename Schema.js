@@ -29,7 +29,7 @@ class Schema {
         // TODO
     }
     getQueryViewerType() {
-        let queries = this.queriesToMap();
+        const queries = this.queriesToMap();
         queries[_1.idArgName] = { type: new graphql_1.GraphQLNonNull(graphql_1.GraphQLID) };
         const queryViewer = new graphql_1.GraphQLObjectType({
             name: "Viewer",
@@ -82,14 +82,14 @@ class Schema {
         });
     }
     mutationsToMap() {
-        let out = {};
+        const out = {};
         this.getMutations().map((q) => {
             out[q.name] = q.field;
         });
         return out;
     }
     queriesToMap() {
-        let out = {};
+        const out = {};
         this.getQueries().map((q) => {
             out[q.name] = q.field;
         });

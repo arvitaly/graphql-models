@@ -114,7 +114,7 @@ class Model {
         return this.connectionType;
     }
     public getOneArgs(): GraphQLFieldConfigArgumentMap {
-        let args: GraphQLFieldConfigArgumentMap = {};
+        const args: GraphQLFieldConfigArgumentMap = {};
         args[idArgName] = { type: new GraphQLNonNull(GraphQLID) };
         return args;
     }
@@ -150,7 +150,7 @@ class Model {
         };
     }
     public getConnectionArgs(): GraphQLFieldConfigArgumentMap {
-        let args = {};
+        const args = {};
         Object.keys(connectionArgs).map((argName) => {
             args[argName] = connectionArgs[argName];
         });
@@ -165,7 +165,7 @@ class Model {
         return this.whereInputType;
     }
     public getQueries(): Queries {
-        let queries: Queries = [];
+        const queries: Queries = [];
         queries.push({
             name: uncapitalize(this.name),
             field: this.getQueryOne(),
@@ -178,7 +178,7 @@ class Model {
     }
     // Mutations
     public getCreateMutation(): GraphQLFieldConfig<any, any> {
-        let outputFields: GraphQLFieldConfigMap<any, any> = {};
+        const outputFields: GraphQLFieldConfigMap<any, any> = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -208,7 +208,7 @@ class Model {
         return this.updateType;
     }
     public getDeleteMutation(): GraphQLFieldConfig<any, any> {
-        let outputFields: GraphQLFieldConfigMap<any, any> = {};
+        const outputFields: GraphQLFieldConfigMap<any, any> = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -226,7 +226,7 @@ class Model {
         });
     }
     public getUpdateMutation() {
-        let outputFields: GraphQLFieldConfigMap<any, any> = {};
+        const outputFields: GraphQLFieldConfigMap<any, any> = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -244,11 +244,11 @@ class Model {
         });
     }
     public getUpdateManyMutation() {
-        let outputFields: GraphQLFieldConfigMap<any, any> = {};
+        const outputFields: GraphQLFieldConfigMap<any, any> = {};
         outputFields[uncapitalize(this.name) + "s"] = {
             type: new GraphQLList(this.getBaseType()),
         };
-        let inputFields: GraphQLInputFieldConfigMap = {};
+        const inputFields: GraphQLInputFieldConfigMap = {};
         inputFields[whereArgName] = { type: this.getWhereInputType() };
         inputFields[uncapitalize(this.name)] = {
             type: this.getUpdateType(),
@@ -267,7 +267,7 @@ class Model {
         });
     }
     public getMutations(): Mutations {
-        let mutations: Mutations = [];
+        const mutations: Mutations = [];
         mutations.push({
             name: "create" + this.name,
             field: this.getCreateMutation(),
@@ -308,7 +308,7 @@ class Model {
         return capitalize(this.name);
     }
     protected generateCreateArguments() {
-        let args: Argument[] = [];
+        const args: Argument[] = [];
         this.attributes.map((attr) => {
             if (attr.name === idArgName) {
                 return;
@@ -348,7 +348,7 @@ class Model {
         return args;
     }
     protected generateWhereArguments() {
-        let args: Argument[] = [];
+        const args: Argument[] = [];
         this.attributes.map((attr) => {
             let type: AttributeType;
             if (attr.type === AttributeTypes.Model || attr.type === AttributeTypes.Collection) {
@@ -356,7 +356,7 @@ class Model {
             } else {
                 type = attr.type;
             }
-            let graphqlType = scalarTypeToGraphQL(type);
+            const graphqlType = scalarTypeToGraphQL(type);
             // EQUALS
             if (attr.type !== AttributeTypes.Collection && !attr.primaryKey && attr.name !== idArgName) {
                 args.push({
@@ -420,10 +420,10 @@ class Model {
         return new GraphQLObjectType({
             name: capitalize(this.name),
             fields: () => {
-                let fields: GraphQLFieldConfigMap<any, any> = {};
+                const fields: GraphQLFieldConfigMap<any, any> = {};
                 this.attributes.map((attr) => {
                     let graphQLType;
-                    let resolve;
+                    // let resolve; ???
                     if (attr.type === AttributeTypes.Model) {
                         graphQLType = this.collector.get((attr as ModelAttribute).model).getBaseType();
                     } else if (attr.type === AttributeTypes.Collection) {
@@ -434,9 +434,9 @@ class Model {
                         graphQLType = scalarTypeToGraphQL(attr.type);
                     }
                     fields[attr.name] = { type: graphQLType };
-                    if (resolve) {
+                    /*if (resolve) {
                         fields[attr.name].resolve = resolve;
-                    }
+                    }*/// ???
                 });
                 return fields;
             },
@@ -447,7 +447,7 @@ class Model {
         return new GraphQLInputObjectType({
             name: "Create" + capitalize(this.name) + "Input",
             fields: () => {
-                let fields: GraphQLInputFieldConfigMap = {};
+                const fields: GraphQLInputFieldConfigMap = {};
                 this.getCreateArguments().map((arg) => {
                     fields[arg.name] = { type: arg.graphQLType };
                 });
@@ -456,7 +456,7 @@ class Model {
         });
     }
     protected generateUpdateArguments() {
-        let args: Argument[] = [];
+        const args: Argument[] = [];
         this.attributes.map((attr) => {
             if (attr.name === idArgName) {
                 return;
@@ -508,7 +508,7 @@ class Model {
         return new GraphQLInputObjectType({
             name: "Update" + this.name + "Input",
             fields: () => {
-                let fields: GraphQLInputFieldConfigMap = {};
+                const fields: GraphQLInputFieldConfigMap = {};
                 this.getUpdateArguments().map((arg) => {
                     fields[arg.name] = { type: arg.graphQLType };
                 });
@@ -517,7 +517,7 @@ class Model {
         });
     }
     protected generateWhereInputType(): GraphQLInputObjectType {
-        let where: GraphQLInputFieldConfigMap = {};
+        const where: GraphQLInputFieldConfigMap = {};
         this.getWhereArguments().map((arg) => {
             where[arg.name] = { type: arg.graphQLType };
         });

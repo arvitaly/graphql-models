@@ -77,7 +77,7 @@ class Model {
         return this.connectionType;
     }
     getOneArgs() {
-        let args = {};
+        const args = {};
         args[_1.idArgName] = { type: new graphql_1.GraphQLNonNull(graphql_1.GraphQLID) };
         return args;
     }
@@ -113,7 +113,7 @@ class Model {
         };
     }
     getConnectionArgs() {
-        let args = {};
+        const args = {};
         Object.keys(graphql_relay_1.connectionArgs).map((argName) => {
             args[argName] = graphql_relay_1.connectionArgs[argName];
         });
@@ -128,7 +128,7 @@ class Model {
         return this.whereInputType;
     }
     getQueries() {
-        let queries = [];
+        const queries = [];
         queries.push({
             name: uncapitalize(this.name),
             field: this.getQueryOne(),
@@ -141,7 +141,7 @@ class Model {
     }
     // Mutations
     getCreateMutation() {
-        let outputFields = {};
+        const outputFields = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -170,7 +170,7 @@ class Model {
         return this.updateType;
     }
     getDeleteMutation() {
-        let outputFields = {};
+        const outputFields = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -187,7 +187,7 @@ class Model {
         });
     }
     getUpdateMutation() {
-        let outputFields = {};
+        const outputFields = {};
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
@@ -204,11 +204,11 @@ class Model {
         });
     }
     getUpdateManyMutation() {
-        let outputFields = {};
+        const outputFields = {};
         outputFields[uncapitalize(this.name) + "s"] = {
             type: new graphql_1.GraphQLList(this.getBaseType()),
         };
-        let inputFields = {};
+        const inputFields = {};
         inputFields[_1.whereArgName] = { type: this.getWhereInputType() };
         inputFields[uncapitalize(this.name)] = {
             type: this.getUpdateType(),
@@ -226,7 +226,7 @@ class Model {
         });
     }
     getMutations() {
-        let mutations = [];
+        const mutations = [];
         mutations.push({
             name: "create" + this.name,
             field: this.getCreateMutation(),
@@ -267,7 +267,7 @@ class Model {
         return capitalize(this.name);
     }
     generateCreateArguments() {
-        let args = [];
+        const args = [];
         this.attributes.map((attr) => {
             if (attr.name === _1.idArgName) {
                 return;
@@ -309,7 +309,7 @@ class Model {
         return args;
     }
     generateWhereArguments() {
-        let args = [];
+        const args = [];
         this.attributes.map((attr) => {
             let type;
             if (attr.type === AttributeTypes_1.default.Model || attr.type === AttributeTypes_1.default.Collection) {
@@ -318,7 +318,7 @@ class Model {
             else {
                 type = attr.type;
             }
-            let graphqlType = scalarTypeToGraphQL(type);
+            const graphqlType = scalarTypeToGraphQL(type);
             // EQUALS
             if (attr.type !== AttributeTypes_1.default.Collection && !attr.primaryKey && attr.name !== _1.idArgName) {
                 args.push({
@@ -382,10 +382,10 @@ class Model {
         return new graphql_1.GraphQLObjectType({
             name: capitalize(this.name),
             fields: () => {
-                let fields = {};
+                const fields = {};
                 this.attributes.map((attr) => {
                     let graphQLType;
-                    let resolve;
+                    // let resolve; ???
                     if (attr.type === AttributeTypes_1.default.Model) {
                         graphQLType = this.collector.get(attr.model).getBaseType();
                     }
@@ -399,9 +399,9 @@ class Model {
                         graphQLType = scalarTypeToGraphQL(attr.type);
                     }
                     fields[attr.name] = { type: graphQLType };
-                    if (resolve) {
+                    /*if (resolve) {
                         fields[attr.name].resolve = resolve;
-                    }
+                    }*/ // ???
                 });
                 return fields;
             },
@@ -412,7 +412,7 @@ class Model {
         return new graphql_1.GraphQLInputObjectType({
             name: "Create" + capitalize(this.name) + "Input",
             fields: () => {
-                let fields = {};
+                const fields = {};
                 this.getCreateArguments().map((arg) => {
                     fields[arg.name] = { type: arg.graphQLType };
                 });
@@ -421,7 +421,7 @@ class Model {
         });
     }
     generateUpdateArguments() {
-        let args = [];
+        const args = [];
         this.attributes.map((attr) => {
             if (attr.name === _1.idArgName) {
                 return;
@@ -475,7 +475,7 @@ class Model {
         return new graphql_1.GraphQLInputObjectType({
             name: "Update" + this.name + "Input",
             fields: () => {
-                let fields = {};
+                const fields = {};
                 this.getUpdateArguments().map((arg) => {
                     fields[arg.name] = { type: arg.graphQLType };
                 });
@@ -484,7 +484,7 @@ class Model {
         });
     }
     generateWhereInputType() {
-        let where = {};
+        const where = {};
         this.getWhereArguments().map((arg) => {
             where[arg.name] = { type: arg.graphQLType };
         });
