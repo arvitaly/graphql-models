@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const AttributeTypes_1 = require("./../AttributeTypes");
 const Collection_1 = require("./../Collection");
 exports.postModel = {
@@ -75,6 +76,5 @@ exports.animalModel = {
         }],
 };
 const models = [exports.postModel, exports.userModel, exports.animalModel];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = new Collection_1.default(models);
 //# sourceMappingURL=collection1.js.map

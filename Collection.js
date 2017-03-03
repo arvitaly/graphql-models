@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const Model_1 = require("./Model");
 class Collection {
     constructor(modelConfigs, opts) {
@@ -19,6 +20,5 @@ class Collection {
         return this.models.map(cb);
     }
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Collection;
 //# sourceMappingURL=Collection.js.map

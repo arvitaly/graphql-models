@@ -178,7 +178,7 @@ describe("Model spec", () => {
             resolveFn = jasmine.createSpy("");
             animalModel.setResolveFn(resolveFn);
         });
-        it("create mutation", async() => {
+        it("create mutation", async () => {
             const createMutation = animalModel.getCreateMutation();
             expect(printGraphQLFieldConfig(createMutation)).toMatchSnapshot();
             const args = { clientMutationId: "5", input: { f1: "hello" } };
@@ -196,7 +196,7 @@ describe("Model spec", () => {
                     resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
-        it("update mutation", async() => {
+        it("update mutation", async () => {
             const updateMutation = animalModel.getUpdateMutation();
             expect(printGraphQLFieldConfig(updateMutation)).toMatchSnapshot();
             const args = { clientMutationId: "5", input: { f1: "hello" } };
@@ -214,7 +214,7 @@ describe("Model spec", () => {
                     resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
-        it("update many mutation", async() => {
+        it("update many mutation", async () => {
             const updateManyMutation = animalModel.getUpdateManyMutation();
             expect(printGraphQLFieldConfig(updateManyMutation)).toMatchSnapshot();
             const args = { clientMutationId: "5", input: { f1: "hello" } };
@@ -232,7 +232,7 @@ describe("Model spec", () => {
                     resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
-        it("delete mutation", async() => {
+        it("delete mutation", async () => {
             const deleteMutation = animalModel.getDeleteMutation();
             expect(printGraphQLFieldConfig(deleteMutation)).toMatchSnapshot();
             const args = { clientMutationId: "5", input: { f1: "hello" } };

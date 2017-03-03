@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const ArgumentTypes = {
     Equal: "equal",
     NotEqual: "notEqual",
@@ -23,6 +24,5 @@ const ArgumentTypes = {
     CreateSubCollection: "createSubCollection",
     UpdateSetter: "updateSetter",
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ArgumentTypes;
 //# sourceMappingURL=ArgumentTypes.js.map

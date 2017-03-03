@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`Functional tests mutation create 1`] = `
 Object {
   "data": Object {
@@ -97,7 +99,7 @@ Object {
         "id": "QW5pbWFsOjE=",
         "isCat": false,
         "name": "Rex",
-        "some": "{\"test\":\"Duck\"}",
+        "some": "{\\"test\\":\\"Duck\\"}",
       },
     },
   },
@@ -119,7 +121,7 @@ Object {
                 "id": "QW5pbWFsOjE=",
                 "isCat": false,
                 "name": "Rex",
-                "some": "{\"test\":\"Duck\"}",
+                "some": "{\\"test\\":\\"Duck\\"}",
               },
             },
             Object {
@@ -130,7 +132,7 @@ Object {
                 "id": "QW5pbWFsOjI=",
                 "isCat": false,
                 "name": "Felix",
-                "some": "{\"test\":\"Mickey\"}",
+                "some": "{\\"test\\":\\"Mickey\\"}",
               },
             },
             Object {
@@ -141,7 +143,7 @@ Object {
                 "id": "QW5pbWFsOjM=",
                 "isCat": false,
                 "name": "Jeck",
-                "some": "{\"test\":\"Luk\"}",
+                "some": "{\\"test\\":\\"Luk\\"}",
               },
             },
           ],
@@ -158,7 +160,7 @@ Object {
                   "id": "QW5pbWFsOjI=",
                   "isCat": false,
                   "name": "Felix",
-                  "some": "{\"test\":\"Mickey\"}",
+                  "some": "{\\"test\\":\\"Mickey\\"}",
                 },
               },
               Object {
@@ -169,7 +171,7 @@ Object {
                   "id": "QW5pbWFsOjM=",
                   "isCat": false,
                   "name": "Jeck",
-                  "some": "{\"test\":\"Luk\"}",
+                  "some": "{\\"test\\":\\"Luk\\"}",
                 },
               },
               Object {
@@ -180,7 +182,7 @@ Object {
                   "id": "QW5pbWFsOjQ=",
                   "isCat": false,
                   "name": "Morph",
-                  "some": "{\"test\":\"Pussy\"}",
+                  "some": "{\\"test\\":\\"Pussy\\"}",
                 },
               },
             ],
@@ -297,7 +299,7 @@ Object {
       "animal": Object {
         "birthday": "Wed, 07 Dec 2016 10:42:48 GMT",
         "name": "testName1",
-        "some": "{\"What\":\"Yepp\"}",
+        "some": "{\\"What\\":\\"Yepp\\"}",
       },
     },
   },

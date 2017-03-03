@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`Model spec Args args for connection for animal 1`] = `
 Object {
   "after": Object {

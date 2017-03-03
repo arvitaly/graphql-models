@@ -14,7 +14,7 @@ class Collection {
         }
         return model;
     }
-    public map(cb: (model: Model, index: Number) => any) {
+    public map(cb: (model: Model, index: number) => any) {
         return this.models.map(cb);
     }
 }

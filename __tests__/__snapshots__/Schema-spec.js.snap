@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`Schema spec circular dependencies 1`] = `
 GraphQLSchema {
   "_directives": Array [

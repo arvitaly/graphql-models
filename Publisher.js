@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class Publisher {
     publishAdd(subscriptionId, modelId, globalId, created, context) {
         throw new Error("Not implemented publishAdd");
@@ -10,6 +11,5 @@ class Publisher {
         throw new Error("Not implemented publishUpdate");
     }
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Publisher;
 //# sourceMappingURL=Publisher.js.map

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const Adapter_1 = require("./../Adapter");
 const ArgumentTypes_1 = require("./../ArgumentTypes");
 const Publisher_1 = require("./../Publisher");

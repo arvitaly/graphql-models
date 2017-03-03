@@ -58,7 +58,7 @@ class Resolver {
             this.callbacks.onCreate(model.id, (created) => {
                 const globalId = toGlobalId(model.getNameForGlobalId(),
                     created[model.getPrimaryKeyAttribute().realName]);
-                Object.keys(this.subscribes).map(async(subscriptionId) => {
+                Object.keys(this.subscribes).map(async (subscriptionId) => {
                     const subscribe = this.subscribes[subscriptionId];
                     const isCriteriaEqual = model.id === subscribe.modelId && (!subscribe.findCriteria ||
                         this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria));
@@ -99,7 +99,7 @@ class Resolver {
         return { id: "1" };
     }
     public async resolveNode(_: ModelID, opts: ResolveOpts) {
-        const {id, type} = fromGlobalId(opts.source);
+        const { id, type } = fromGlobalId(opts.source);
         const modelId = type.replace(/Type$/gi, "").toLowerCase();
         return this.resolveOne(modelId, opts.source, opts.resolveInfo.getNodeFields(), opts.resolveInfo);
     }
@@ -198,7 +198,7 @@ class Resolver {
         }
         if (opts.context && opts.context.subscriptionId) {
             this.subscribeConnection(opts.context.subscriptionId, modelId,
-                result.edges.map((r) => { return r.node.id; }),
+                result.edges.map((r) => r.node.id),
                 findCriteria, opts);
         }
         return result;
@@ -224,7 +224,7 @@ class Resolver {
             const arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
             arg.value = argsForUpdate[updateArgName];
             return arg;
-        }).map(async(arg) => {
+        }).map(async (arg) => {
             switch (arg.type) {
                 case ArgumentTypes.UpdateSetter:
                     if (arg.attribute.type === AttributeTypes.Date) {
@@ -242,7 +242,7 @@ class Resolver {
                     break;
                 case ArgumentTypes.CreateSubCollection:
                     const childModel = arg.attribute.model;
-                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async(v) => {
+                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {
                         return fromGlobalId(await this.createOne(childModel, v)).id;
                     }));
                     break;
@@ -271,7 +271,7 @@ class Resolver {
             return arg;
         });
         const submodels = await Promise.all(
-            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubModel).map(async(arg) => {
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubModel).map(async (arg) => {
                 const childModel = arg.attribute.model;
                 return {
                     name: arg.attribute.name,
@@ -284,9 +284,9 @@ class Resolver {
         );
         createArgs = createArgs.concat(submodels);
         const subcollections = await Promise.all(
-            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async(arg) => {
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async (arg) => {
                 const childModel = arg.attribute.model;
-                const ids = await Promise.all(arg.value.map(async(row) => {
+                const ids = await Promise.all(arg.value.map(async (row) => {
                     return fromGlobalId(await this.createOne(childModel, row)).id;
                 }));
                 return {

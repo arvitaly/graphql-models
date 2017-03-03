@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class Adapter {
     findOne(modelId, id, populates) {
         throw new Error("Not implemented findOne");
@@ -19,6 +20,5 @@ class Adapter {
         throw new Error("Not implemented updateOne");
     }
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Adapter;
 //# sourceMappingURL=Adapter.js.map

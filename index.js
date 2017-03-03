@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Adapter_1 = require("./Adapter");
 exports.Adapter = Adapter_1.default;
 var ArgumentTypes_1 = require("./ArgumentTypes");

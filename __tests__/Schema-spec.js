@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_1 = require("graphql");
 const AttributeTypes_1 = require("./../AttributeTypes");
 const Collection_1 = require("./../Collection");

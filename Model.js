@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_1 = require("graphql");
 const graphql_fields_info_1 = require("graphql-fields-info");
 const graphql_relay_1 = require("graphql-relay");
@@ -600,6 +601,5 @@ exports.whereArgHelpers = {
         return [];
     },
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Model;
 //# sourceMappingURL=Model.js.map

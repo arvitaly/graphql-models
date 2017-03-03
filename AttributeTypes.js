@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const AttributeTypes = {
     Boolean: "boolean",
     Collection: "collection",
@@ -10,6 +11,5 @@ const AttributeTypes = {
     Model: "model",
     String: "string",
 };
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = AttributeTypes;
 //# sourceMappingURL=AttributeTypes.js.map
