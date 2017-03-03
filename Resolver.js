@@ -116,6 +116,9 @@ class Resolver {
         const model = this.collection.get(modelId);
         fields.map((field) => {
             const attr = model.attributes.find((a) => a.name === field.name);
+            if (!attr) {
+                return;
+            }
             if (typeof (row[attr.name]) === "undefined") {
                 return;
             }
