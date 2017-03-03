@@ -594,33 +594,33 @@ export const whereArgHelpers: {
         [AttributeTypes.Integer]: (attr: Attribute) => {
             const types = [];
             numberFunctions.map((f) => {
-                return {
+                types.push({
                     name: attr.name + capitalize(f),
                     type: GraphQLInt,
                     argumentType: f,
-                };
+                });
             });
             return types;
         },
         [AttributeTypes.Float]: (attr: Attribute) => {
             const types = [];
             numberFunctions.map((f) => {
-                return {
+                types.push({
                     name: attr.name + capitalize(f),
                     type: GraphQLFloat,
                     argumentType: f,
-                };
+                });
             });
             return types;
         },
         [AttributeTypes.Date]: (attr: Attribute) => {
             const types = [];
             numberFunctions.map((f) => {
-                return {
+                types.push({
                     name: attr.name + capitalize(f),
                     type: GraphQLString,
                     argumentType: f,
-                };
+                });
             });
             return types;
         },

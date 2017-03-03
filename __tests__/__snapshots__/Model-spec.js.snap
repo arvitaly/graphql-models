@@ -312,6 +312,54 @@ Array [
   Object {
     "attribute": Object {
       "model": undefined,
+      "name": "age",
+      "realName": "age",
+      "required": false,
+      "type": "integer",
+    },
+    "graphQLType": "Int",
+    "name": "ageGreaterThan",
+    "type": "greaterThan",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "age",
+      "realName": "age",
+      "required": false,
+      "type": "integer",
+    },
+    "graphQLType": "Int",
+    "name": "ageLessThan",
+    "type": "lessThan",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "age",
+      "realName": "age",
+      "required": false,
+      "type": "integer",
+    },
+    "graphQLType": "Int",
+    "name": "ageGreaterThanOrEqual",
+    "type": "greaterThanOrEqual",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "age",
+      "realName": "age",
+      "required": false,
+      "type": "integer",
+    },
+    "graphQLType": "Int",
+    "name": "ageLessThanOrEqual",
+    "type": "lessThanOrEqual",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
       "name": "Weight",
       "realName": "Weight",
       "required": false,
@@ -384,6 +432,54 @@ Array [
   Object {
     "attribute": Object {
       "model": undefined,
+      "name": "Weight",
+      "realName": "Weight",
+      "required": false,
+      "type": "float",
+    },
+    "graphQLType": "Float",
+    "name": "WeightGreaterThan",
+    "type": "greaterThan",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "Weight",
+      "realName": "Weight",
+      "required": false,
+      "type": "float",
+    },
+    "graphQLType": "Float",
+    "name": "WeightLessThan",
+    "type": "lessThan",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "Weight",
+      "realName": "Weight",
+      "required": false,
+      "type": "float",
+    },
+    "graphQLType": "Float",
+    "name": "WeightGreaterThanOrEqual",
+    "type": "greaterThanOrEqual",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "Weight",
+      "realName": "Weight",
+      "required": false,
+      "type": "float",
+    },
+    "graphQLType": "Float",
+    "name": "WeightLessThanOrEqual",
+    "type": "lessThanOrEqual",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
       "name": "birthday",
       "realName": "birthday",
       "required": false,
@@ -452,6 +548,54 @@ Array [
     "graphQLType": "Boolean",
     "name": "birthdayIsNotNull",
     "type": "isNotNull",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "birthday",
+      "realName": "birthday",
+      "required": false,
+      "type": "date",
+    },
+    "graphQLType": "String",
+    "name": "birthdayGreaterThan",
+    "type": "greaterThan",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "birthday",
+      "realName": "birthday",
+      "required": false,
+      "type": "date",
+    },
+    "graphQLType": "String",
+    "name": "birthdayLessThan",
+    "type": "lessThan",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "birthday",
+      "realName": "birthday",
+      "required": false,
+      "type": "date",
+    },
+    "graphQLType": "String",
+    "name": "birthdayGreaterThanOrEqual",
+    "type": "greaterThanOrEqual",
+  },
+  Object {
+    "attribute": Object {
+      "model": undefined,
+      "name": "birthday",
+      "realName": "birthday",
+      "required": false,
+      "type": "date",
+    },
+    "graphQLType": "String",
+    "name": "birthdayLessThanOrEqual",
+    "type": "lessThanOrEqual",
   },
   Object {
     "attribute": Object {
@@ -1986,6 +2130,42 @@ Object {
                         "field": Object {
                           "defaultValue": undefined,
                           "description": undefined,
+                          "name": "ageGreaterThan",
+                          "type": "Int",
+                        },
+                        "name": "ageGreaterThan",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "ageLessThan",
+                          "type": "Int",
+                        },
+                        "name": "ageLessThan",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "ageGreaterThanOrEqual",
+                          "type": "Int",
+                        },
+                        "name": "ageGreaterThanOrEqual",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "ageLessThanOrEqual",
+                          "type": "Int",
+                        },
+                        "name": "ageLessThanOrEqual",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
                           "name": "Weight",
                           "type": "Float",
                         },
@@ -2046,6 +2226,42 @@ Object {
                         "field": Object {
                           "defaultValue": undefined,
                           "description": undefined,
+                          "name": "WeightGreaterThan",
+                          "type": "Float",
+                        },
+                        "name": "WeightGreaterThan",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "WeightLessThan",
+                          "type": "Float",
+                        },
+                        "name": "WeightLessThan",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "WeightGreaterThanOrEqual",
+                          "type": "Float",
+                        },
+                        "name": "WeightGreaterThanOrEqual",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "WeightLessThanOrEqual",
+                          "type": "Float",
+                        },
+                        "name": "WeightLessThanOrEqual",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
                           "name": "birthday",
                           "type": "String",
                         },
@@ -2101,6 +2317,42 @@ Object {
                           "type": "Boolean",
                         },
                         "name": "birthdayIsNotNull",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "birthdayGreaterThan",
+                          "type": "String",
+                        },
+                        "name": "birthdayGreaterThan",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "birthdayLessThan",
+                          "type": "String",
+                        },
+                        "name": "birthdayLessThan",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "birthdayGreaterThanOrEqual",
+                          "type": "String",
+                        },
+                        "name": "birthdayGreaterThanOrEqual",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "birthdayLessThanOrEqual",
+                          "type": "String",
+                        },
+                        "name": "birthdayLessThanOrEqual",
                       },
                       Object {
                         "field": Object {
@@ -3182,6 +3434,42 @@ Object {
               "field": Object {
                 "defaultValue": undefined,
                 "description": undefined,
+                "name": "ageGreaterThan",
+                "type": "Int",
+              },
+              "name": "ageGreaterThan",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "ageLessThan",
+                "type": "Int",
+              },
+              "name": "ageLessThan",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "ageGreaterThanOrEqual",
+                "type": "Int",
+              },
+              "name": "ageGreaterThanOrEqual",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "ageLessThanOrEqual",
+                "type": "Int",
+              },
+              "name": "ageLessThanOrEqual",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
                 "name": "Weight",
                 "type": "Float",
               },
@@ -3242,6 +3530,42 @@ Object {
               "field": Object {
                 "defaultValue": undefined,
                 "description": undefined,
+                "name": "WeightGreaterThan",
+                "type": "Float",
+              },
+              "name": "WeightGreaterThan",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "WeightLessThan",
+                "type": "Float",
+              },
+              "name": "WeightLessThan",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "WeightGreaterThanOrEqual",
+                "type": "Float",
+              },
+              "name": "WeightGreaterThanOrEqual",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "WeightLessThanOrEqual",
+                "type": "Float",
+              },
+              "name": "WeightLessThanOrEqual",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
                 "name": "birthday",
                 "type": "String",
               },
@@ -3297,6 +3621,42 @@ Object {
                 "type": "Boolean",
               },
               "name": "birthdayIsNotNull",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "birthdayGreaterThan",
+                "type": "String",
+              },
+              "name": "birthdayGreaterThan",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "birthdayLessThan",
+                "type": "String",
+              },
+              "name": "birthdayLessThan",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "birthdayGreaterThanOrEqual",
+                "type": "String",
+              },
+              "name": "birthdayGreaterThanOrEqual",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "birthdayLessThanOrEqual",
+                "type": "String",
+              },
+              "name": "birthdayLessThanOrEqual",
             },
             Object {
               "field": Object {
