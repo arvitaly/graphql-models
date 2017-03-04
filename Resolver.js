@@ -136,9 +136,10 @@ class Resolver {
             }
             if (attr.type === AttributeTypes_1.default.Collection) {
                 const edges = row[attr.name].map((r) => {
+                    const node = this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo);
                     return {
-                        cursor: "",
-                        node: this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo),
+                        cursor: node.id,
+                        node,
                     };
                 });
                 row[attr.name] = {
@@ -175,9 +176,10 @@ class Resolver {
             }
             else {
                 const edges = rows.map((row) => {
+                    const node = this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(), opts.resolveInfo);
                     return {
-                        cursor: "",
-                        node: this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(), opts.resolveInfo),
+                        cursor: node.id,
+                        node,
                     };
                 });
                 result = {
