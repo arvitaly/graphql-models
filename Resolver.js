@@ -176,7 +176,7 @@ class Resolver {
             else {
                 const edges = rows.map((row) => {
                     return {
-                        cursor: null,
+                        cursor: "",
                         node: this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(), opts.resolveInfo),
                     };
                 });
