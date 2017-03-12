@@ -135,22 +135,35 @@ class Resolver {
                 row[attr.name] = this.resolveRow(attr.model, row[attr.name], field.fields, resolveInfo);
             }
             if (attr.type === AttributeTypes_1.default.Collection) {
-                const edges = row[attr.name].map((r) => {
-                    const node = this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo);
-                    return {
-                        cursor: node.id,
-                        node,
+                if (!row[attr.name] || row[attr.name].length === 0) {
+                    row[attr.name] = {
+                        edges: [],
+                        pageInfo: {
+                            hasNextPage: false,
+                            hasPreviousPage: false,
+                            endCursor: undefined,
+                            startCursor: undefined,
+                        },
                     };
-                });
-                row[attr.name] = {
-                    edges,
-                    pageInfo: {
-                        hasNextPage: false,
-                        hasPreviousPage: false,
-                        startCursor: edges[0].node.id,
-                        endCursor: edges[edges.length - 1].node.id,
-                    },
-                };
+                }
+                else {
+                    const edges = row[attr.name].map((r) => {
+                        const node = this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo);
+                        return {
+                            cursor: node.id,
+                            node,
+                        };
+                    });
+                    row[attr.name] = {
+                        edges,
+                        pageInfo: {
+                            hasNextPage: false,
+                            hasPreviousPage: false,
+                            startCursor: edges[0].node.id,
+                            endCursor: edges[edges.length - 1].node.id,
+                        },
+                    };
+                }
             }
         });
         row[_1.idArgName] = graphql_relay_1.toGlobalId(model.getNameForGlobalId(), row[model.getPrimaryKeyAttribute().realName]);
