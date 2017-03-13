@@ -21,12 +21,12 @@
   "dependencies": {
     "@types/graphql": "^0.8.2",
     "@types/graphql-relay": "^0.4.0",
-    "graphql": "^0.8.2",
+    "graphql": "^0.9.1",
     "graphql-fields-info": "^0.0.10",
-    "graphql-relay": "^0.4.4"
+    "graphql-relay": "^0.5.1"
   },
   "devDependencies": {
-    "@types/jest": "^18.1.1",
+    "@types/jest": "^19.2.1",
     "coveralls": "^2.11.16",
     "jest": "^19.0.2",
     "tslint": "^4.5.1",

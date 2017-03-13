@@ -1,4 +1,6 @@
 # graphql-models
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/arvitaly/graphql-models.svg)](https://greenkeeper.io/)
 Util for generate GraphQL-types from abstract models.
 
 [![Build Status](https://travis-ci.org/arvitaly/graphql-models.svg?branch=master)](https://travis-ci.org/arvitaly/graphql-models)
