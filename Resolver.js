@@ -87,6 +87,9 @@ class Resolver {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, type } = graphql_relay_1.fromGlobalId(opts.source);
             const modelId = type.replace(/Type$/gi, "").toLowerCase();
+            if (opts.context && opts.context.subscriptionId) {
+                this.subscribeOne(opts.context.subscriptionId, modelId, opts.source, opts);
+            }
             return this.resolveOne(modelId, opts.source, opts.resolveInfo.getNodeFields(), opts.resolveInfo);
         });
     }

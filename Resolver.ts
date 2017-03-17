@@ -101,6 +101,9 @@ class Resolver {
     public async resolveNode(_: ModelID, opts: ResolveOpts) {
         const { id, type } = fromGlobalId(opts.source);
         const modelId = type.replace(/Type$/gi, "").toLowerCase();
+        if (opts.context && opts.context.subscriptionId) {
+            this.subscribeOne(opts.context.subscriptionId, modelId, opts.source, opts);
+        }
         return this.resolveOne(modelId, opts.source, opts.resolveInfo.getNodeFields(), opts.resolveInfo);
     }
     public async resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
