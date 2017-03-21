@@ -419,7 +419,14 @@ class Resolver {
         if (args.where) {
             criteria.where = Object.keys(args.where).map((whereArgName) => {
                 const arg = Object.assign({}, whereArguments.find((w) => w.name === whereArgName));
-                arg.value = args.where[whereArgName];
+                switch (arg.attribute.type) {
+                    case AttributeTypes.Date:
+                        arg.value = new Date(args.where[whereArgName]);
+                        break;
+                    default:
+                        arg.value = args.where[whereArgName];
+                }
+
                 return arg;
             });
         }
