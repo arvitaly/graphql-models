@@ -253,6 +253,8 @@ class Resolver {
                         updating[arg.attribute.name] = new Date(arg.value[arg.attribute.name]);
                     } else if (arg.attribute.type === AttributeTypes.JSON) {
                         updating[arg.attribute.name] = JSON.parse(arg.value[arg.attribute.name]);
+                    } else if (arg.attribute.type === AttributeTypes.ID) {
+                        updating[arg.attribute.name] = fromGlobalId(arg.value[arg.attribute.name]);
                     } else {
                         updating[arg.attribute.name] = arg.value[arg.attribute.name];
                     }
@@ -327,6 +329,8 @@ class Resolver {
                 creating[arg.attribute.name] = new Date(arg.value);
             } else if (arg.attribute.type === AttributeTypes.JSON) {
                 creating[arg.attribute.name] = JSON.parse(arg.value);
+            } else if (arg.attribute.type === AttributeTypes.ID) {
+                creating[arg.attribute.name] = fromGlobalId(arg.value).id;
             } else {
                 creating[arg.attribute.name] = arg.value;
             }
@@ -422,6 +426,9 @@ class Resolver {
                 switch (arg.attribute.type) {
                     case AttributeTypes.Date:
                         arg.value = new Date(args.where[whereArgName]);
+                        break;
+                    case AttributeTypes.ID:
+                        arg.value = fromGlobalId(args.where[whereArgName]);
                         break;
                     default:
                         arg.value = args.where[whereArgName];

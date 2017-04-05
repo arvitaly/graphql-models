@@ -246,6 +246,9 @@ class Resolver {
                         else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
                             updating[arg.attribute.name] = JSON.parse(arg.value[arg.attribute.name]);
                         }
+                        else if (arg.attribute.type === AttributeTypes_1.default.ID) {
+                            updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value[arg.attribute.name]);
+                        }
                         else {
                             updating[arg.attribute.name] = arg.value[arg.attribute.name];
                         }
@@ -314,6 +317,9 @@ class Resolver {
                 }
                 else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
                     creating[arg.attribute.name] = JSON.parse(arg.value);
+                }
+                else if (arg.attribute.type === AttributeTypes_1.default.ID) {
+                    creating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value).id;
                 }
                 else {
                     creating[arg.attribute.name] = arg.value;
@@ -406,6 +412,9 @@ class Resolver {
                 switch (arg.attribute.type) {
                     case AttributeTypes_1.default.Date:
                         arg.value = new Date(args.where[whereArgName]);
+                        break;
+                    case AttributeTypes_1.default.ID:
+                        arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]);
                         break;
                     default:
                         arg.value = args.where[whereArgName];
