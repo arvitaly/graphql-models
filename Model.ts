@@ -593,7 +593,7 @@ export const whereArgHelpers: {
             stringFunctions.map((f) => {
                 types.push({
                     name: attr.name + capitalize(f),
-                    type: GraphQLString,
+                    type: GraphQLJSON,
                     argumentType: f,
                 });
             });
@@ -626,7 +626,7 @@ export const whereArgHelpers: {
             numberFunctions.map((f) => {
                 types.push({
                     name: attr.name + capitalize(f),
-                    type: GraphQLString,
+                    type: GraphQLDate,
                     argumentType: f,
                 });
             });

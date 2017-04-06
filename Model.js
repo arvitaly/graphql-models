@@ -556,7 +556,7 @@ exports.whereArgHelpers = {
         stringFunctions.map((f) => {
             types.push({
                 name: attr.name + capitalize(f),
-                type: graphql_1.GraphQLString,
+                type: JSON_1.default,
                 argumentType: f,
             });
         });
@@ -589,7 +589,7 @@ exports.whereArgHelpers = {
         numberFunctions.map((f) => {
             types.push({
                 name: attr.name + capitalize(f),
-                type: graphql_1.GraphQLString,
+                type: Date_1.default,
                 argumentType: f,
             });
         });
