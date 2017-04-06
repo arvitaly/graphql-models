@@ -26,10 +26,10 @@ exports.default = new graphql_1.GraphQLScalarType({
         if (isNaN(result.getTime())) {
             throw new error_1.GraphQLError("Query error: Invalid date " + ast.value, [ast]);
         }
-        if (ast.value !== result.toJSON() && ast.value !== result.toUTCString()) {
+        if (ast.value !== result.toJSON() && ast.value !== result.toUTCString() && ast.value !== result.toString()) {
             throw new error_1.GraphQLError("Query error: Invalid date format " +
                 ast.value
-                + " , only accepts: YYYY-MM-DDTHH:MM:SS.SSSZ or UTC", [ast]);
+                + " , only accepts: YYYY-MM-DDTHH:MM:SS.SSSZ or UTC or local UTC", [ast]);
         }
         return result;
     },
