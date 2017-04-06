@@ -5,7 +5,8 @@ import { Kind } from "graphql/language";
 function coerceDate(value) {
     if (!(value instanceof Date)) {
         // Is this how you raise a 'field error'?
-        throw new Error("Field error: value is not an instance of Date");
+        // throw new Error("Field error: value is not an instance of Date");
+        value = new Date(value);
     }
     if (isNaN(value.getTime())) {
         throw new Error("Field error: value is an invalid Date");
