@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_1 = require("graphql");
-const Date_1 = require("./scalars/Date");
-const JSON_1 = require("./scalars/JSON");
 const graphql_fields_info_1 = require("graphql-fields-info");
 const graphql_relay_1 = require("graphql-relay");
 const _1 = require(".");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
 const ResolveTypes_1 = require("./ResolveTypes");
+const Date_1 = require("./scalars/Date");
+const JSON_1 = require("./scalars/JSON");
 class Model {
     constructor(config, collector, opts = {}) {
         this.config = config;

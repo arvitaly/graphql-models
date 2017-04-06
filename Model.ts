@@ -16,8 +16,6 @@ import {
     GraphQLScalarType,
     GraphQLString,
 } from "graphql";
-import GraphQLDate from "./scalars/Date";
-import GraphQLJSON from "./scalars/JSON";
 import { fromResolveInfo } from "graphql-fields-info";
 import {
     connectionArgs, connectionDefinitions,
@@ -30,6 +28,8 @@ import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import ResolveTypes from "./ResolveTypes";
+import GraphQLDate from "./scalars/Date";
+import GraphQLJSON from "./scalars/JSON";
 import {
     Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute,
     ModelAttribute, ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
