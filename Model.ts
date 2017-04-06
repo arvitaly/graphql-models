@@ -16,6 +16,8 @@ import {
     GraphQLScalarType,
     GraphQLString,
 } from "graphql";
+import GraphQLDate from "./scalars/Date";
+import GraphQLJSON from "./scalars/JSON";
 import { fromResolveInfo } from "graphql-fields-info";
 import {
     connectionArgs, connectionDefinitions,
@@ -536,7 +538,11 @@ export function scalarTypeToGraphQL(type: AttributeType): GraphQLScalarType {
             graphQLType = GraphQLID;
             break;
         case AttributeTypes.JSON:
+            graphQLType = GraphQLJSON;
+            break;
         case AttributeTypes.Date:
+            graphQLType = GraphQLDate;
+            break;
         case AttributeTypes.String:
             graphQLType = GraphQLString;
             break;

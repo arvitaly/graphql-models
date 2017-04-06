@@ -125,12 +125,6 @@ class Resolver {
             if (typeof (row[attr.name]) === "undefined") {
                 return;
             }
-            if (attr.type === AttributeTypes_1.default.Date) {
-                row[attr.name] = new Date(row[attr.name]).toUTCString();
-            }
-            if (attr.type === AttributeTypes_1.default.JSON) {
-                row[attr.name] = JSON.stringify(row[attr.name]);
-            }
             if (attr.realName === "id") {
                 row._id = row.id;
             }
@@ -240,13 +234,7 @@ class Resolver {
             }).map((arg) => __awaiter(this, void 0, void 0, function* () {
                 switch (arg.type) {
                     case ArgumentTypes_1.default.UpdateSetter:
-                        if (arg.attribute.type === AttributeTypes_1.default.Date) {
-                            updating[arg.attribute.name] = new Date(arg.value[arg.attribute.name]);
-                        }
-                        else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
-                            updating[arg.attribute.name] = JSON.parse(arg.value[arg.attribute.name]);
-                        }
-                        else if (arg.attribute.type === AttributeTypes_1.default.ID) {
+                        if (arg.attribute.type === AttributeTypes_1.default.ID) {
                             updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value[arg.attribute.name]);
                         }
                         else if (arg.attribute.type === AttributeTypes_1.default.Model) {
@@ -324,13 +312,7 @@ class Resolver {
                     case ArgumentTypes_1.default.CreateSubCollection:
                         break;
                     default:
-                        if (arg.attribute.type === AttributeTypes_1.default.Date) {
-                            creating[arg.attribute.name] = new Date(arg.value);
-                        }
-                        else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
-                            creating[arg.attribute.name] = JSON.parse(arg.value);
-                        }
-                        else if (arg.attribute.type === AttributeTypes_1.default.ID) {
+                        if (arg.attribute.type === AttributeTypes_1.default.ID) {
                             creating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value).id;
                         }
                         else if (arg.attribute.type === AttributeTypes_1.default.Model) {
@@ -429,9 +411,6 @@ class Resolver {
             criteria.where = Object.keys(args.where).map((whereArgName) => {
                 const arg = Object.assign({}, whereArguments.find((w) => w.name === whereArgName));
                 switch (arg.attribute.type) {
-                    case AttributeTypes_1.default.Date:
-                        arg.value = new Date(args.where[whereArgName]);
-                        break;
                     case AttributeTypes_1.default.ID:
                         arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]).id;
                         break;

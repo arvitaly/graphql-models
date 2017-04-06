@@ -99,7 +99,9 @@ Object {
         "id": "QW5pbWFsOjE=",
         "isCat": false,
         "name": "Rex",
-        "some": "{\\"test\\":\\"Duck\\"}",
+        "some": Object {
+          "test": "Duck",
+        },
       },
     },
   },
@@ -121,7 +123,9 @@ Object {
                 "id": "QW5pbWFsOjE=",
                 "isCat": false,
                 "name": "Rex",
-                "some": "{\\"test\\":\\"Duck\\"}",
+                "some": Object {
+                  "test": "Duck",
+                },
               },
             },
             Object {
@@ -132,7 +136,9 @@ Object {
                 "id": "QW5pbWFsOjI=",
                 "isCat": false,
                 "name": "Felix",
-                "some": "{\\"test\\":\\"Mickey\\"}",
+                "some": Object {
+                  "test": "Mickey",
+                },
               },
             },
             Object {
@@ -143,7 +149,9 @@ Object {
                 "id": "QW5pbWFsOjM=",
                 "isCat": false,
                 "name": "Jeck",
-                "some": "{\\"test\\":\\"Luk\\"}",
+                "some": Object {
+                  "test": "Luk",
+                },
               },
             },
           ],
@@ -160,7 +168,9 @@ Object {
                   "id": "QW5pbWFsOjI=",
                   "isCat": false,
                   "name": "Felix",
-                  "some": "{\\"test\\":\\"Mickey\\"}",
+                  "some": Object {
+                    "test": "Mickey",
+                  },
                 },
               },
               Object {
@@ -171,7 +181,9 @@ Object {
                   "id": "QW5pbWFsOjM=",
                   "isCat": false,
                   "name": "Jeck",
-                  "some": "{\\"test\\":\\"Luk\\"}",
+                  "some": Object {
+                    "test": "Luk",
+                  },
                 },
               },
               Object {
@@ -182,7 +194,9 @@ Object {
                   "id": "QW5pbWFsOjQ=",
                   "isCat": false,
                   "name": "Morph",
-                  "some": "{\\"test\\":\\"Pussy\\"}",
+                  "some": Object {
+                    "test": "Pussy",
+                  },
                 },
               },
             ],

@@ -12,3 +12,5 @@ export const sortArgName = "sort";
 export const whereArgName = "where";
 export const idArgName = "id";
 export const inputArgName = "input";
+export { default as GraphQLDate } from "./scalars/Date";
+export { default as GraphQLJSON } from "./scalars/JSON";

@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_1 = require("graphql");
+const Date_1 = require("./scalars/Date");
+const JSON_1 = require("./scalars/JSON");
 const graphql_fields_info_1 = require("graphql-fields-info");
 const graphql_relay_1 = require("graphql-relay");
 const _1 = require(".");
@@ -503,7 +505,11 @@ function scalarTypeToGraphQL(type) {
             graphQLType = graphql_1.GraphQLID;
             break;
         case AttributeTypes_1.default.JSON:
+            graphQLType = JSON_1.default;
+            break;
         case AttributeTypes_1.default.Date:
+            graphQLType = Date_1.default;
+            break;
         case AttributeTypes_1.default.String:
             graphQLType = graphql_1.GraphQLString;
             break;

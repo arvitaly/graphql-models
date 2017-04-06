@@ -136,12 +136,6 @@ class Resolver {
             if (typeof (row[attr.name]) === "undefined") {
                 return;
             }
-            if (attr.type === AttributeTypes.Date) {
-                row[attr.name] = new Date(row[attr.name]).toUTCString();
-            }
-            if (attr.type === AttributeTypes.JSON) {
-                row[attr.name] = JSON.stringify(row[attr.name]);
-            }
             if (attr.realName === "id") {
                 row._id = row.id;
             }
@@ -249,11 +243,7 @@ class Resolver {
         }).map(async (arg) => {
             switch (arg.type) {
                 case ArgumentTypes.UpdateSetter:
-                    if (arg.attribute.type === AttributeTypes.Date) {
-                        updating[arg.attribute.name] = new Date(arg.value[arg.attribute.name]);
-                    } else if (arg.attribute.type === AttributeTypes.JSON) {
-                        updating[arg.attribute.name] = JSON.parse(arg.value[arg.attribute.name]);
-                    } else if (arg.attribute.type === AttributeTypes.ID) {
+                    if (arg.attribute.type === AttributeTypes.ID) {
                         updating[arg.attribute.name] = fromGlobalId(arg.value[arg.attribute.name]);
                     } else if (arg.attribute.type === AttributeTypes.Model) {
                         updating[arg.attribute.name] = fromGlobalId(arg.value[arg.attribute.name]);
@@ -335,11 +325,7 @@ class Resolver {
                 case ArgumentTypes.CreateSubCollection:
                     break;
                 default:
-                    if (arg.attribute.type === AttributeTypes.Date) {
-                        creating[arg.attribute.name] = new Date(arg.value);
-                    } else if (arg.attribute.type === AttributeTypes.JSON) {
-                        creating[arg.attribute.name] = JSON.parse(arg.value);
-                    } else if (arg.attribute.type === AttributeTypes.ID) {
+                    if (arg.attribute.type === AttributeTypes.ID) {
                         creating[arg.attribute.name] = fromGlobalId(arg.value).id;
                     } else if (arg.attribute.type === AttributeTypes.Model) {
                         creating[arg.attribute.name] = fromGlobalId(arg.value).id;
@@ -439,9 +425,6 @@ class Resolver {
             criteria.where = Object.keys(args.where).map((whereArgName) => {
                 const arg = Object.assign({}, whereArguments.find((w) => w.name === whereArgName));
                 switch (arg.attribute.type) {
-                    case AttributeTypes.Date:
-                        arg.value = new Date(args.where[whereArgName]);
-                        break;
                     case AttributeTypes.ID:
                         arg.value = fromGlobalId(args.where[whereArgName]).id;
                         break;
