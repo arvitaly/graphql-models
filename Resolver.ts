@@ -443,10 +443,10 @@ class Resolver {
                         arg.value = new Date(args.where[whereArgName]);
                         break;
                     case AttributeTypes.ID:
-                        arg.value = fromGlobalId(args.where[whereArgName]);
+                        arg.value = fromGlobalId(args.where[whereArgName]).id;
                         break;
                     case AttributeTypes.Model:
-                        arg.value = fromGlobalId(args.where[whereArgName]);
+                        arg.value = fromGlobalId(args.where[whereArgName]).id;
                         break;
                     case AttributeTypes.Collection:
                         arg.value = args.where[whereArgName].map((v) => fromGlobalId(v).id);

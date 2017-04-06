@@ -433,10 +433,10 @@ class Resolver {
                         arg.value = new Date(args.where[whereArgName]);
                         break;
                     case AttributeTypes_1.default.ID:
-                        arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]);
+                        arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]).id;
                         break;
                     case AttributeTypes_1.default.Model:
-                        arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]);
+                        arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]).id;
                         break;
                     case AttributeTypes_1.default.Collection:
                         arg.value = args.where[whereArgName].map((v) => graphql_relay_1.fromGlobalId(v).id);
