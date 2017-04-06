@@ -36,6 +36,7 @@ class Model {
     public id: string;
     public name: string;
     public queryName: string;
+    public connectionName: string;
     public attributes: Attribute[];
     protected primaryKeyAttribute: Attribute;
     protected baseType: GraphQLObjectType;
@@ -52,6 +53,7 @@ class Model {
         this.resolveFn = this.opts.resolveFn;
         this.name = this.config.name || capitalize(this.config.id);
         this.queryName = uncapitalize(this.name);
+        this.connectionName = uncapitalize(this.name) + "s";
         this.id = this.config.id;
         let idAttr: Attribute;
         this.attributes = this.config.attributes.map((attrConfig) => {
@@ -171,7 +173,7 @@ class Model {
             field: this.getQueryOne(),
         });
         queries.push({
-            name: uncapitalize(this.name) + "s",
+            name: this.connectionName,
             field: this.getConnectionQuery(),
         });
         return queries;
@@ -245,7 +247,7 @@ class Model {
     }
     public getUpdateManyMutation() {
         const outputFields: GraphQLFieldConfigMap<any, any> = {};
-        outputFields[uncapitalize(this.name) + "s"] = {
+        outputFields[this.connectionName] = {
             type: new GraphQLList(this.getBaseType()),
         };
         const inputFields: GraphQLInputFieldConfigMap = {};

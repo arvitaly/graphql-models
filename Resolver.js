@@ -176,7 +176,7 @@ class Resolver {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.collection.get(modelId);
             const findCriteria = this.argsToFindCriteria(modelId, opts.args);
-            const fields = opts.resolveInfo.getQueryConnectionFields(model.id + "s");
+            const fields = opts.resolveInfo.getQueryConnectionFields(model.connectionName);
             const rows = yield this.adapter.findMany(modelId, findCriteria, this.getPopulates(modelId, fields));
             let result;
             if (!rows || rows.length === 0) {
@@ -192,7 +192,7 @@ class Resolver {
             }
             else {
                 const edges = rows.map((row) => {
-                    const node = this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(model.id + "s"), opts.resolveInfo);
+                    const node = this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(model.connectionName), opts.resolveInfo);
                     return {
                         cursor: node.id,
                         node,

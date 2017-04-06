@@ -186,7 +186,7 @@ class Resolver {
     public async resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
         const model = this.collection.get(modelId);
         const findCriteria: FindCriteria = this.argsToFindCriteria(modelId, opts.args);
-        const fields = opts.resolveInfo.getQueryConnectionFields(model.id + "s");
+        const fields = opts.resolveInfo.getQueryConnectionFields(model.connectionName);
         const rows = await this.adapter.findMany(modelId, findCriteria, this.getPopulates(modelId, fields));
         let result: Connection<any>;
         if (!rows || rows.length === 0) {
@@ -202,7 +202,7 @@ class Resolver {
         } else {
             const edges = rows.map((row) => {
                 const node = this.resolveRow(modelId, row,
-                    opts.resolveInfo.getQueryConnectionFields(model.id + "s"), opts.resolveInfo);
+                    opts.resolveInfo.getQueryConnectionFields(model.connectionName), opts.resolveInfo);
                 return {
                     cursor: node.id,
                     node,
