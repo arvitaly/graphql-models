@@ -436,7 +436,20 @@ class Resolver {
                         arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]).id;
                         break;
                     case AttributeTypes_1.default.Model:
-                        arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]).id;
+                        switch (arg.type) {
+                            case ArgumentTypes_1.default.IsNull:
+                            case ArgumentTypes_1.default.IsNotNull:
+                                arg.value = args.where[whereArgName];
+                                break;
+                            case ArgumentTypes_1.default.In:
+                            case ArgumentTypes_1.default.NotIn:
+                                arg.value = args.where[whereArgName].map((v) => graphql_relay_1.fromGlobalId(v).id);
+                                break;
+                            case ArgumentTypes_1.default.Equal:
+                            case ArgumentTypes_1.default.NotEqual:
+                            default:
+                                arg.value = graphql_relay_1.fromGlobalId(args.where[whereArgName]).id;
+                        }
                         break;
                     case AttributeTypes_1.default.Collection:
                         arg.value = args.where[whereArgName].map((v) => graphql_relay_1.fromGlobalId(v).id);
