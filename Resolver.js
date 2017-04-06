@@ -249,6 +249,12 @@ class Resolver {
                         else if (arg.attribute.type === AttributeTypes_1.default.ID) {
                             updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value[arg.attribute.name]);
                         }
+                        else if (arg.attribute.type === AttributeTypes_1.default.Model) {
+                            updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value[arg.attribute.name]);
+                        }
+                        else if (arg.attribute.type === AttributeTypes_1.default.Collection) {
+                            updating[arg.attribute.name] = arg.value[arg.attribute.name].map((v) => graphql_relay_1.fromGlobalId(v).id);
+                        }
                         else {
                             updating[arg.attribute.name] = arg.value[arg.attribute.name];
                         }
@@ -289,7 +295,7 @@ class Resolver {
                 const childModel = arg.attribute.model;
                 return {
                     name: arg.attribute.name,
-                    value: graphql_relay_1.fromGlobalId(yield this.createOne(childModel, arg.value)).id,
+                    value: yield this.createOne(childModel, arg.value),
                     attribute: arg.attribute,
                     type: ArgumentTypes_1.default.CreateArgument,
                     graphQLType: null,
@@ -299,7 +305,7 @@ class Resolver {
             const subcollections = yield Promise.all(createArgs.filter((arg) => arg.type === ArgumentTypes_1.default.CreateSubCollection).map((arg) => __awaiter(this, void 0, void 0, function* () {
                 const childModel = arg.attribute.model;
                 const ids = yield Promise.all(arg.value.map((row) => __awaiter(this, void 0, void 0, function* () {
-                    return graphql_relay_1.fromGlobalId(yield this.createOne(childModel, row)).id;
+                    return yield this.createOne(childModel, row);
                 })));
                 return {
                     name: arg.attribute.name,
@@ -312,17 +318,30 @@ class Resolver {
             createArgs = createArgs.concat(subcollections);
             const creating = {};
             createArgs.map((arg) => {
-                if (arg.attribute.type === AttributeTypes_1.default.Date) {
-                    creating[arg.attribute.name] = new Date(arg.value);
-                }
-                else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
-                    creating[arg.attribute.name] = JSON.parse(arg.value);
-                }
-                else if (arg.attribute.type === AttributeTypes_1.default.ID) {
-                    creating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value).id;
-                }
-                else {
-                    creating[arg.attribute.name] = arg.value;
+                switch (arg.type) {
+                    case ArgumentTypes_1.default.CreateSubModel:
+                        break;
+                    case ArgumentTypes_1.default.CreateSubCollection:
+                        break;
+                    default:
+                        if (arg.attribute.type === AttributeTypes_1.default.Date) {
+                            creating[arg.attribute.name] = new Date(arg.value);
+                        }
+                        else if (arg.attribute.type === AttributeTypes_1.default.JSON) {
+                            creating[arg.attribute.name] = JSON.parse(arg.value);
+                        }
+                        else if (arg.attribute.type === AttributeTypes_1.default.ID) {
+                            creating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value).id;
+                        }
+                        else if (arg.attribute.type === AttributeTypes_1.default.Model) {
+                            creating[arg.attribute.name] = graphql_relay_1.fromGlobalId(arg.value).id;
+                        }
+                        else if (arg.attribute.type === AttributeTypes_1.default.Collection) {
+                            creating[arg.attribute.name] = arg.value.map((v) => graphql_relay_1.fromGlobalId(v).id);
+                        }
+                        else {
+                            creating[arg.attribute.name] = arg.value;
+                        }
                 }
             });
             const created = yield this.adapter.createOne(modelId, creating);

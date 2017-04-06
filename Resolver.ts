@@ -255,6 +255,10 @@ class Resolver {
                         updating[arg.attribute.name] = JSON.parse(arg.value[arg.attribute.name]);
                     } else if (arg.attribute.type === AttributeTypes.ID) {
                         updating[arg.attribute.name] = fromGlobalId(arg.value[arg.attribute.name]);
+                    } else if (arg.attribute.type === AttributeTypes.Model) {
+                        updating[arg.attribute.name] = fromGlobalId(arg.value[arg.attribute.name]);
+                    } else if (arg.attribute.type === AttributeTypes.Collection) {
+                        updating[arg.attribute.name] = arg.value[arg.attribute.name].map((v) => fromGlobalId(v).id);
                     } else {
                         updating[arg.attribute.name] = arg.value[arg.attribute.name];
                     }
@@ -299,7 +303,7 @@ class Resolver {
                 const childModel = arg.attribute.model;
                 return {
                     name: arg.attribute.name,
-                    value: fromGlobalId(await this.createOne(childModel, arg.value)).id,
+                    value: await this.createOne(childModel, arg.value),
                     attribute: arg.attribute,
                     type: ArgumentTypes.CreateArgument,
                     graphQLType: null,
@@ -311,7 +315,7 @@ class Resolver {
             createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async (arg) => {
                 const childModel = arg.attribute.model;
                 const ids = await Promise.all(arg.value.map(async (row) => {
-                    return fromGlobalId(await this.createOne(childModel, row)).id;
+                    return await this.createOne(childModel, row);
                 }));
                 return {
                     name: arg.attribute.name,
@@ -325,14 +329,25 @@ class Resolver {
         createArgs = createArgs.concat(subcollections);
         const creating: any = {};
         createArgs.map((arg) => {
-            if (arg.attribute.type === AttributeTypes.Date) {
-                creating[arg.attribute.name] = new Date(arg.value);
-            } else if (arg.attribute.type === AttributeTypes.JSON) {
-                creating[arg.attribute.name] = JSON.parse(arg.value);
-            } else if (arg.attribute.type === AttributeTypes.ID) {
-                creating[arg.attribute.name] = fromGlobalId(arg.value).id;
-            } else {
-                creating[arg.attribute.name] = arg.value;
+            switch (arg.type) {
+                case ArgumentTypes.CreateSubModel:
+                    break;
+                case ArgumentTypes.CreateSubCollection:
+                    break;
+                default:
+                    if (arg.attribute.type === AttributeTypes.Date) {
+                        creating[arg.attribute.name] = new Date(arg.value);
+                    } else if (arg.attribute.type === AttributeTypes.JSON) {
+                        creating[arg.attribute.name] = JSON.parse(arg.value);
+                    } else if (arg.attribute.type === AttributeTypes.ID) {
+                        creating[arg.attribute.name] = fromGlobalId(arg.value).id;
+                    } else if (arg.attribute.type === AttributeTypes.Model) {
+                        creating[arg.attribute.name] = fromGlobalId(arg.value).id;
+                    } else if (arg.attribute.type === AttributeTypes.Collection) {
+                        creating[arg.attribute.name] = arg.value.map((v) => fromGlobalId(v).id);
+                    } else {
+                        creating[arg.attribute.name] = arg.value;
+                    }
             }
         });
         const created = await this.adapter.createOne(modelId, creating);

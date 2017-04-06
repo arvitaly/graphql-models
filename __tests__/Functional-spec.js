@@ -198,10 +198,12 @@ describe("Functional tests", () => {
     it("mutation create", () => __awaiter(this, void 0, void 0, function* () {
         const result = yield graphql_1.graphql(graphqlSchema, `mutation M1{  
             createPost(input:{createAnimals:[
-                {name:"animal1", birthday:"${date1}"},
-                {name:"animal2"}], 
-                createOwner:{name:"user5", 
-                createPets:[{name:"pet1"}] } } ){
+                    {name:"animal1", birthday:"${date1}"},
+                    {name:"animal2"}], 
+                    createOwner:{name:"user5", 
+                        createPets:[{name:"pet1"}] 
+                    } 
+                } ){
                 post{
                     owner{
                         name
