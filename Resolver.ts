@@ -445,6 +445,12 @@ class Resolver {
                     case AttributeTypes.ID:
                         arg.value = fromGlobalId(args.where[whereArgName]);
                         break;
+                    case AttributeTypes.Model:
+                        arg.value = fromGlobalId(args.where[whereArgName]);
+                        break;
+                    case AttributeTypes.Collection:
+                        arg.value = args.where[whereArgName].map((v) => fromGlobalId(v).id);
+                        break;
                     default:
                         arg.value = args.where[whereArgName];
                 }
