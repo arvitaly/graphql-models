@@ -164,7 +164,7 @@ export function printField(field: GraphQLField<any, any>) {
         resolve: typeof (field.resolve),
         type: printGraphQLType(field.type),
     };
-};
+}
 export function printGraphQLSchema(schema: GraphQLSchema) {
     const queryType = schema.getQueryType();
     const mutationType = schema.getMutationType();
@@ -293,4 +293,4 @@ function _<T, F>(obj: { [index: string]: T }, cb: (field: T) => F): Array<{ name
             field: cb(obj[name]),
         };
     });
-};
+}

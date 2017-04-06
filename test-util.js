@@ -167,7 +167,6 @@ function printField(field) {
     };
 }
 exports.printField = printField;
-;
 function printGraphQLSchema(schema) {
     const queryType = schema.getQueryType();
     const mutationType = schema.getMutationType();
@@ -311,5 +310,4 @@ function _(obj, cb) {
         };
     });
 }
-;
 //# sourceMappingURL=test-util.js.map
