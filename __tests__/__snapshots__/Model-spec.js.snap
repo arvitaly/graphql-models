@@ -2055,7 +2055,7 @@ Object {
                           "name": "setIsCat",
                         },
                       ],
-                      "name": "CreateOrUpdateMutationUpdate",
+                      "name": "AnimalCreateOrUpdateMutationUpdate",
                       "type": "GraphQLInputObjectType",
                     },
                     "type": "GraphQLNonNull",
