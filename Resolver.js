@@ -12,6 +12,7 @@ const graphql_relay_1 = require("graphql-relay");
 const _1 = require(".");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
+const CreateDuplicateError_1 = require("./CreateDuplicateError");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Resolver {
     constructor(adapter, callbacks, publisher) {
@@ -75,6 +76,8 @@ class Resolver {
                 return this.resolveMutationCreate(modelId, opts);
             case ResolveTypes_1.default.MutationUpdate:
                 return this.resolveMutationUpdate(modelId, opts);
+            case ResolveTypes_1.default.MutationCreateOrUpdate:
+                return this.resolveMutationCreateOrUpdate(modelId, opts);
             default:
                 throw new Error("Unsupported resolve type: " + type);
         }
@@ -218,6 +221,43 @@ class Resolver {
                 clientMutationId: opts.args.clientMutationId,
                 [this.collection.get(modelId).queryName]: row,
             };
+        });
+    }
+    resolveMutationCreateOrUpdate(modelId, opts) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.collection.get(modelId);
+            try {
+                return yield this.resolveMutationCreate(modelId, {
+                    args: opts.args.create,
+                    attrName: opts.attrName,
+                    context: opts.context,
+                    info: opts.info,
+                    resolveInfo: opts.resolveInfo,
+                    source: opts.source,
+                });
+            }
+            catch (e) {
+                if (e instanceof CreateDuplicateError_1.default) {
+                    const result = yield this.adapter.findOrCreateOne(modelId, opts.args.create);
+                    if (!result) {
+                        throw new Error("Not found record for createOrUpdate");
+                    }
+                    const globalId = graphql_relay_1.toGlobalId(modelId, "" + result[model.getPrimaryKeyAttribute().realName]);
+                    const updated = Object.assign({}, opts.args.update);
+                    updated.id = globalId;
+                    return this.resolveMutationUpdate(modelId, {
+                        args: updated,
+                        attrName: opts.attrName,
+                        context: opts.context,
+                        info: opts.info,
+                        resolveInfo: opts.resolveInfo,
+                        source: opts.source,
+                    });
+                }
+                else {
+                    throw e;
+                }
+            }
         });
     }
     resolveMutationUpdate(modelId, opts) {

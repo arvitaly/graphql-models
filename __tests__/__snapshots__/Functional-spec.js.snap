@@ -1,5 +1,31 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Functional tests create or update mutation: animal 1`] = `
+Object {
+  "data": Object {
+    "createOrUpdateAnimal": Object {
+      "animal": Object {
+        "Weight": 1.5,
+        "id": "QW5pbWFsOjEw",
+      },
+    },
+  },
+}
+`;
+
+exports[`Functional tests create or update mutation: animal 2`] = `
+Object {
+  "data": Object {
+    "createOrUpdateAnimal": Object {
+      "animal": Object {
+        "Weight": 5.7,
+        "id": "QW5pbWFsOjEw",
+      },
+    },
+  },
+}
+`;
+
 exports[`Functional tests mutation create 1`] = `
 Object {
   "data": Object {

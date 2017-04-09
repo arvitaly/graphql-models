@@ -8,6 +8,7 @@ const ResolveTypes = {
     QueryOne: "queryOne",
     QueryConnection: "queryConnection",
     MutationCreate: "mutationCreate",
+    MutationCreateOrUpdate: "mutationCreateOrUpdate",
     MutationUpdate: "mutationUpdate",
     MutationUpdateMany: "mutationUpdateMany",
     MutationDelete: "mutationDelete",

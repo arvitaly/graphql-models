@@ -266,5 +266,26 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     }));
+    it("create or update mutation: animal", () => __awaiter(this, void 0, void 0, function* () {
+        const query = `mutation M1{
+            createOrUpdateAnimal(input:{
+                create:{
+                    name: "Hi",
+                    Weight: 1.5
+                }
+                update: {
+                    setWeight: {Weight: 5.7}
+                }
+            }){
+                animal{
+                    id
+                    Weight
+                }
+            }}`;
+        let result = yield graphql_1.graphql(graphqlSchema, query);
+        expect(result).toMatchSnapshot();
+        result = yield graphql_1.graphql(graphqlSchema, query);
+        expect(result).toMatchSnapshot();
+    }));
 });
 //# sourceMappingURL=Functional-spec.js.map

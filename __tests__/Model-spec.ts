@@ -232,6 +232,24 @@ describe("Model spec", () => {
                     resolveInfo: fromResolveInfo({} as any),
                 }]]);
         });
+        it("create or update mutation", async () => {
+            const createOrUpdateMutation = animalModel.getCreateOrUpdateMutation();
+            expect(printGraphQLFieldConfig(createOrUpdateMutation)).toMatchSnapshot();
+            const args = { clientMutationId: "6", input: { f1: "hello" } };
+            const result = { clientMutationId: "6", animal: { name: "m2" } };
+            resolveFn.and.returnValue(result);
+            const mutationResut = await createOrUpdateMutation.resolve("source", args, "f3", "f4" as any);
+            expect(mutationResut).toEqual(result);
+            expect(resolveFn.calls.allArgs()).toEqual([[
+                "animal",
+                ResolveTypes.MutationCreateOrUpdate, {
+                    args: args.input,
+                    source: null,
+                    context: "f3",
+                    info: "f4",
+                    resolveInfo: fromResolveInfo({} as any),
+                }]]);
+        });
         it("delete mutation", async () => {
             const deleteMutation = animalModel.getDeleteMutation();
             expect(printGraphQLFieldConfig(deleteMutation)).toMatchSnapshot();
@@ -254,11 +272,16 @@ describe("Model spec", () => {
             const getCreateMutationSpy = spyOn(animalModel, "getCreateMutation").and.returnValue("f1");
             const getUpdateMutationSpy = spyOn(animalModel, "getUpdateMutation").and.returnValue("f2");
             const getUpdateManyMutationSpy = spyOn(animalModel, "getUpdateManyMutation").and.returnValue("f3");
+            const getCreateOrUpdateManyMutationSpy = spyOn(animalModel,
+                "getCreateOrUpdateMutation").and.returnValue("f5");
             const getDeleteMutationSpy = spyOn(animalModel, "getDeleteMutation").and.returnValue("f4");
             const mutations = animalModel.getMutations();
             const expectedMutations = [{
                 name: "createAnimal",
                 field: animalModel.getCreateMutation(),
+            }, {
+                name: "createOrUpdateAnimal",
+                field: animalModel.getCreateOrUpdateMutation(),
             }, {
                 name: "updateAnimal",
                 field: animalModel.getUpdateMutation(),
@@ -273,6 +296,7 @@ describe("Model spec", () => {
             getCreateMutationSpy.and.callThrough();
             getUpdateMutationSpy.and.callThrough();
             getUpdateManyMutationSpy.and.callThrough();
+            getCreateOrUpdateManyMutationSpy.and.callThrough();
             getDeleteMutationSpy.and.callThrough();
         });
     });

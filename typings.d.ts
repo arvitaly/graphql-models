@@ -53,7 +53,9 @@ export type Attribute = AttributeConfig & {
 export interface GraphQLTypes {
     [modelName: string]: GraphQLObjectType;
 }
-export type ResolveType = "node" | "viewer" | "model" | "connection" | "queryOne" | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationUpdateMany" | "mutationDelete" | "subscriptionOne" | "subscriptionConnection";
+export type ResolveType = "node" | "viewer" | "model" | "connection" | "queryOne"
+    | "queryConnection" | "mutationCreate" | "mutationUpdate" | "mutationUpdateMany"
+    | "mutationDelete" | "subscriptionOne" | "subscriptionConnection" | "mutationCreateOrUpdate";
 export type ResolveOpts = GraphQLResolveArgs & {
     attrName?: string;
     resolveInfo: GraphQLFieldsInfo,

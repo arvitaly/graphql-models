@@ -256,4 +256,25 @@ describe("Functional tests", () => {
         }
         expect(result).toMatchSnapshot();
     });
+    it("create or update mutation: animal", async () => {
+        const query = `mutation M1{
+            createOrUpdateAnimal(input:{
+                create:{
+                    name: "Hi",
+                    Weight: 1.5
+                }
+                update: {
+                    setWeight: {Weight: 5.7}
+                }
+            }){
+                animal{
+                    id
+                    Weight
+                }
+            }}`;
+        let result = await graphql(graphqlSchema, query);
+        expect(result).toMatchSnapshot();
+        result = await graphql(graphqlSchema, query);
+        expect(result).toMatchSnapshot();
+    });
 });

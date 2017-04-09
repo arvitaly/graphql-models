@@ -1,5 +1,6 @@
 import Adapter from "./../Adapter";
 import ArgumentTypes from "./../ArgumentTypes";
+import CreateDuplicateError from "./../CreateDuplicateError";
 import Model from "./../Model";
 import Publisher from "./../Publisher";
 import { Callbacks, FindCriteria, ModelID, PopulateFields } from "./../typings";
@@ -53,6 +54,9 @@ export const data: { [index: string]: any[] } = {
 };
 export function createAnimal(row?: any) {
     const newId: number = data[animalsName][data[animalsName].length - 1].id + 1;
+    if (row.Weight && data[animalsName].find((a) => a.Weight === row.Weight)) {
+        throw new CreateDuplicateError("Weight is unique fields, and value " + row.Weight + " already exists");
+    }
     return Object.assign({
         id: newId,
         name: "Name" + newId,
@@ -100,6 +104,12 @@ export class DataAdapter extends Adapter {
         subscribers.filter((s) => {
             return s.type === "create" && s.model === modelId;
         }).map((s) => s.callback(newRow));
+    }
+    public findOrCreateOne(modelId, row) {
+        switch (modelId) {
+            case "animal":
+                return data[animalsName].find((row2) => row2.Weight === row.Weight);
+        }
     }
     public update(modelId, id: number, row) {
         const oldRow = data[modelId.toLowerCase() + "s"].find((r) => r.id === id);

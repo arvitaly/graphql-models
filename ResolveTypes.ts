@@ -6,6 +6,7 @@ const ResolveTypes = {
     QueryOne: "queryOne" as "queryOne",
     QueryConnection: "queryConnection" as "queryConnection",
     MutationCreate: "mutationCreate" as "mutationCreate",
+    MutationCreateOrUpdate: "mutationCreateOrUpdate" as "mutationCreateOrUpdate",
     MutationUpdate: "mutationUpdate" as "mutationUpdate",
     MutationUpdateMany: "mutationUpdateMany" as "mutationUpdateMany",
     MutationDelete: "mutationDelete" as "mutationDelete",

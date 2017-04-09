@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Adapter_1 = require("./../Adapter");
 const ArgumentTypes_1 = require("./../ArgumentTypes");
+const CreateDuplicateError_1 = require("./../CreateDuplicateError");
 const Publisher_1 = require("./../Publisher");
 const animalsName = "animals";
 const usersName = "users";
@@ -53,6 +54,9 @@ exports.data = {
 };
 function createAnimal(row) {
     const newId = exports.data[animalsName][exports.data[animalsName].length - 1].id + 1;
+    if (row.Weight && exports.data[animalsName].find((a) => a.Weight === row.Weight)) {
+        throw new CreateDuplicateError_1.default("Weight is unique fields, and value " + row.Weight + " already exists");
+    }
     return Object.assign({
         id: newId,
         name: "Name" + newId,
@@ -99,6 +103,12 @@ class DataAdapter extends Adapter_1.default {
         subscribers.filter((s) => {
             return s.type === "create" && s.model === modelId;
         }).map((s) => s.callback(newRow));
+    }
+    findOrCreateOne(modelId, row) {
+        switch (modelId) {
+            case "animal":
+                return exports.data[animalsName].find((row2) => row2.Weight === row.Weight);
+        }
     }
     update(modelId, id, row) {
         const oldRow = exports.data[modelId.toLowerCase() + "s"].find((r) => r.id === id);

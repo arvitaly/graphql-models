@@ -18,6 +18,7 @@ const ArgumentTypes = {
     GreaterThanOrEqual: "greaterThanOrEqual" as "greaterThanOrEqual",
     LessThanOrEqual: "lessThanOrEqual" as "lessThanOrEqual",
     CreateArgument: "createArgument" as "createArgument",
+    CreateOrUpdateArgument: "createOrUpdateArgument" as "createOrUpdateArgument",
     CreateSubModel: "createSubModel" as "createSubModel",
     CreateSubCollection: "createSubCollection" as "createSubCollection",
     UpdateSetter: "updateSetter" as "updateSetter",

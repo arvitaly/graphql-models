@@ -16,6 +16,9 @@ class Adapter {
     createOne(modelId, created) {
         throw new Error("Not implemented createOne");
     }
+    findOrCreateOne(modelId, created) {
+        throw new Error("Not implemented findOrCreateOne");
+    }
     updateOne(modelId, id, updated) {
         throw new Error("Not implemented updateOne");
     }

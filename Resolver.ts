@@ -6,6 +6,7 @@ import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
+import CreateDuplicateError from "./CreateDuplicateError";
 import Model from "./Model";
 import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
@@ -90,6 +91,8 @@ class Resolver {
                 return this.resolveMutationCreate(modelId, opts);
             case ResolveTypes.MutationUpdate:
                 return this.resolveMutationUpdate(modelId, opts);
+            case ResolveTypes.MutationCreateOrUpdate:
+                return this.resolveMutationCreateOrUpdate(modelId, opts);
             default:
                 throw new Error("Unsupported resolve type: " + type);
         }
@@ -229,6 +232,39 @@ class Resolver {
             clientMutationId: (opts.args as any).clientMutationId,
             [this.collection.get(modelId).queryName]: row,
         };
+    }
+    public async resolveMutationCreateOrUpdate(modelId: string, opts: ResolveOpts) {
+        const model = this.collection.get(modelId);
+        try {
+            return await this.resolveMutationCreate(modelId, {
+                args: opts.args.create,
+                attrName: opts.attrName,
+                context: opts.context,
+                info: opts.info,
+                resolveInfo: opts.resolveInfo,
+                source: opts.source,
+            });
+        } catch (e) {
+            if (e instanceof CreateDuplicateError) {
+                const result = await this.adapter.findOrCreateOne(modelId, opts.args.create);
+                if (!result) {
+                    throw new Error("Not found record for createOrUpdate");
+                }
+                const globalId = toGlobalId(modelId, "" + result[model.getPrimaryKeyAttribute().realName]);
+                const updated = Object.assign({}, opts.args.update);
+                updated.id = globalId;
+                return this.resolveMutationUpdate(modelId, {
+                    args: updated,
+                    attrName: opts.attrName,
+                    context: opts.context,
+                    info: opts.info,
+                    resolveInfo: opts.resolveInfo,
+                    source: opts.source,
+                });
+            } else {
+                throw e;
+            }
+        }
     }
     public async resolveMutationUpdate(modelId: string, opts: ResolveOpts) {
         const model = this.collection.get(modelId);

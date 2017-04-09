@@ -199,6 +199,37 @@ class Model {
             },
         });
     }
+    public getCreateOrUpdateMutation(): GraphQLFieldConfig<any, any> {
+        const outputFields: GraphQLFieldConfigMap<any, any> = {};
+        outputFields[uncapitalize(this.name)] = {
+            type: this.getBaseType(),
+        };
+        const updateFields = Object.assign({}, this.getUpdateType().getFields());
+        delete updateFields[idArgName];
+
+        return mutationWithClientMutationId({
+            name: this.name + "CreateOrUpdateMutation",
+            inputFields: {
+                create: {
+                    type: new GraphQLNonNull(this.getCreateType()),
+                },
+                update: {
+                    type: new GraphQLNonNull(new GraphQLInputObjectType({
+                        name: this.name + "CreateOrUpdateMutationUpdate",
+                        fields: updateFields,
+                    })),
+                },
+            },
+            outputFields,
+            mutateAndGetPayload: (object, context, info: GraphQLResolveInfo) => {
+                return this.resolveFn(this.id,
+                    ResolveTypes.MutationCreateOrUpdate, {
+                        source: null, args: object, context, info,
+                        resolveInfo: fromResolveInfo(info),
+                    });
+            },
+        });
+    }
     public getCreateType() {
         if (!this.createType) {
             this.createType = this.generateCreationType();
@@ -275,6 +306,10 @@ class Model {
         mutations.push({
             name: "create" + this.name,
             field: this.getCreateMutation(),
+        });
+        mutations.push({
+            name: "createOrUpdate" + this.name,
+            field: this.getCreateOrUpdateMutation(),
         });
         mutations.push({
             name: "update" + this.name,
