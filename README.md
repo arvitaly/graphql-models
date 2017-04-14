@@ -1,6 +1,5 @@
 # graphql-models
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/arvitaly/graphql-models.svg)](https://greenkeeper.io/)
 Util for generate GraphQL-types from abstract models.
 
 [![Build Status](https://travis-ci.org/arvitaly/graphql-models.svg?branch=master)](https://travis-ci.org/arvitaly/graphql-models)
@@ -95,8 +94,10 @@ For more examples, look https://github.com/arvitaly/graphql-models/blob/master/s
     primaryKey?: boolean | undefined;
 
 ## Suported attribute type
+    
+    type AttributeType = "id" | "string" | "integer" | "float" | "json" | "boolean" | "date" | "model" | "collection";
 
-    type AttributeType = "string" | "integer" | "float" | "boolean" | "date" | "model" | "collection";
+id -> `GraphQLID`
 
 string -> `GraphQLString`
 
@@ -104,9 +105,11 @@ integer -> `GraphQLInt`
 
 float -> `GraphQLFloat`
 
+json -> `GraphQLJSON` - own scalar type, https://github.com/arvitaly/graphql-models/blob/master/scalars/JSON.ts
+
 boolean -> `GraphQLBool`
 
-date -> `GraphQLString`
+date -> `GraphQLDate` - own scalar type, https://github.com/arvitaly/graphql-models/blob/master/scalars/Date.ts
 
 model -> `new GraphQLObjectType(...)`
 
@@ -223,5 +226,4 @@ All for primary-key type
 # Tests
 
     npm install
-    typings install
     npm test
