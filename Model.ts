@@ -363,6 +363,13 @@ class Model {
                     type: ArgumentTypes.CreateSubModel,
                     value: undefined,
                 });
+                args.push({
+                    attribute: attr,
+                    graphQLType: childModel.getCreateOrUpdateType(),
+                    name: "createOrUpdate" + capitalize(attr.name),
+                    type: ArgumentTypes.CreateOrUpdateSubModel,
+                    value: undefined,
+                });
             } else if (attr.type === AttributeTypes.Collection) {
                 const childModel = this.collector.get((attr as CollectionAttribute).model);
                 graphQLType = new GraphQLList(GraphQLID);

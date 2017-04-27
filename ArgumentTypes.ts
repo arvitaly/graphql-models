@@ -20,7 +20,9 @@ const ArgumentTypes = {
     CreateArgument: "createArgument" as "createArgument",
     CreateOrUpdateArgument: "createOrUpdateArgument" as "createOrUpdateArgument",
     CreateSubModel: "createSubModel" as "createSubModel",
+    CreateOrUpdateSubModel: "createOrUpdateSubModel" as "createOrUpdateSubModel",
     CreateSubCollection: "createSubCollection" as "createSubCollection",
+    CreateOrUpdateSubCollection: "createOrUpdateSubCollection" as "createOrUpdateSubCollection",
     UpdateSetter: "updateSetter" as "updateSetter",
 };
 export default ArgumentTypes;

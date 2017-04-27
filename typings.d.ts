@@ -86,7 +86,10 @@ export type Mutations = Array<Mutation>;
 export type WhereArgHelper = {
 
 }
-export type ArgumentType = "createArgument" | "createSubModel" | "createSubCollection" | "updateSetter" |
+export type ArgumentType = "createArgument"
+    | "createSubModel" | "createSubCollection"
+    | "createOrUpdateSubModel" | "createOrUpdateSubCollection"
+    | "updateSetter" |
     "equal" | "notEqual" | "isNull" | "isNotNull" | "in" | "notIn" | "contains" |
     "notContains" | "startsWith" | "notStartsWith" | "endsWith" | "notEndsWith" |
     "like" | "notLike" | "greaterThan" | "lessThan" | "greaterThanOrEqual" | "lessThanOrEqual";
