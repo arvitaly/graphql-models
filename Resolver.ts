@@ -233,6 +233,24 @@ class Resolver {
             [this.collection.get(modelId).queryName]: row,
         };
     }
+    public async createOrUpdateOne(modelId: string, args) {
+        const model = this.collection.get(modelId);
+        try {
+            return await this.createOne(modelId, Object.assign({}, args.create));
+        } catch (e) {
+            if (e instanceof CreateDuplicateError) {
+                const result = await this.adapter.findOrCreateOne(modelId, args.create);
+                if (!result) {
+                    throw new Error("Not found record for createOrUpdate");
+                }
+                const globalId = toGlobalId(modelId, "" + result[model.getPrimaryKeyAttribute().realName]);
+                const forUpdatings = Object.assign({}, args.update);
+                return await this.updateOne(modelId, forUpdatings);
+            } else {
+                throw e;
+            }
+        }
+    }
     public async resolveMutationCreateOrUpdate(modelId: string, opts: ResolveOpts) {
         const model = this.collection.get(modelId);
         try {
@@ -270,6 +288,17 @@ class Resolver {
         const model = this.collection.get(modelId);
         const argsForUpdate: any = Object.assign({}, opts.args);
         delete argsForUpdate.clientMutationId;
+
+        const globalId = await this.updateOne(modelId, argsForUpdate);
+        const row = await this.resolveOne(modelId, globalId,
+            opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
+        return {
+            clientMutationId: (opts.args as any).clientMutationId,
+            [this.collection.get(modelId).queryName]: row,
+        };
+    }
+    public async updateOne(modelId: string, argsForUpdate) {
+        const model = this.collection.get(modelId);
         const updating: any = {};
         let id;
         await Promise.all(Object.keys(argsForUpdate).map((updateArgName) => {
@@ -295,22 +324,19 @@ class Resolver {
                     ).id;
                     break;
                 case ArgumentTypes.CreateOrUpdateSubModel:
-                    try {
-                        await this.createOne(arg.attribute.model, arg.value.create);
-                    } catch (e) {
-                        const result = await this.adapter.findOrCreateOne(modelId, opts.args.create);
-                        if (!result) {
-                            throw new Error("Not found record for createOrUpdate");
-                        }
-                    }
                     updating[arg.attribute.name] = fromGlobalId(
-                        await this.create One(arg.attribute.model, arg.value),
+                        await this.createOrUpdateOne(arg.attribute.model, arg.value),
                     ).id;
                     break;
                 case ArgumentTypes.CreateSubCollection:
                     const childModel = arg.attribute.model;
                     updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {
                         return fromGlobalId(await this.createOne(childModel, v)).id;
+                    }));
+                    break;
+                case ArgumentTypes.CreateOrUpdateSubCollection:
+                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {
+                        return fromGlobalId(await this.createOrUpdateOne(arg.attribute.model, v)).id;
                     }));
                     break;
                 case ArgumentTypes.Equal:
@@ -321,14 +347,7 @@ class Resolver {
             }
         }));
         const updated = await this.adapter.updateOne(model.id, id, updating);
-
-        const row = await this.resolveOne(modelId,
-            toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]),
-            opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
-        return {
-            clientMutationId: (opts.args as any).clientMutationId,
-            [this.collection.get(modelId).queryName]: row,
-        };
+        return toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]);
     }
     public async createOne(modelId: string, args) {
         const model = this.collection.get(modelId);

@@ -223,6 +223,28 @@ class Resolver {
             };
         });
     }
+    createOrUpdateOne(modelId, args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.collection.get(modelId);
+            try {
+                return yield this.createOne(modelId, Object.assign({}, args.create));
+            }
+            catch (e) {
+                if (e instanceof CreateDuplicateError_1.default) {
+                    const result = yield this.adapter.findOrCreateOne(modelId, args.create);
+                    if (!result) {
+                        throw new Error("Not found record for createOrUpdate");
+                    }
+                    const globalId = graphql_relay_1.toGlobalId(modelId, "" + result[model.getPrimaryKeyAttribute().realName]);
+                    const forUpdatings = Object.assign({}, args.update);
+                    return yield this.updateOne(modelId, forUpdatings);
+                }
+                else {
+                    throw e;
+                }
+            }
+        });
+    }
     resolveMutationCreateOrUpdate(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.collection.get(modelId);
@@ -265,6 +287,17 @@ class Resolver {
             const model = this.collection.get(modelId);
             const argsForUpdate = Object.assign({}, opts.args);
             delete argsForUpdate.clientMutationId;
+            const globalId = yield this.updateOne(modelId, argsForUpdate);
+            const row = yield this.resolveOne(modelId, globalId, opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
+            return {
+                clientMutationId: opts.args.clientMutationId,
+                [this.collection.get(modelId).queryName]: row,
+            };
+        });
+    }
+    updateOne(modelId, argsForUpdate) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.collection.get(modelId);
             const updating = {};
             let id;
             yield Promise.all(Object.keys(argsForUpdate).map((updateArgName) => {
@@ -291,21 +324,17 @@ class Resolver {
                         updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(yield this.createOne(arg.attribute.model, arg.value)).id;
                         break;
                     case ArgumentTypes_1.default.CreateOrUpdateSubModel:
-                        try {
-                            yield this.createOne(arg.attribute.model, arg.value.create);
-                        }
-                        catch (e) {
-                            const result = yield this.adapter.findOrCreateOne(modelId, opts.args.create);
-                            if (!result) {
-                                throw new Error("Not found record for createOrUpdate");
-                            }
-                        }
-                        updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(yield this.create, One(arg.attribute.model, arg.value)).id;
+                        updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(yield this.createOrUpdateOne(arg.attribute.model, arg.value)).id;
                         break;
                     case ArgumentTypes_1.default.CreateSubCollection:
                         const childModel = arg.attribute.model;
                         updating[arg.attribute.name] = yield Promise.all(arg.value.map((v) => __awaiter(this, void 0, void 0, function* () {
                             return graphql_relay_1.fromGlobalId(yield this.createOne(childModel, v)).id;
+                        })));
+                        break;
+                    case ArgumentTypes_1.default.CreateOrUpdateSubCollection:
+                        updating[arg.attribute.name] = yield Promise.all(arg.value.map((v) => __awaiter(this, void 0, void 0, function* () {
+                            return graphql_relay_1.fromGlobalId(yield this.createOrUpdateOne(arg.attribute.model, v)).id;
                         })));
                         break;
                     case ArgumentTypes_1.default.Equal:
@@ -316,11 +345,7 @@ class Resolver {
                 }
             })));
             const updated = yield this.adapter.updateOne(model.id, id, updating);
-            const row = yield this.resolveOne(modelId, graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]), opts.resolveInfo.getMutationPayloadFields(), opts.resolveInfo);
-            return {
-                clientMutationId: opts.args.clientMutationId,
-                [this.collection.get(modelId).queryName]: row,
-            };
+            return graphql_relay_1.toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]);
         });
     }
     createOne(modelId, args) {
