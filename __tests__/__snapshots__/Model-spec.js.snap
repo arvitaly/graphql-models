@@ -1316,6 +1316,309 @@ Object {
               "field": Object {
                 "defaultValue": undefined,
                 "description": undefined,
+                "name": "createOrUpdatePets",
+                "type": Object {
+                  "of": Object {
+                    "description": undefined,
+                    "fields": Array [
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "create",
+                          "type": Object {
+                            "of": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "_id",
+                                    "type": "Int",
+                                  },
+                                  "name": "_id",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "name",
+                                    "type": Object {
+                                      "of": "String",
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "name",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "age",
+                                    "type": "Int",
+                                  },
+                                  "name": "age",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "Weight",
+                                    "type": "Float",
+                                  },
+                                  "name": "Weight",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "birthday",
+                                    "type": "Date",
+                                  },
+                                  "name": "birthday",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "some",
+                                    "type": "JSON",
+                                  },
+                                  "name": "some",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "isCat",
+                                    "type": "Boolean",
+                                  },
+                                  "name": "isCat",
+                                },
+                              ],
+                              "name": "CreateAnimalInput",
+                              "type": "GraphQLInputObjectType",
+                            },
+                            "type": "GraphQLNonNull",
+                          },
+                        },
+                        "name": "create",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "update",
+                          "type": Object {
+                            "of": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "set_id",
+                                    "type": Object {
+                                      "description": undefined,
+                                      "fields": Array [
+                                        Object {
+                                          "field": Object {
+                                            "defaultValue": undefined,
+                                            "description": undefined,
+                                            "name": "_id",
+                                            "type": "Int",
+                                          },
+                                          "name": "_id",
+                                        },
+                                      ],
+                                      "name": "UpdateAnimalInputSet_id",
+                                      "type": "GraphQLInputObjectType",
+                                    },
+                                  },
+                                  "name": "set_id",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "setName",
+                                    "type": Object {
+                                      "description": undefined,
+                                      "fields": Array [
+                                        Object {
+                                          "field": Object {
+                                            "defaultValue": undefined,
+                                            "description": undefined,
+                                            "name": "name",
+                                            "type": Object {
+                                              "of": "String",
+                                              "type": "GraphQLNonNull",
+                                            },
+                                          },
+                                          "name": "name",
+                                        },
+                                      ],
+                                      "name": "UpdateAnimalInputSetName",
+                                      "type": "GraphQLInputObjectType",
+                                    },
+                                  },
+                                  "name": "setName",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "setAge",
+                                    "type": Object {
+                                      "description": undefined,
+                                      "fields": Array [
+                                        Object {
+                                          "field": Object {
+                                            "defaultValue": undefined,
+                                            "description": undefined,
+                                            "name": "age",
+                                            "type": "Int",
+                                          },
+                                          "name": "age",
+                                        },
+                                      ],
+                                      "name": "UpdateAnimalInputSetAge",
+                                      "type": "GraphQLInputObjectType",
+                                    },
+                                  },
+                                  "name": "setAge",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "setWeight",
+                                    "type": Object {
+                                      "description": undefined,
+                                      "fields": Array [
+                                        Object {
+                                          "field": Object {
+                                            "defaultValue": undefined,
+                                            "description": undefined,
+                                            "name": "Weight",
+                                            "type": "Float",
+                                          },
+                                          "name": "Weight",
+                                        },
+                                      ],
+                                      "name": "UpdateAnimalInputSetWeight",
+                                      "type": "GraphQLInputObjectType",
+                                    },
+                                  },
+                                  "name": "setWeight",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "setBirthday",
+                                    "type": Object {
+                                      "description": undefined,
+                                      "fields": Array [
+                                        Object {
+                                          "field": Object {
+                                            "defaultValue": undefined,
+                                            "description": undefined,
+                                            "name": "birthday",
+                                            "type": "Date",
+                                          },
+                                          "name": "birthday",
+                                        },
+                                      ],
+                                      "name": "UpdateAnimalInputSetBirthday",
+                                      "type": "GraphQLInputObjectType",
+                                    },
+                                  },
+                                  "name": "setBirthday",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "setSome",
+                                    "type": Object {
+                                      "description": undefined,
+                                      "fields": Array [
+                                        Object {
+                                          "field": Object {
+                                            "defaultValue": undefined,
+                                            "description": undefined,
+                                            "name": "some",
+                                            "type": "JSON",
+                                          },
+                                          "name": "some",
+                                        },
+                                      ],
+                                      "name": "UpdateAnimalInputSetSome",
+                                      "type": "GraphQLInputObjectType",
+                                    },
+                                  },
+                                  "name": "setSome",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "setIsCat",
+                                    "type": Object {
+                                      "description": undefined,
+                                      "fields": Array [
+                                        Object {
+                                          "field": Object {
+                                            "defaultValue": undefined,
+                                            "description": undefined,
+                                            "name": "isCat",
+                                            "type": "Boolean",
+                                          },
+                                          "name": "isCat",
+                                        },
+                                      ],
+                                      "name": "UpdateAnimalInputSetIsCat",
+                                      "type": "GraphQLInputObjectType",
+                                    },
+                                  },
+                                  "name": "setIsCat",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "id",
+                                    "type": Object {
+                                      "of": "ID",
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "id",
+                                },
+                              ],
+                              "name": "UpdateAnimalInput",
+                              "type": "GraphQLInputObjectType",
+                            },
+                            "type": "GraphQLNonNull",
+                          },
+                        },
+                        "name": "update",
+                      },
+                    ],
+                    "name": "CreateOrUpdateAnimalInput",
+                    "type": "GraphQLInputObjectType",
+                  },
+                  "type": "GraphQLList",
+                },
+              },
+              "name": "createOrUpdatePets",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
                 "name": "pets",
                 "type": Object {
                   "of": "ID",
@@ -1330,6 +1633,954 @@ Object {
         },
       },
       "name": "createOwner",
+    },
+    Object {
+      "field": Object {
+        "defaultValue": undefined,
+        "description": undefined,
+        "name": "createOrUpdateOwner",
+        "type": Object {
+          "description": undefined,
+          "fields": Array [
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "create",
+                "type": Object {
+                  "of": Object {
+                    "description": undefined,
+                    "fields": Array [
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "key",
+                          "type": "Float",
+                        },
+                        "name": "key",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "name",
+                          "type": Object {
+                            "of": "String",
+                            "type": "GraphQLNonNull",
+                          },
+                        },
+                        "name": "name",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "createPets",
+                          "type": Object {
+                            "of": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "_id",
+                                    "type": "Int",
+                                  },
+                                  "name": "_id",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "name",
+                                    "type": Object {
+                                      "of": "String",
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "name",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "age",
+                                    "type": "Int",
+                                  },
+                                  "name": "age",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "Weight",
+                                    "type": "Float",
+                                  },
+                                  "name": "Weight",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "birthday",
+                                    "type": "Date",
+                                  },
+                                  "name": "birthday",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "some",
+                                    "type": "JSON",
+                                  },
+                                  "name": "some",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "isCat",
+                                    "type": "Boolean",
+                                  },
+                                  "name": "isCat",
+                                },
+                              ],
+                              "name": "CreateAnimalInput",
+                              "type": "GraphQLInputObjectType",
+                            },
+                            "type": "GraphQLList",
+                          },
+                        },
+                        "name": "createPets",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "createOrUpdatePets",
+                          "type": Object {
+                            "of": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "create",
+                                    "type": Object {
+                                      "of": Object {
+                                        "description": undefined,
+                                        "fields": Array [
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "_id",
+                                              "type": "Int",
+                                            },
+                                            "name": "_id",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "name",
+                                              "type": Object {
+                                                "of": "String",
+                                                "type": "GraphQLNonNull",
+                                              },
+                                            },
+                                            "name": "name",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "age",
+                                              "type": "Int",
+                                            },
+                                            "name": "age",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "Weight",
+                                              "type": "Float",
+                                            },
+                                            "name": "Weight",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "birthday",
+                                              "type": "Date",
+                                            },
+                                            "name": "birthday",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "some",
+                                              "type": "JSON",
+                                            },
+                                            "name": "some",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "isCat",
+                                              "type": "Boolean",
+                                            },
+                                            "name": "isCat",
+                                          },
+                                        ],
+                                        "name": "CreateAnimalInput",
+                                        "type": "GraphQLInputObjectType",
+                                      },
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "create",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "update",
+                                    "type": Object {
+                                      "of": Object {
+                                        "description": undefined,
+                                        "fields": Array [
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "set_id",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "_id",
+                                                      "type": "Int",
+                                                    },
+                                                    "name": "_id",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSet_id",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "set_id",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setName",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "name",
+                                                      "type": Object {
+                                                        "of": "String",
+                                                        "type": "GraphQLNonNull",
+                                                      },
+                                                    },
+                                                    "name": "name",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetName",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setName",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setAge",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "age",
+                                                      "type": "Int",
+                                                    },
+                                                    "name": "age",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetAge",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setAge",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setWeight",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "Weight",
+                                                      "type": "Float",
+                                                    },
+                                                    "name": "Weight",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetWeight",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setWeight",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setBirthday",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "birthday",
+                                                      "type": "Date",
+                                                    },
+                                                    "name": "birthday",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetBirthday",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setBirthday",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setSome",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "some",
+                                                      "type": "JSON",
+                                                    },
+                                                    "name": "some",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetSome",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setSome",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setIsCat",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "isCat",
+                                                      "type": "Boolean",
+                                                    },
+                                                    "name": "isCat",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetIsCat",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setIsCat",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "id",
+                                              "type": Object {
+                                                "of": "ID",
+                                                "type": "GraphQLNonNull",
+                                              },
+                                            },
+                                            "name": "id",
+                                          },
+                                        ],
+                                        "name": "UpdateAnimalInput",
+                                        "type": "GraphQLInputObjectType",
+                                      },
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "update",
+                                },
+                              ],
+                              "name": "CreateOrUpdateAnimalInput",
+                              "type": "GraphQLInputObjectType",
+                            },
+                            "type": "GraphQLList",
+                          },
+                        },
+                        "name": "createOrUpdatePets",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "pets",
+                          "type": Object {
+                            "of": "ID",
+                            "type": "GraphQLList",
+                          },
+                        },
+                        "name": "pets",
+                      },
+                    ],
+                    "name": "CreateUserInput",
+                    "type": "GraphQLInputObjectType",
+                  },
+                  "type": "GraphQLNonNull",
+                },
+              },
+              "name": "create",
+            },
+            Object {
+              "field": Object {
+                "defaultValue": undefined,
+                "description": undefined,
+                "name": "update",
+                "type": Object {
+                  "of": Object {
+                    "description": undefined,
+                    "fields": Array [
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "setKey",
+                          "type": Object {
+                            "description": undefined,
+                            "fields": Array [
+                              Object {
+                                "field": Object {
+                                  "defaultValue": undefined,
+                                  "description": undefined,
+                                  "name": "key",
+                                  "type": "Float",
+                                },
+                                "name": "key",
+                              },
+                            ],
+                            "name": "UpdateuserInputSetKey",
+                            "type": "GraphQLInputObjectType",
+                          },
+                        },
+                        "name": "setKey",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "setName",
+                          "type": Object {
+                            "description": undefined,
+                            "fields": Array [
+                              Object {
+                                "field": Object {
+                                  "defaultValue": undefined,
+                                  "description": undefined,
+                                  "name": "name",
+                                  "type": Object {
+                                    "of": "String",
+                                    "type": "GraphQLNonNull",
+                                  },
+                                },
+                                "name": "name",
+                              },
+                            ],
+                            "name": "UpdateuserInputSetName",
+                            "type": "GraphQLInputObjectType",
+                          },
+                        },
+                        "name": "setName",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "createPets",
+                          "type": Object {
+                            "of": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "_id",
+                                    "type": "Int",
+                                  },
+                                  "name": "_id",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "name",
+                                    "type": Object {
+                                      "of": "String",
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "name",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "age",
+                                    "type": "Int",
+                                  },
+                                  "name": "age",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "Weight",
+                                    "type": "Float",
+                                  },
+                                  "name": "Weight",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "birthday",
+                                    "type": "Date",
+                                  },
+                                  "name": "birthday",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "some",
+                                    "type": "JSON",
+                                  },
+                                  "name": "some",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "isCat",
+                                    "type": "Boolean",
+                                  },
+                                  "name": "isCat",
+                                },
+                              ],
+                              "name": "CreateAnimalInput",
+                              "type": "GraphQLInputObjectType",
+                            },
+                            "type": "GraphQLList",
+                          },
+                        },
+                        "name": "createPets",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "createOrUpdatePets",
+                          "type": Object {
+                            "of": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "create",
+                                    "type": Object {
+                                      "of": Object {
+                                        "description": undefined,
+                                        "fields": Array [
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "_id",
+                                              "type": "Int",
+                                            },
+                                            "name": "_id",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "name",
+                                              "type": Object {
+                                                "of": "String",
+                                                "type": "GraphQLNonNull",
+                                              },
+                                            },
+                                            "name": "name",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "age",
+                                              "type": "Int",
+                                            },
+                                            "name": "age",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "Weight",
+                                              "type": "Float",
+                                            },
+                                            "name": "Weight",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "birthday",
+                                              "type": "Date",
+                                            },
+                                            "name": "birthday",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "some",
+                                              "type": "JSON",
+                                            },
+                                            "name": "some",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "isCat",
+                                              "type": "Boolean",
+                                            },
+                                            "name": "isCat",
+                                          },
+                                        ],
+                                        "name": "CreateAnimalInput",
+                                        "type": "GraphQLInputObjectType",
+                                      },
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "create",
+                                },
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "update",
+                                    "type": Object {
+                                      "of": Object {
+                                        "description": undefined,
+                                        "fields": Array [
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "set_id",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "_id",
+                                                      "type": "Int",
+                                                    },
+                                                    "name": "_id",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSet_id",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "set_id",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setName",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "name",
+                                                      "type": Object {
+                                                        "of": "String",
+                                                        "type": "GraphQLNonNull",
+                                                      },
+                                                    },
+                                                    "name": "name",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetName",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setName",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setAge",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "age",
+                                                      "type": "Int",
+                                                    },
+                                                    "name": "age",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetAge",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setAge",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setWeight",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "Weight",
+                                                      "type": "Float",
+                                                    },
+                                                    "name": "Weight",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetWeight",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setWeight",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setBirthday",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "birthday",
+                                                      "type": "Date",
+                                                    },
+                                                    "name": "birthday",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetBirthday",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setBirthday",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setSome",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "some",
+                                                      "type": "JSON",
+                                                    },
+                                                    "name": "some",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetSome",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setSome",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "setIsCat",
+                                              "type": Object {
+                                                "description": undefined,
+                                                "fields": Array [
+                                                  Object {
+                                                    "field": Object {
+                                                      "defaultValue": undefined,
+                                                      "description": undefined,
+                                                      "name": "isCat",
+                                                      "type": "Boolean",
+                                                    },
+                                                    "name": "isCat",
+                                                  },
+                                                ],
+                                                "name": "UpdateAnimalInputSetIsCat",
+                                                "type": "GraphQLInputObjectType",
+                                              },
+                                            },
+                                            "name": "setIsCat",
+                                          },
+                                          Object {
+                                            "field": Object {
+                                              "defaultValue": undefined,
+                                              "description": undefined,
+                                              "name": "id",
+                                              "type": Object {
+                                                "of": "ID",
+                                                "type": "GraphQLNonNull",
+                                              },
+                                            },
+                                            "name": "id",
+                                          },
+                                        ],
+                                        "name": "UpdateAnimalInput",
+                                        "type": "GraphQLInputObjectType",
+                                      },
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "update",
+                                },
+                              ],
+                              "name": "CreateOrUpdateAnimalInput",
+                              "type": "GraphQLInputObjectType",
+                            },
+                            "type": "GraphQLList",
+                          },
+                        },
+                        "name": "createOrUpdatePets",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "setPets",
+                          "type": Object {
+                            "description": undefined,
+                            "fields": Array [
+                              Object {
+                                "field": Object {
+                                  "defaultValue": undefined,
+                                  "description": undefined,
+                                  "name": "pets",
+                                  "type": Object {
+                                    "of": "ID",
+                                    "type": "GraphQLList",
+                                  },
+                                },
+                                "name": "pets",
+                              },
+                            ],
+                            "name": "UpdateuserInputSetPets",
+                            "type": "GraphQLInputObjectType",
+                          },
+                        },
+                        "name": "setPets",
+                      },
+                      Object {
+                        "field": Object {
+                          "defaultValue": undefined,
+                          "description": undefined,
+                          "name": "id",
+                          "type": Object {
+                            "of": "ID",
+                            "type": "GraphQLNonNull",
+                          },
+                        },
+                        "name": "id",
+                      },
+                    ],
+                    "name": "UpdateuserInput",
+                    "type": "GraphQLInputObjectType",
+                  },
+                  "type": "GraphQLNonNull",
+                },
+              },
+              "name": "update",
+            },
+          ],
+          "name": "CreateOrUpdateuserInput",
+          "type": "GraphQLInputObjectType",
+        },
+      },
+      "name": "createOrUpdateOwner",
     },
     Object {
       "field": Object {
@@ -1423,6 +2674,309 @@ Object {
         },
       },
       "name": "createAnimals",
+    },
+    Object {
+      "field": Object {
+        "defaultValue": undefined,
+        "description": undefined,
+        "name": "createOrUpdateAnimals",
+        "type": Object {
+          "of": Object {
+            "description": undefined,
+            "fields": Array [
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "name": "create",
+                  "type": Object {
+                    "of": Object {
+                      "description": undefined,
+                      "fields": Array [
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "_id",
+                            "type": "Int",
+                          },
+                          "name": "_id",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "name",
+                            "type": Object {
+                              "of": "String",
+                              "type": "GraphQLNonNull",
+                            },
+                          },
+                          "name": "name",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "age",
+                            "type": "Int",
+                          },
+                          "name": "age",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "Weight",
+                            "type": "Float",
+                          },
+                          "name": "Weight",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "birthday",
+                            "type": "Date",
+                          },
+                          "name": "birthday",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "some",
+                            "type": "JSON",
+                          },
+                          "name": "some",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "isCat",
+                            "type": "Boolean",
+                          },
+                          "name": "isCat",
+                        },
+                      ],
+                      "name": "CreateAnimalInput",
+                      "type": "GraphQLInputObjectType",
+                    },
+                    "type": "GraphQLNonNull",
+                  },
+                },
+                "name": "create",
+              },
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "name": "update",
+                  "type": Object {
+                    "of": Object {
+                      "description": undefined,
+                      "fields": Array [
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "set_id",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "_id",
+                                    "type": "Int",
+                                  },
+                                  "name": "_id",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSet_id",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "set_id",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setName",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "name",
+                                    "type": Object {
+                                      "of": "String",
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "name",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetName",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setName",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setAge",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "age",
+                                    "type": "Int",
+                                  },
+                                  "name": "age",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetAge",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setAge",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setWeight",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "Weight",
+                                    "type": "Float",
+                                  },
+                                  "name": "Weight",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetWeight",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setWeight",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setBirthday",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "birthday",
+                                    "type": "Date",
+                                  },
+                                  "name": "birthday",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetBirthday",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setBirthday",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setSome",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "some",
+                                    "type": "JSON",
+                                  },
+                                  "name": "some",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetSome",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setSome",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setIsCat",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "isCat",
+                                    "type": "Boolean",
+                                  },
+                                  "name": "isCat",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetIsCat",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setIsCat",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "id",
+                            "type": Object {
+                              "of": "ID",
+                              "type": "GraphQLNonNull",
+                            },
+                          },
+                          "name": "id",
+                        },
+                      ],
+                      "name": "UpdateAnimalInput",
+                      "type": "GraphQLInputObjectType",
+                    },
+                    "type": "GraphQLNonNull",
+                  },
+                },
+                "name": "update",
+              },
+            ],
+            "name": "CreateOrUpdateAnimalInput",
+            "type": "GraphQLInputObjectType",
+          },
+          "type": "GraphQLList",
+        },
+      },
+      "name": "createOrUpdateAnimals",
     },
     Object {
       "field": Object {
@@ -1550,6 +3104,309 @@ Object {
         },
       },
       "name": "createPets",
+    },
+    Object {
+      "field": Object {
+        "defaultValue": undefined,
+        "description": undefined,
+        "name": "createOrUpdatePets",
+        "type": Object {
+          "of": Object {
+            "description": undefined,
+            "fields": Array [
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "name": "create",
+                  "type": Object {
+                    "of": Object {
+                      "description": undefined,
+                      "fields": Array [
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "_id",
+                            "type": "Int",
+                          },
+                          "name": "_id",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "name",
+                            "type": Object {
+                              "of": "String",
+                              "type": "GraphQLNonNull",
+                            },
+                          },
+                          "name": "name",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "age",
+                            "type": "Int",
+                          },
+                          "name": "age",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "Weight",
+                            "type": "Float",
+                          },
+                          "name": "Weight",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "birthday",
+                            "type": "Date",
+                          },
+                          "name": "birthday",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "some",
+                            "type": "JSON",
+                          },
+                          "name": "some",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "isCat",
+                            "type": "Boolean",
+                          },
+                          "name": "isCat",
+                        },
+                      ],
+                      "name": "CreateAnimalInput",
+                      "type": "GraphQLInputObjectType",
+                    },
+                    "type": "GraphQLNonNull",
+                  },
+                },
+                "name": "create",
+              },
+              Object {
+                "field": Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "name": "update",
+                  "type": Object {
+                    "of": Object {
+                      "description": undefined,
+                      "fields": Array [
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "set_id",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "_id",
+                                    "type": "Int",
+                                  },
+                                  "name": "_id",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSet_id",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "set_id",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setName",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "name",
+                                    "type": Object {
+                                      "of": "String",
+                                      "type": "GraphQLNonNull",
+                                    },
+                                  },
+                                  "name": "name",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetName",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setName",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setAge",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "age",
+                                    "type": "Int",
+                                  },
+                                  "name": "age",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetAge",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setAge",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setWeight",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "Weight",
+                                    "type": "Float",
+                                  },
+                                  "name": "Weight",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetWeight",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setWeight",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setBirthday",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "birthday",
+                                    "type": "Date",
+                                  },
+                                  "name": "birthday",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetBirthday",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setBirthday",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setSome",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "some",
+                                    "type": "JSON",
+                                  },
+                                  "name": "some",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetSome",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setSome",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "setIsCat",
+                            "type": Object {
+                              "description": undefined,
+                              "fields": Array [
+                                Object {
+                                  "field": Object {
+                                    "defaultValue": undefined,
+                                    "description": undefined,
+                                    "name": "isCat",
+                                    "type": "Boolean",
+                                  },
+                                  "name": "isCat",
+                                },
+                              ],
+                              "name": "UpdateAnimalInputSetIsCat",
+                              "type": "GraphQLInputObjectType",
+                            },
+                          },
+                          "name": "setIsCat",
+                        },
+                        Object {
+                          "field": Object {
+                            "defaultValue": undefined,
+                            "description": undefined,
+                            "name": "id",
+                            "type": Object {
+                              "of": "ID",
+                              "type": "GraphQLNonNull",
+                            },
+                          },
+                          "name": "id",
+                        },
+                      ],
+                      "name": "UpdateAnimalInput",
+                      "type": "GraphQLInputObjectType",
+                    },
+                    "type": "GraphQLNonNull",
+                  },
+                },
+                "name": "update",
+              },
+            ],
+            "name": "CreateOrUpdateAnimalInput",
+            "type": "GraphQLInputObjectType",
+          },
+          "type": "GraphQLList",
+        },
+      },
+      "name": "createOrUpdatePets",
     },
     Object {
       "field": Object {

@@ -202,6 +202,12 @@ class Model {
         }
         return this.updateType;
     }
+    getCreateOrUpdateType() {
+        if (!this.createOrUpdateType) {
+            this.createOrUpdateType = this.generateCreateOrUpdateType();
+        }
+        return this.createOrUpdateType;
+    }
     getDeleteMutation() {
         const outputFields = {};
         outputFields[uncapitalize(this.name)] = {
@@ -336,6 +342,13 @@ class Model {
                     graphQLType: new graphql_1.GraphQLList(childModel.getCreateType()),
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes_1.default.CreateSubCollection,
+                    value: undefined,
+                });
+                args.push({
+                    attribute: attr,
+                    graphQLType: new graphql_1.GraphQLList(childModel.getCreateOrUpdateType()),
+                    name: "createOrUpdate" + capitalize(attr.name),
+                    type: ArgumentTypes_1.default.CreateOrUpdateSubCollection,
                     value: undefined,
                 });
             }
@@ -480,6 +493,12 @@ class Model {
                     attribute: attr,
                     graphQLType: childModel.getCreateType(),
                 });
+                args.push({
+                    type: ArgumentTypes_1.default.CreateOrUpdateSubModel,
+                    name: "createOrUpdate" + capitalize(attr.name),
+                    attribute: attr,
+                    graphQLType: childModel.getCreateOrUpdateType(),
+                });
             }
             else if (attr.type === AttributeTypes_1.default.Collection) {
                 const childModel = this.collector.get(attr.model);
@@ -489,6 +508,12 @@ class Model {
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes_1.default.CreateSubCollection,
                     graphQLType: new graphql_1.GraphQLList(childModel.getCreateType()),
+                    attribute: attr,
+                });
+                args.push({
+                    name: "createOrUpdate" + capitalize(attr.name),
+                    type: ArgumentTypes_1.default.CreateOrUpdateSubCollection,
+                    graphQLType: new graphql_1.GraphQLList(childModel.getCreateOrUpdateType()),
                     attribute: attr,
                 });
             }
@@ -524,6 +549,17 @@ class Model {
                     fields[arg.name] = { type: arg.graphQLType };
                 });
                 return fields;
+            },
+        });
+    }
+    generateCreateOrUpdateType() {
+        return new graphql_1.GraphQLInputObjectType({
+            name: "CreateOrUpdate" + this.name + "Input",
+            fields: () => {
+                return {
+                    create: { type: new graphql_1.GraphQLNonNull(this.getCreateType()) },
+                    update: { type: new graphql_1.GraphQLNonNull(this.getUpdateType()) },
+                };
             },
         });
     }

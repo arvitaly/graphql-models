@@ -44,6 +44,7 @@ class Model {
     protected baseType: GraphQLObjectType;
     protected createType: GraphQLInputObjectType;
     protected updateType: GraphQLInputObjectType;
+    protected createOrUpdateType: GraphQLInputObjectType;
     protected connectionType: GraphQLObjectType;
     protected whereInputType: GraphQLInputObjectType;
     protected whereArguments: Argument[];
@@ -242,6 +243,12 @@ class Model {
         }
         return this.updateType;
     }
+    public getCreateOrUpdateType() {
+        if (!this.createOrUpdateType) {
+            this.createOrUpdateType = this.generateCreateOrUpdateType();
+        }
+        return this.createOrUpdateType;
+    }
     public getDeleteMutation(): GraphQLFieldConfig<any, any> {
         const outputFields: GraphQLFieldConfigMap<any, any> = {};
         outputFields[uncapitalize(this.name)] = {
@@ -378,6 +385,13 @@ class Model {
                     graphQLType: new GraphQLList(childModel.getCreateType()),
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes.CreateSubCollection,
+                    value: undefined,
+                });
+                args.push({
+                    attribute: attr,
+                    graphQLType: new GraphQLList(childModel.getCreateOrUpdateType()),
+                    name: "createOrUpdate" + capitalize(attr.name),
+                    type: ArgumentTypes.CreateOrUpdateSubCollection,
                     value: undefined,
                 });
             } else {
@@ -517,6 +531,12 @@ class Model {
                     attribute: attr,
                     graphQLType: childModel.getCreateType(),
                 });
+                args.push({
+                    type: ArgumentTypes.CreateOrUpdateSubModel,
+                    name: "createOrUpdate" + capitalize(attr.name),
+                    attribute: attr,
+                    graphQLType: childModel.getCreateOrUpdateType(),
+                });
             } else if (attr.type === AttributeTypes.Collection) {
                 const childModel = this.collector.get((attr as CollectionAttribute).model);
                 graphQLType = GraphQLID;
@@ -525,6 +545,12 @@ class Model {
                     name: "create" + capitalize(attr.name),
                     type: ArgumentTypes.CreateSubCollection,
                     graphQLType: new GraphQLList(childModel.getCreateType()),
+                    attribute: attr,
+                });
+                args.push({
+                    name: "createOrUpdate" + capitalize(attr.name),
+                    type: ArgumentTypes.CreateOrUpdateSubCollection,
+                    graphQLType: new GraphQLList(childModel.getCreateOrUpdateType()),
                     attribute: attr,
                 });
             } else {
@@ -559,6 +585,17 @@ class Model {
                     fields[arg.name] = { type: arg.graphQLType };
                 });
                 return fields;
+            },
+        });
+    }
+    protected generateCreateOrUpdateType(): GraphQLInputObjectType {
+        return new GraphQLInputObjectType({
+            name: "CreateOrUpdate" + this.name + "Input",
+            fields: () => {
+                return {
+                    create: { type: new GraphQLNonNull(this.getCreateType()) },
+                    update: { type: new GraphQLNonNull(this.getUpdateType()) },
+                };
             },
         });
     }

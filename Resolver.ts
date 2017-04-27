@@ -294,6 +294,19 @@ class Resolver {
                         await this.createOne(arg.attribute.model, arg.value),
                     ).id;
                     break;
+                case ArgumentTypes.CreateOrUpdateSubModel:
+                    try {
+                        await this.createOne(arg.attribute.model, arg.value.create);
+                    } catch (e) {
+                        const result = await this.adapter.findOrCreateOne(modelId, opts.args.create);
+                        if (!result) {
+                            throw new Error("Not found record for createOrUpdate");
+                        }
+                    }
+                    updating[arg.attribute.name] = fromGlobalId(
+                        await this.create One(arg.attribute.model, arg.value),
+                    ).id;
+                    break;
                 case ArgumentTypes.CreateSubCollection:
                     const childModel = arg.attribute.model;
                     updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {

@@ -290,6 +290,18 @@ class Resolver {
                     case ArgumentTypes_1.default.CreateArgument:
                         updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(yield this.createOne(arg.attribute.model, arg.value)).id;
                         break;
+                    case ArgumentTypes_1.default.CreateOrUpdateSubModel:
+                        try {
+                            yield this.createOne(arg.attribute.model, arg.value.create);
+                        }
+                        catch (e) {
+                            const result = yield this.adapter.findOrCreateOne(modelId, opts.args.create);
+                            if (!result) {
+                                throw new Error("Not found record for createOrUpdate");
+                            }
+                        }
+                        updating[arg.attribute.name] = graphql_relay_1.fromGlobalId(yield this.create, One(arg.attribute.model, arg.value)).id;
+                        break;
                     case ArgumentTypes_1.default.CreateSubCollection:
                         const childModel = arg.attribute.model;
                         updating[arg.attribute.name] = yield Promise.all(arg.value.map((v) => __awaiter(this, void 0, void 0, function* () {

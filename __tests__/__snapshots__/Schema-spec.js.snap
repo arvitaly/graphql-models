@@ -66,6 +66,8 @@ GraphQLSchema {
     "Boolean": "Boolean",
     "CreateModel1Input": "CreateModel1Input",
     "CreateModel2Input": "CreateModel2Input",
+    "CreateOrUpdateModel1Input": "CreateOrUpdateModel1Input",
+    "CreateOrUpdateModel2Input": "CreateOrUpdateModel2Input",
     "ID": "ID",
     "Int": "Int",
     "Model1": "Model1",
