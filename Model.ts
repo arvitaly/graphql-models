@@ -45,6 +45,7 @@ class Model {
     protected createType: GraphQLInputObjectType;
     protected updateType: GraphQLInputObjectType;
     protected createOrUpdateType: GraphQLInputObjectType;
+    protected createOrUpdateUpdateType: GraphQLInputObjectType;
     protected connectionType: GraphQLObjectType;
     protected whereInputType: GraphQLInputObjectType;
     protected whereArguments: Argument[];
@@ -205,9 +206,6 @@ class Model {
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
-        const updateFields = Object.assign({}, this.getUpdateType().getFields());
-        delete updateFields[idArgName];
-
         return mutationWithClientMutationId({
             name: this.name + "CreateOrUpdateMutation",
             inputFields: {
@@ -215,10 +213,7 @@ class Model {
                     type: new GraphQLNonNull(this.getCreateType()),
                 },
                 update: {
-                    type: new GraphQLNonNull(new GraphQLInputObjectType({
-                        name: this.name + "CreateOrUpdateMutationUpdate",
-                        fields: updateFields,
-                    })),
+                    type: new GraphQLNonNull(this.getCreateOrUpdateUpdateType()),
                 },
             },
             outputFields,
@@ -242,6 +237,12 @@ class Model {
             this.updateType = this.generateUpdateType();
         }
         return this.updateType;
+    }
+    public getCreateOrUpdateUpdateType() {
+        if (!this.createOrUpdateUpdateType) {
+            this.createOrUpdateUpdateType = this.generateCreateOrUpdateUpdateType();
+        }
+        return this.createOrUpdateUpdateType;
     }
     public getCreateOrUpdateType() {
         if (!this.createOrUpdateType) {
@@ -594,9 +595,17 @@ class Model {
             fields: () => {
                 return {
                     create: { type: new GraphQLNonNull(this.getCreateType()) },
-                    update: { type: new GraphQLNonNull(this.getUpdateType()) },
+                    update: { type: new GraphQLNonNull(this.getCreateOrUpdateUpdateType()) },
                 };
             },
+        });
+    }
+    protected generateCreateOrUpdateUpdateType(): GraphQLInputObjectType {
+        const updateFields = Object.assign({}, this.getUpdateType().getFields());
+        delete updateFields[idArgName];
+        return new GraphQLInputObjectType({
+            name: this.name + "CreateOrUpdateUpdateType",
+            fields: updateFields,
         });
     }
     protected generateWhereInputType(): GraphQLInputObjectType {

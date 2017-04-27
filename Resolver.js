@@ -237,6 +237,7 @@ class Resolver {
                     }
                     const globalId = graphql_relay_1.toGlobalId(modelId, "" + result[model.getPrimaryKeyAttribute().realName]);
                     const forUpdatings = Object.assign({}, args.update);
+                    forUpdatings.id = globalId;
                     return yield this.updateOne(modelId, forUpdatings);
                 }
                 else {

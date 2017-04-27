@@ -245,6 +245,7 @@ class Resolver {
                 }
                 const globalId = toGlobalId(modelId, "" + result[model.getPrimaryKeyAttribute().realName]);
                 const forUpdatings = Object.assign({}, args.update);
+                forUpdatings.id = globalId;
                 return await this.updateOne(modelId, forUpdatings);
             } else {
                 throw e;

@@ -166,8 +166,6 @@ class Model {
         outputFields[uncapitalize(this.name)] = {
             type: this.getBaseType(),
         };
-        const updateFields = Object.assign({}, this.getUpdateType().getFields());
-        delete updateFields[_1.idArgName];
         return graphql_relay_1.mutationWithClientMutationId({
             name: this.name + "CreateOrUpdateMutation",
             inputFields: {
@@ -175,10 +173,7 @@ class Model {
                     type: new graphql_1.GraphQLNonNull(this.getCreateType()),
                 },
                 update: {
-                    type: new graphql_1.GraphQLNonNull(new graphql_1.GraphQLInputObjectType({
-                        name: this.name + "CreateOrUpdateMutationUpdate",
-                        fields: updateFields,
-                    })),
+                    type: new graphql_1.GraphQLNonNull(this.getCreateOrUpdateUpdateType()),
                 },
             },
             outputFields,
@@ -201,6 +196,12 @@ class Model {
             this.updateType = this.generateUpdateType();
         }
         return this.updateType;
+    }
+    getCreateOrUpdateUpdateType() {
+        if (!this.createOrUpdateUpdateType) {
+            this.createOrUpdateUpdateType = this.generateCreateOrUpdateUpdateType();
+        }
+        return this.createOrUpdateUpdateType;
     }
     getCreateOrUpdateType() {
         if (!this.createOrUpdateType) {
@@ -558,9 +559,17 @@ class Model {
             fields: () => {
                 return {
                     create: { type: new graphql_1.GraphQLNonNull(this.getCreateType()) },
-                    update: { type: new graphql_1.GraphQLNonNull(this.getUpdateType()) },
+                    update: { type: new graphql_1.GraphQLNonNull(this.getCreateOrUpdateUpdateType()) },
                 };
             },
+        });
+    }
+    generateCreateOrUpdateUpdateType() {
+        const updateFields = Object.assign({}, this.getUpdateType().getFields());
+        delete updateFields[_1.idArgName];
+        return new graphql_1.GraphQLInputObjectType({
+            name: this.name + "CreateOrUpdateUpdateType",
+            fields: updateFields,
         });
     }
     generateWhereInputType() {

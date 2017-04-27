@@ -29,14 +29,7 @@
     "@types/jest": "^19.2.2",
     "coveralls": "^2.13.0",
     "jest": "^19.0.2",
-    "tslint": "^5.0.0",
-    "typescript": "^2.2.2"
-  },
-  "jest": {
-    "automock": false,
-    "unmockedModulePathPatterns": [
-      "graphql",
-      "graphql-relay"
-    ]
+    "tslint": "^5.1.0",
+    "typescript": "^2.3.1"
   }
 }
