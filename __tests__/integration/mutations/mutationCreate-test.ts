@@ -70,7 +70,7 @@ it("mutation create", async () => {
 });
 it("mutationCreate with createOrUpdateSubModel", async () => {
     const tester = new Tester();
-    const animal1 = tester.generateModel("animal")
+    const animal1 = tester.generateModel("animal");
     const user = tester.generateModel("user");
     const post = tester.generateModel("post");
     tester.adapter.findOne.mockImplementation((modelId: string) => {

@@ -26,7 +26,7 @@ it("mutationUpdate: animal", async () => {
 });
 it("mutationUpdate with createOrUpdateSubModel", async () => {
     const tester = new Tester();
-    const animal1 = tester.generateModel("animal")
+    const animal1 = tester.generateModel("animal");
     const user = tester.generateModel("user");
     const post = tester.generateModel("post");
     tester.adapter.findOne.mockImplementation((modelId: string) => {
@@ -106,4 +106,3 @@ it("mutationUpdate with createOrUpdateSubModel", async () => {
     expect(tester.adapter.findOne.mock.calls).toMatchSnapshot();
     expect(result).toMatchSnapshot();
 });
-
