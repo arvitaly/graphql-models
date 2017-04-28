@@ -28,4 +28,3 @@ const ArgumentTypes = {
     UpdateSetter: "updateSetter",
 };
 exports.default = ArgumentTypes;
-//# sourceMappingURL=ArgumentTypes.js.map

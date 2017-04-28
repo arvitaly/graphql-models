@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const graphql_1 = require("graphql");
 const graphql_fields_info_1 = require("graphql-fields-info");
 const collection1_1 = require("./../__fixtures__/collection1");
 const AttributeTypes_1 = require("./../AttributeTypes");
@@ -28,15 +27,6 @@ describe("Model spec", () => {
             toThrowError("Not found primary key attribute for model `" + m1.name + "`");
     });
     describe("base type", () => {
-        const expectedUserType = new graphql_1.GraphQLObjectType({
-            name: "user",
-            fields: {
-                key: { type: graphql_1.GraphQLFloat },
-                name: { type: graphql_1.GraphQLString },
-                pets: { type: collection1_1.default.get("animal").getConnectionType() },
-            },
-            interfaces: [],
-        });
         it("when generate base type with scalar attributes, should return equals", () => {
             const animalModelBaseType = animalModel.getBaseType();
             expect(test_util_1.printGraphQLObjectType(animalModelBaseType)).toMatchSnapshot();
@@ -295,4 +285,3 @@ describe("Model spec", () => {
         });
     });
 });
-//# sourceMappingURL=Model-spec.js.map

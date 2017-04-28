@@ -12,4 +12,3 @@ const AttributeTypes = {
     String: "string",
 };
 exports.default = AttributeTypes;
-//# sourceMappingURL=AttributeTypes.js.map

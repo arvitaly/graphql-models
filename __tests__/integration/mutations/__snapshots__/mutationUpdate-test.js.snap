@@ -1,0 +1,156 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mutationUpdate with createOrUpdateSubModel 1`] = `
+Array [
+  Array [
+    "animal",
+    Object {
+      "name": "animalNew1",
+    },
+  ],
+  Array [
+    "user",
+    Object {
+      "name": "OwnerName1",
+      "pets": Array [
+        "1",
+      ],
+    },
+  ],
+]
+`;
+
+exports[`mutationUpdate with createOrUpdateSubModel 2`] = `
+Array [
+  Array [
+    "animal",
+    Object {
+      "name": "animalNew1",
+    },
+  ],
+  Array [
+    "user",
+    Object {
+      "createOrUpdatePets": Array [
+        Object {
+          "create": Object {
+            "name": "animalNew1",
+          },
+          "update": Object {
+            "setName": Object {
+              "name": "updateNameAnimal1",
+            },
+          },
+        },
+      ],
+      "name": "OwnerName1",
+    },
+  ],
+]
+`;
+
+exports[`mutationUpdate with createOrUpdateSubModel 3`] = `
+Array [
+  Array [
+    "animal",
+    "1",
+    Object {
+      "name": "updateNameAnimal1",
+    },
+  ],
+  Array [
+    "user",
+    "1",
+    Object {
+      "name": "NewNameOwner",
+    },
+  ],
+  Array [
+    "post",
+    "",
+    Object {
+      "owner": "1",
+    },
+  ],
+]
+`;
+
+exports[`mutationUpdate with createOrUpdateSubModel 4`] = `
+Array [
+  Array [
+    "post",
+    "1",
+    Array [
+      Object {
+        "attribute": Object {
+          "model": "user",
+          "name": "owner",
+          "realName": "owner",
+          "required": false,
+          "type": "model",
+        },
+        "fields": Array [
+          Object {
+            "attribute": Object {
+              "model": "animal",
+              "name": "pets",
+              "realName": "pets",
+              "required": false,
+              "type": "collection",
+            },
+            "fields": Array [],
+          },
+        ],
+      },
+    ],
+  ],
+]
+`;
+
+exports[`mutationUpdate with createOrUpdateSubModel 5`] = `
+Object {
+  "updatePost": Object {
+    "post": Object {
+      "owner": Object {
+        "pets": Object {
+          "edges": Array [
+            Object {
+              "node": Object {
+                "name": "Str1",
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`mutationUpdate: animal 1`] = `
+Array [
+  Array [
+    "animal",
+    "1",
+    Object {
+      "birthday": 2016-12-07T10:42:48.000Z,
+      "name": "testName1",
+      "some": "{\\"What\\":\\"Yepp\\"}",
+    },
+  ],
+]
+`;
+
+exports[`mutationUpdate: animal 2`] = `
+Object {
+  "updateAnimal": Object {
+    "animal": Object {
+      "birthday": "Fri, 01 Jan 2010 00:00:00 GMT",
+      "name": "Str1",
+      "some": Object {
+        "test": 1,
+      },
+    },
+  },
+}
+`;

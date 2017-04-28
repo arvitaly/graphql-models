@@ -77,4 +77,3 @@ exports.animalModel = {
 };
 const models = [exports.postModel, exports.userModel, exports.animalModel];
 exports.default = new Collection_1.default(models);
-//# sourceMappingURL=collection1.js.map

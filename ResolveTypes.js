@@ -14,4 +14,3 @@ const ResolveTypes = {
     MutationDelete: "mutationDelete",
 };
 exports.default = ResolveTypes;
-//# sourceMappingURL=ResolveTypes.js.map

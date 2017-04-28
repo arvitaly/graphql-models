@@ -35,4 +35,3 @@ exports.default = new graphql_1.GraphQLScalarType({
         return result;
     },
 });
-//# sourceMappingURL=Date.js.map

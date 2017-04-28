@@ -1,29 +1,11 @@
-import {
-    GraphQLArgumentConfig,
-    GraphQLBoolean,
-    GraphQLFieldConfig,
-    GraphQLFieldConfigMap,
-    GraphQLFloat,
-    GraphQLID,
-    GraphQLInputObjectType,
-    GraphQLInt,
-    GraphQLList,
-    GraphQLNonNull,
-    GraphQLObjectType,
-    GraphQLString,
-} from "graphql";
+import { GraphQLList, GraphQLObjectType } from "graphql";
 import { fromResolveInfo } from "graphql-fields-info";
-import { connectionArgs, mutationWithClientMutationId } from "graphql-relay";
-import { idArgName, whereArgName } from "./..";
 import collection1 from "./../__fixtures__/collection1";
 import AttributeTypes from "./../AttributeTypes";
-import Model, {
-    capitalize, scalarTypeToGraphQL,
-    uncapitalize, whereArgHelpers,
-} from "./../Model";
+import Model, { uncapitalize, whereArgHelpers } from "./../Model";
 import ResolveTypes from "./../ResolveTypes";
 import { printGraphQLFieldConfig, printGraphQLInputObjectType, printGraphQLObjectType } from "./../test-util";
-import { AttributeType, ModelAttribute, Queries } from "./../typings";
+import { Queries } from "./../typings";
 const animalModel = collection1.get("animal");
 const postModel = collection1.get("post");
 const userModel = collection1.get("user");
@@ -37,15 +19,6 @@ describe("Model spec", () => {
             toThrowError("Not found primary key attribute for model `" + m1.name + "`");
     });
     describe("base type", () => {
-        const expectedUserType = new GraphQLObjectType({
-            name: "user",
-            fields: {
-                key: { type: GraphQLFloat },
-                name: { type: GraphQLString },
-                pets: { type: collection1.get("animal").getConnectionType() },
-            },
-            interfaces: [],
-        });
         it("when generate base type with scalar attributes, should return equals", () => {
             const animalModelBaseType = animalModel.getBaseType();
             expect(printGraphQLObjectType(animalModelBaseType)).toMatchSnapshot();
@@ -129,7 +102,7 @@ describe("Model spec", () => {
         it("Query one", () => {
             const animalSingleQuery = animalModel.getQueryOne();
             expect(printGraphQLFieldConfig(animalSingleQuery)).toMatchSnapshot();
-            animalSingleQuery.resolve("f1", "f2" as any, "f3", "f4" as any);
+            (animalSingleQuery as any).resolve("f1", "f2" as any, "f3", "f4" as any);
             expect(resolveFn.calls.allArgs()).toEqual([[
                 "animal",
                 ResolveTypes.QueryOne,
@@ -144,7 +117,7 @@ describe("Model spec", () => {
         it("Query connection", () => {
             const queryConnection = animalModel.getConnectionQuery();
             expect(printGraphQLFieldConfig(queryConnection)).toMatchSnapshot();
-            queryConnection.resolve("f1", "f2" as any, "f3", "f4" as any);
+            (queryConnection as any).resolve("f1", "f2" as any, "f3", "f4" as any);
             expect(resolveFn.calls.allArgs()).toEqual([[
                 "animal",
                 ResolveTypes.QueryConnection,
@@ -184,7 +157,7 @@ describe("Model spec", () => {
             const args = { clientMutationId: "5", input: { f1: "hello" } };
             const result = { clientMutationId: "5", animal: { name: "m1" } };
             resolveFn.and.returnValue(result);
-            const mutationResut = await createMutation.resolve("source", args, "f3", "f4" as any);
+            const mutationResut = await (createMutation as any).resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
             expect(resolveFn.calls.allArgs()).toEqual([[
                 "animal",
@@ -202,7 +175,7 @@ describe("Model spec", () => {
             const args = { clientMutationId: "5", input: { f1: "hello" } };
             const result = { clientMutationId: "5", animal: { name: "m1" } };
             resolveFn.and.returnValue(result);
-            const mutationResut = await updateMutation.resolve("source", args, "f3", "f4" as any);
+            const mutationResut = await (updateMutation as any).resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
             expect(resolveFn.calls.allArgs()).toEqual([[
                 "animal",
@@ -220,7 +193,7 @@ describe("Model spec", () => {
             const args = { clientMutationId: "5", input: { f1: "hello" } };
             const result = { clientMutationId: "5", animal: { name: "m1" } };
             resolveFn.and.returnValue(result);
-            const mutationResut = await updateManyMutation.resolve("source", args, "f3", "f4" as any);
+            const mutationResut = await (updateManyMutation as any).resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
             expect(resolveFn.calls.allArgs()).toEqual([[
                 "animal",
@@ -238,7 +211,7 @@ describe("Model spec", () => {
             const args = { clientMutationId: "6", input: { f1: "hello" } };
             const result = { clientMutationId: "6", animal: { name: "m2" } };
             resolveFn.and.returnValue(result);
-            const mutationResut = await createOrUpdateMutation.resolve("source", args, "f3", "f4" as any);
+            const mutationResut = await (createOrUpdateMutation as any).resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
             expect(resolveFn.calls.allArgs()).toEqual([[
                 "animal",
@@ -256,7 +229,7 @@ describe("Model spec", () => {
             const args = { clientMutationId: "5", input: { f1: "hello" } };
             const result = { clientMutationId: "5", animal: { name: "m1" } };
             resolveFn.and.returnValue(result);
-            const mutationResut = await deleteMutation.resolve("source", args, "f3", "f4" as any);
+            const mutationResut = await (deleteMutation as any).resolve("source", args, "f3", "f4" as any);
             expect(mutationResut).toEqual(result);
             expect(resolveFn.calls.allArgs()).toEqual([[
                 "animal",

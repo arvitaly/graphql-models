@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`query connection: animal 1`] = `
+Object {
+  "viewer": Object {
+    "animals": Object {
+      "edges": Array [
+        Object {
+          "node": Object {
+            "name": "withx",
+          },
+        },
+        Object {
+          "node": Object {
+            "name": "withx2",
+          },
+        },
+      ],
+    },
+  },
+}
+`;

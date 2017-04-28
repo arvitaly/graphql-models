@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`query node 1`] = `
+Object {
+  "node": Object {
+    "name": "Str1",
+  },
+}
+`;

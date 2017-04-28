@@ -1,19 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_1 = require("graphql");
-/*
-    export type GraphQLInputType =
-        GraphQLScalarType |
-        GraphQLEnumType |
-        GraphQLInputObjectType |
-        GraphQLList<any> |
-        GraphQLNonNull<
-        GraphQLScalarType |
-        GraphQLEnumType |
-        GraphQLInputObjectType |
-        GraphQLList<any>
-        >;
-*/
 function printGraphQLInputType(type) {
     if (type instanceof graphql_1.GraphQLScalarType) {
         return type;
@@ -74,16 +61,6 @@ function printGraphQLInterfaceType(type) {
     };
 }
 exports.printGraphQLInterfaceType = printGraphQLInterfaceType;
-/*     export type GraphQLType =
-        GraphQLScalarType |
-        GraphQLObjectType |
-        GraphQLInterfaceType |
-        GraphQLUnionType |
-        GraphQLEnumType |
-        GraphQLInputObjectType |
-        GraphQLList<any> |
-        GraphQLNonNull<any>;
-*/
 function printGraphQLType(type) {
     if (type instanceof graphql_1.GraphQLScalarType) {
         return type;
@@ -310,4 +287,3 @@ function _(obj, cb) {
         };
     });
 }
-//# sourceMappingURL=test-util.js.map

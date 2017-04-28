@@ -17,7 +17,7 @@ export type ModelOptions = {
 export type AttributeType = "id" | "string" | "integer" | "float" | "json" | "boolean" | "date" | "model" | "collection";
 export interface BaseAttribute {
     name: string;
-    realName?: string;
+    realName: string | null;
     type: AttributeType;
     required?: boolean | undefined;
     primaryKey?: boolean | undefined;
@@ -119,3 +119,4 @@ export type PopulateField = {
     fields: PopulateFields
 }
 export type PopulateFields = PopulateField[];
+

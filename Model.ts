@@ -1,5 +1,4 @@
 import {
-    GraphQLArgumentConfig,
     GraphQLBoolean,
     GraphQLFieldConfig,
     GraphQLFieldConfigArgumentMap,
@@ -17,13 +16,8 @@ import {
     GraphQLString,
 } from "graphql";
 import { fromResolveInfo } from "graphql-fields-info";
-import {
-    connectionArgs, connectionDefinitions,
-    fromGlobalId, mutationWithClientMutationId,
-    toGlobalId,
-} from "graphql-relay";
-import { idArgName, inputArgName, sortArgName, whereArgName } from ".";
-import Adapter from "./Adapter";
+import { connectionArgs, connectionDefinitions, mutationWithClientMutationId } from "graphql-relay";
+import { idArgName, sortArgName, whereArgName } from ".";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
@@ -32,7 +26,7 @@ import GraphQLDate from "./scalars/Date";
 import GraphQLJSON from "./scalars/JSON";
 import {
     Argument, ArgumentType, Attribute, AttributeType, CollectionAttribute,
-    ModelAttribute, ModelConfig, ModelOptions, Mutation, Mutations, Queries, ResolveFn,
+    ModelAttribute, ModelConfig, ModelOptions, Mutations, Queries, ResolveFn,
 } from "./typings";
 class Model {
     public id: string;
@@ -54,7 +48,7 @@ class Model {
     protected resolveFn: ResolveFn;
     constructor(public config: ModelConfig, protected collector: Collection, protected opts: ModelOptions = {}) {
         this.opts.interfaces = this.opts.interfaces || [];
-        this.resolveFn = this.opts.resolveFn;
+        this.resolveFn = this.opts.resolveFn ? this.opts.resolveFn : () => null;
         this.name = this.config.name || capitalize(this.config.id);
         this.queryName = uncapitalize(this.name);
         this.connectionName = uncapitalize(this.name) + "s";
@@ -124,7 +118,7 @@ class Model {
         args[idArgName] = { type: new GraphQLNonNull(GraphQLID) };
         return args;
     }
-    public getWhereArgument(name) {
+    public getWhereArgument(name: string) {
         const arg = this.getWhereArguments().find((a) => a.name === name);
         if (!arg) {
             throw new Error("Unknown where argument " + name);
@@ -156,7 +150,7 @@ class Model {
         };
     }
     public getConnectionArgs(): GraphQLFieldConfigArgumentMap {
-        const args = {};
+        const args: any = {};
         Object.keys(connectionArgs).map((argName) => {
             args[argName] = connectionArgs[argName];
         });
@@ -658,12 +652,13 @@ export function capitalize(str: string) {
 const stringFunctions = ["contains", "notContains", "startsWith", "notStartsWith",
     "endsWith", "notEndsWith", "like", "notLike"];
 const numberFunctions = ["greaterThan", "lessThan", "greaterThanOrEqual", "lessThanOrEqual"];
+interface IWhereArgHelpersType {
+    name: string;
+    type: any;
+    argumentType: ArgumentType;
+}
 export const whereArgHelpers: {
-    [attrType: string]: (attr: Attribute) => Array<{
-        name: string;
-        type: any;
-        argumentType: ArgumentType,
-    }>;
+    [attrType: string]: (attr: Attribute) => IWhereArgHelpersType[];
 } = {
         [AttributeTypes.String]: (attr: Attribute) => {
             const types = [];
@@ -720,16 +715,16 @@ export const whereArgHelpers: {
             });
             return types;
         },
-        [AttributeTypes.Boolean]: (attr: Attribute) => {
+        [AttributeTypes.Boolean]: (_: Attribute) => {
             return [];
         },
-        [AttributeTypes.Model]: (attr: Attribute) => {
+        [AttributeTypes.Model]: (_: Attribute) => {
             return [];
         },
-        [AttributeTypes.Collection]: (attr: Attribute) => {
+        [AttributeTypes.Collection]: (_: Attribute) => {
             return [];
         },
-        [AttributeTypes.ID]: (attr: Attribute) => {
+        [AttributeTypes.ID]: (_: Attribute) => {
             return [];
         },
     };

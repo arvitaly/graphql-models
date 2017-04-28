@@ -1,5 +1,4 @@
-import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
-import collection1 from "./../__fixtures__/collection1";
+import { GraphQLObjectType, GraphQLString } from "graphql";
 import AttributeTypes from "./../AttributeTypes";
 import Collection from "./../Collection";
 import Schema from "./../Schema";

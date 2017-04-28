@@ -61,4 +61,3 @@ describe("Schema spec", () => {
         expect(schema.getGraphQLSchema()).toMatchSnapshot();
     });
 });
-//# sourceMappingURL=Schema-spec.js.map

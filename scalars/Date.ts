@@ -2,7 +2,7 @@ import { GraphQLScalarType } from "graphql";
 import { GraphQLError } from "graphql/error";
 import { Kind } from "graphql/language";
 
-function coerceDate(value) {
+function coerceDate(value: any) {
     if (!(value instanceof Date)) {
         // Is this how you raise a 'field error'?
         // throw new Error("Field error: value is not an instance of Date");

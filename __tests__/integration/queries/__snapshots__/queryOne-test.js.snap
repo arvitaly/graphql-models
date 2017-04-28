@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`query one: animal 1`] = `
+Object {
+  "viewer": Object {
+    "animal": Object {
+      "Weight": 1001.1,
+      "age": 101,
+      "birthday": "Fri, 01 Jan 2010 00:00:00 GMT",
+      "id": "QW5pbWFsOjE=",
+      "isCat": true,
+      "name": "Str1",
+      "some": Object {
+        "test": 1,
+      },
+    },
+  },
+}
+`;
+
+exports[`query one: post 1`] = `
+Object {
+  "viewer": Object {
+    "post": Object {
+      "animals": Object {
+        "edges": Array [
+          Object {
+            "node": Object {
+              "Weight": 1001.1,
+              "age": 101,
+              "birthday": "Fri, 01 Jan 2010 00:00:00 GMT",
+              "id": "QW5pbWFsOjE=",
+              "isCat": true,
+              "name": "Str1",
+              "some": Object {
+                "test": 1,
+              },
+            },
+          },
+        ],
+      },
+      "owner": Object {
+        "name": "Str1",
+        "pets": Object {
+          "edges": Array [
+            Object {
+              "node": Object {
+                "Weight": 1002.1,
+                "age": 102,
+                "birthday": "Fri, 01 Jan 2010 00:00:00 GMT",
+                "id": "QW5pbWFsOjI=",
+                "isCat": true,
+                "name": "Str2",
+                "some": Object {
+                  "test": 2,
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;

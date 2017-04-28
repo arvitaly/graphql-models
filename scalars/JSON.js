@@ -35,4 +35,3 @@ exports.default = new graphql_1.GraphQLScalarType({
     parseValue: identity,
     parseLiteral,
 });
-//# sourceMappingURL=JSON.js.map

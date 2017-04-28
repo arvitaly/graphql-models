@@ -69,7 +69,7 @@ class Schema {
                     source: id, args: null, context, info,
                     resolveInfo: graphql_fields_info_1.fromResolveInfo(info),
                 });
-            }, (value, context, info) => {
+            }, (value, _, __) => {
                 return this.collection.get(graphql_relay_1.fromGlobalId(value.id).type.replace(/Type$/gi, "").toLowerCase())
                     .getBaseType();
             });
@@ -98,4 +98,3 @@ class Schema {
     }
 }
 exports.default = Schema;
-//# sourceMappingURL=Schema.js.map

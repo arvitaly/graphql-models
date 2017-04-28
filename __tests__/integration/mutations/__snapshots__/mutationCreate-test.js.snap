@@ -1,0 +1,186 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mutation create 1`] = `
+Object {
+  "createPost": Object {
+    "post": Object {
+      "animals": Object {
+        "edges": Array [
+          Object {
+            "node": Object {
+              "Weight": 1001.1,
+              "age": 101,
+              "birthday": "Fri, 01 Jan 2010 00:00:00 GMT",
+              "id": "QW5pbWFsOjE=",
+              "isCat": true,
+              "name": "Str1",
+              "some": Object {
+                "test": 1,
+              },
+            },
+          },
+          Object {
+            "node": Object {
+              "Weight": 1002.1,
+              "age": 102,
+              "birthday": "Fri, 01 Jan 2010 00:00:00 GMT",
+              "id": "QW5pbWFsOjI=",
+              "isCat": true,
+              "name": "Str2",
+              "some": Object {
+                "test": 2,
+              },
+            },
+          },
+        ],
+      },
+      "owner": Object {
+        "name": "Str1",
+        "pets": Object {
+          "edges": Array [
+            Object {
+              "node": Object {
+                "Weight": 1003.1,
+                "age": 103,
+                "birthday": "Fri, 01 Jan 2010 00:00:00 GMT",
+                "id": "QW5pbWFsOjM=",
+                "isCat": true,
+                "name": "Str3",
+                "some": Object {
+                  "test": 3,
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`mutationCreate with createOrUpdateSubModel 1`] = `
+Array [
+  Array [
+    "animal",
+    Object {
+      "name": "animalNew1",
+    },
+  ],
+  Array [
+    "user",
+    Object {
+      "name": "OwnerName1",
+      "pets": Array [
+        "1",
+      ],
+    },
+  ],
+  Array [
+    "post",
+    Object {
+      "owner": "1",
+    },
+  ],
+]
+`;
+
+exports[`mutationCreate with createOrUpdateSubModel 2`] = `
+Array [
+  Array [
+    "animal",
+    Object {
+      "name": "animalNew1",
+    },
+  ],
+  Array [
+    "user",
+    Object {
+      "createOrUpdatePets": Array [
+        Object {
+          "create": Object {
+            "name": "animalNew1",
+          },
+          "update": Object {
+            "setName": Object {
+              "name": "updateNameAnimal1",
+            },
+          },
+        },
+      ],
+      "name": "OwnerName1",
+    },
+  ],
+]
+`;
+
+exports[`mutationCreate with createOrUpdateSubModel 3`] = `
+Array [
+  Array [
+    "animal",
+    "1",
+    Object {
+      "name": "updateNameAnimal1",
+    },
+  ],
+  Array [
+    "user",
+    "1",
+    Object {
+      "name": "NewNameOwner",
+    },
+  ],
+]
+`;
+
+exports[`mutationCreate with createOrUpdateSubModel 4`] = `
+Array [
+  Array [
+    "post",
+    "1",
+    Array [
+      Object {
+        "attribute": Object {
+          "model": "user",
+          "name": "owner",
+          "realName": "owner",
+          "required": false,
+          "type": "model",
+        },
+        "fields": Array [
+          Object {
+            "attribute": Object {
+              "model": "animal",
+              "name": "pets",
+              "realName": "pets",
+              "required": false,
+              "type": "collection",
+            },
+            "fields": Array [],
+          },
+        ],
+      },
+    ],
+  ],
+]
+`;
+
+exports[`mutationCreate with createOrUpdateSubModel 5`] = `
+Object {
+  "createPost": Object {
+    "post": Object {
+      "owner": Object {
+        "pets": Object {
+          "edges": Array [
+            Object {
+              "node": Object {
+                "name": "Str1",
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;

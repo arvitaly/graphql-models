@@ -1,5 +1,5 @@
 import {
-    GraphQLFieldConfigMap, GraphQLID, GraphQLInputFieldConfigMap,
+    GraphQLFieldConfigMap, GraphQLID,
     GraphQLNonNull, GraphQLObjectType,
     GraphQLResolveInfo, GraphQLSchema,
 } from "graphql";
@@ -9,7 +9,7 @@ import { idArgName } from ".";
 import Collection from "./Collection";
 import Resolver from "./Resolver";
 import ResolveTypes from "./ResolveTypes";
-import { Mutations, Queries, ResolveFn } from "./typings";
+import { Mutations, Queries } from "./typings";
 class Schema {
     protected nodeDefinition: GraphQLNodeDefinitions;
     protected collection: Collection;
@@ -74,7 +74,7 @@ class Schema {
                     source: id, args: null, context, info,
                     resolveInfo: fromResolveInfo(info),
                 });
-            }, (value: any, context: any, info: GraphQLResolveInfo) => {
+            }, (value: any, _: any, __: GraphQLResolveInfo) => {
                 return this.collection.get(fromGlobalId(value.id).type.replace(/Type$/gi, "").toLowerCase())
                     .getBaseType();
             });

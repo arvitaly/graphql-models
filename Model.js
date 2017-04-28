@@ -15,7 +15,7 @@ class Model {
         this.collector = collector;
         this.opts = opts;
         this.opts.interfaces = this.opts.interfaces || [];
-        this.resolveFn = this.opts.resolveFn;
+        this.resolveFn = this.opts.resolveFn ? this.opts.resolveFn : () => null;
         this.name = this.config.name || capitalize(this.config.id);
         this.queryName = uncapitalize(this.name);
         this.connectionName = uncapitalize(this.name) + "s";
@@ -680,18 +680,17 @@ exports.whereArgHelpers = {
         });
         return types;
     },
-    [AttributeTypes_1.default.Boolean]: (attr) => {
+    [AttributeTypes_1.default.Boolean]: (_) => {
         return [];
     },
-    [AttributeTypes_1.default.Model]: (attr) => {
+    [AttributeTypes_1.default.Model]: (_) => {
         return [];
     },
-    [AttributeTypes_1.default.Collection]: (attr) => {
+    [AttributeTypes_1.default.Collection]: (_) => {
         return [];
     },
-    [AttributeTypes_1.default.ID]: (attr) => {
+    [AttributeTypes_1.default.ID]: (_) => {
         return [];
     },
 };
 exports.default = Model;
-//# sourceMappingURL=Model.js.map

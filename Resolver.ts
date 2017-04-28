@@ -1,18 +1,16 @@
-import { FieldNode, GraphQLResolveInfo, SelectionSetNode } from "graphql";
 import { Field as ResolveSelectionField, GraphQLFieldsInfo as InfoParser } from "graphql-fields-info";
 import { Connection, fromGlobalId, toGlobalId } from "graphql-relay";
-import { idArgName, inputArgName } from ".";
+import { Argument, idArgName } from ".";
 import Adapter from "./Adapter";
 import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import CreateDuplicateError from "./CreateDuplicateError";
-import Model from "./Model";
 import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
 import {
-    Argument, Callbacks, FindCriteria, ModelID, PopulateFields,
-    ResolveOpts, ResolveType, SubscriptionID,
+    Callbacks, FindCriteria, ModelAttribute, ModelID,
+    PopulateFields, ResolveOpts, ResolveType,
 } from "./typings";
 class Resolver {
     public collection: Collection;
@@ -97,12 +95,12 @@ class Resolver {
                 throw new Error("Unsupported resolve type: " + type);
         }
     }
-    public resolveViewer(opts: ResolveOpts) {
+    public resolveViewer(_: ResolveOpts) {
         // TODO this resolve should make adapter
         return { id: "1" };
     }
     public async resolveNode(_: ModelID, opts: ResolveOpts) {
-        const { id, type } = fromGlobalId(opts.source);
+        const { type } = fromGlobalId(opts.source);
         const modelId = type.replace(/Type$/gi, "").toLowerCase();
         if (opts.context && opts.context.subscriptionId) {
             this.subscribeOne(opts.context.subscriptionId, modelId, opts.source, opts);
@@ -121,12 +119,14 @@ class Resolver {
         }
         return result;
     }
-    public async resolveOne(modelId: ModelID, globalId, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
+    public async resolveOne(
+        modelId: ModelID, globalId: string,
+        fields: ResolveSelectionField[], resolveInfo: InfoParser) {
         const id = fromGlobalId(globalId).id;
         const result = await this.adapter.findOne(modelId, id, this.getPopulates(modelId, fields));
         return this.resolveRow(modelId, result, fields, resolveInfo);
     }
-    public resolveRow(modelId: ModelID, row, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
+    public resolveRow(modelId: ModelID, row: any, fields: ResolveSelectionField[], resolveInfo: InfoParser) {
         if (!row) {
             return row;
         }
@@ -143,7 +143,8 @@ class Resolver {
                 row._id = row.id;
             }
             if (attr.type === AttributeTypes.Model) {
-                row[attr.name] = this.resolveRow(attr.model, row[attr.name], field.fields, resolveInfo);
+                row[attr.name] = this.resolveRow((attr as ModelAttribute).model,
+                    row[attr.name], field.fields, resolveInfo);
             }
             if (attr.type === AttributeTypes.Collection) {
                 if (!row[attr.name] || row[attr.name].length === 0) {
@@ -157,8 +158,8 @@ class Resolver {
                         },
                     };
                 } else {
-                    const edges = row[attr.name].map((r) => {
-                        const node = this.resolveRow(attr.model, r,
+                    const edges = row[attr.name].map((r: any) => {
+                        const node = this.resolveRow((attr as ModelAttribute).model, r,
                             resolveInfo.getFieldsForConnection(field), resolveInfo);
                         return {
                             cursor: node.id,
@@ -192,8 +193,8 @@ class Resolver {
                 pageInfo: {
                     hasNextPage: false,
                     hasPreviousPage: false,
-                    endCursor: undefined,
-                    startCursor: undefined,
+                    endCursor: "",
+                    startCursor: "",
                 },
             };
         } else {
@@ -233,7 +234,7 @@ class Resolver {
             [this.collection.get(modelId).queryName]: row,
         };
     }
-    public async createOrUpdateOne(modelId: string, args) {
+    public async createOrUpdateOne(modelId: string, args: any) {
         const model = this.collection.get(modelId);
         try {
             return await this.createOne(modelId, Object.assign({}, args.create));
@@ -286,7 +287,6 @@ class Resolver {
         }
     }
     public async resolveMutationUpdate(modelId: string, opts: ResolveOpts) {
-        const model = this.collection.get(modelId);
         const argsForUpdate: any = Object.assign({}, opts.args);
         delete argsForUpdate.clientMutationId;
 
@@ -298,12 +298,13 @@ class Resolver {
             [this.collection.get(modelId).queryName]: row,
         };
     }
-    public async updateOne(modelId: string, argsForUpdate) {
+    public async updateOne(modelId: string, argsForUpdate: any) {
         const model = this.collection.get(modelId);
         const updating: any = {};
         let id;
         await Promise.all(Object.keys(argsForUpdate).map((updateArgName) => {
-            const arg = Object.assign({}, model.getUpdateArguments().find((a) => a.name === updateArgName));
+            const arg = Object.assign({},
+                model.getUpdateArguments().find((a) => a.name === updateArgName)) as Argument;
             arg.value = argsForUpdate[updateArgName];
             return arg;
         }).map(async (arg) => {
@@ -314,30 +315,34 @@ class Resolver {
                     } else if (arg.attribute.type === AttributeTypes.Model) {
                         updating[arg.attribute.name] = fromGlobalId(arg.value[arg.attribute.name]);
                     } else if (arg.attribute.type === AttributeTypes.Collection) {
-                        updating[arg.attribute.name] = arg.value[arg.attribute.name].map((v) => fromGlobalId(v).id);
+                        updating[arg.attribute.name] =
+                            arg.value[arg.attribute.name].map((v: any) => fromGlobalId(v).id);
                     } else {
                         updating[arg.attribute.name] = arg.value[arg.attribute.name];
                     }
                     break;
                 case ArgumentTypes.CreateArgument:
+                    const attr = arg.attribute as ModelAttribute;
                     updating[arg.attribute.name] = fromGlobalId(
-                        await this.createOne(arg.attribute.model, arg.value),
+                        await this.createOne(attr.model, arg.value),
                     ).id;
                     break;
                 case ArgumentTypes.CreateOrUpdateSubModel:
+                    const attr2 = arg.attribute as ModelAttribute;
                     updating[arg.attribute.name] = fromGlobalId(
-                        await this.createOrUpdateOne(arg.attribute.model, arg.value),
+                        await this.createOrUpdateOne(attr2.model, arg.value),
                     ).id;
                     break;
                 case ArgumentTypes.CreateSubCollection:
-                    const childModel = arg.attribute.model;
-                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {
-                        return fromGlobalId(await this.createOne(childModel, v)).id;
+                    const attr3 = arg.attribute as ModelAttribute;
+                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v: any) => {
+                        return fromGlobalId(await this.createOne(attr3.model, v)).id;
                     }));
                     break;
                 case ArgumentTypes.CreateOrUpdateSubCollection:
-                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v) => {
-                        return fromGlobalId(await this.createOrUpdateOne(arg.attribute.model, v)).id;
+                    const attr4 = arg.attribute as ModelAttribute;
+                    updating[arg.attribute.name] = await Promise.all(arg.value.map(async (v: any) => {
+                        return fromGlobalId(await this.createOrUpdateOne(attr4.model, v)).id;
                     }));
                     break;
                 case ArgumentTypes.Equal:
@@ -350,16 +355,18 @@ class Resolver {
         const updated = await this.adapter.updateOne(model.id, id, updating);
         return toGlobalId(model.getNameForGlobalId(), updated[model.getPrimaryKeyAttribute().realName]);
     }
-    public async createOne(modelId: string, args) {
+    public async createOne(modelId: string, args: any) {
         const model = this.collection.get(modelId);
+        // Fill createArgs
         let createArgs = Object.keys(args).map((createArgName) => {
-            const arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName));
+            const arg = Object.assign({}, model.getCreateArguments().find((a) => a.name === createArgName)) as Argument;
             arg.value = args[createArgName];
             return arg;
         });
+        // Create all submodels
         const submodels = await Promise.all(
             createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubModel).map(async (arg) => {
-                const childModel = arg.attribute.model;
+                const childModel = (arg.attribute as ModelAttribute).model;
                 return {
                     name: arg.attribute.name,
                     value: await this.createOne(childModel, arg.value),
@@ -370,10 +377,25 @@ class Resolver {
             }),
         );
         createArgs = createArgs.concat(submodels);
+        // create or update all submodels
+        const submodels2 = await Promise.all(
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateOrUpdateSubModel).map(async (arg) => {
+                const childModel = (arg.attribute as ModelAttribute).model;
+                return {
+                    name: arg.attribute.name,
+                    value: await this.createOrUpdateOne(childModel, arg.value),
+                    attribute: arg.attribute,
+                    type: ArgumentTypes.CreateArgument,
+                    graphQLType: null,
+                };
+            }),
+        );
+
+        createArgs = createArgs.concat(submodels2);
         const subcollections = await Promise.all(
             createArgs.filter((arg) => arg.type === ArgumentTypes.CreateSubCollection).map(async (arg) => {
-                const childModel = arg.attribute.model;
-                const ids = await Promise.all(arg.value.map(async (row) => {
+                const childModel = (arg.attribute as ModelAttribute).model;
+                const ids = await Promise.all(arg.value.map(async (row: any) => {
                     return await this.createOne(childModel, row);
                 }));
                 return {
@@ -386,6 +408,22 @@ class Resolver {
             }),
         );
         createArgs = createArgs.concat(subcollections);
+        const subcollections2 = await Promise.all(
+            createArgs.filter((arg) => arg.type === ArgumentTypes.CreateOrUpdateSubCollection).map(async (arg) => {
+                const childModel = (arg.attribute as ModelAttribute).model;
+                const ids = await Promise.all(arg.value.map(async (row: any) => {
+                    return await this.createOrUpdateOne(childModel, row);
+                }));
+                return {
+                    name: arg.attribute.name,
+                    value: ids,
+                    attribute: arg.attribute,
+                    type: ArgumentTypes.CreateArgument,
+                    graphQLType: null,
+                };
+            }),
+        );
+        createArgs = createArgs.concat(subcollections2);
         const creating: any = {};
         createArgs.map((arg) => {
             switch (arg.type) {
@@ -393,13 +431,17 @@ class Resolver {
                     break;
                 case ArgumentTypes.CreateSubCollection:
                     break;
+                case ArgumentTypes.CreateOrUpdateSubCollection:
+                    break;
+                case ArgumentTypes.CreateOrUpdateSubModel:
+                    break;
                 default:
                     if (arg.attribute.type === AttributeTypes.ID) {
                         creating[arg.attribute.name] = fromGlobalId(arg.value).id;
                     } else if (arg.attribute.type === AttributeTypes.Model) {
                         creating[arg.attribute.name] = fromGlobalId(arg.value).id;
                     } else if (arg.attribute.type === AttributeTypes.Collection) {
-                        creating[arg.attribute.name] = arg.value.map((v) => fromGlobalId(v).id);
+                        creating[arg.attribute.name] = arg.value.map((v: any) => fromGlobalId(v).id);
                     } else {
                         creating[arg.attribute.name] = arg.value;
                     }
@@ -408,10 +450,6 @@ class Resolver {
         const created = await this.adapter.createOne(modelId, creating);
         return toGlobalId(modelId, "" + created[model.getPrimaryKeyAttribute().realName]);
     }
-    /*resolveMutationCreate();
-    resolveMutationUpdate();
-    resolveMutationUpdateMany();
-    resolveMutationDelete();*/
     public subscribeOne(subscriptionId: string, modelId: ModelID, globalId: string, opts: ResolveOpts) {
         this.subscribes[subscriptionId] = {
             modelId,
@@ -445,14 +483,20 @@ class Resolver {
             return !!fields.find((f) => f.name === attr.name);
         }).map((attr) => {
             const field = fields.find((f) => f.name === attr.name);
+            if (!field) {
+                throw new Error("Not found field with name " + attr.name);
+            }
             return {
                 attribute: attr,
-                fields: this.getPopulates(attr.model, field.fields),
+                fields: this.getPopulates((attr as ModelAttribute).model, field.fields),
             };
         });
     }
-    protected equalRowToFindCriteria(modelId: ModelID, row: any, findCriteria: FindCriteria) {
+    protected equalRowToFindCriteria(_: ModelID, row: any, findCriteria: FindCriteria) {
         // if all criteria not false
+        if (!findCriteria.where) {
+            return true;
+        }
         return !findCriteria.where.some((arg) => {
             const rowValue = row[arg.attribute.name];
             switch (arg.type) {

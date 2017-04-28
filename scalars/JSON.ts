@@ -1,11 +1,11 @@
-import { GraphQLScalarType } from "graphql";
+import { ASTNode, GraphQLScalarType } from "graphql";
 import { Kind } from "graphql/language";
 
-function identity(value) {
+function identity(value: any) {
     return value;
 }
 
-function parseLiteral(ast) {
+function parseLiteral(ast: ASTNode): any {
     switch (ast.kind) {
         case Kind.STRING:
         case Kind.BOOLEAN:

@@ -2,6 +2,9 @@
     "compilerOptions": {
         "target": "es2015",
         "module": "commonjs",
-        "sourceMap": true
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
     }
 }

@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mutationCreateOrUpdate: animal 1`] = `
+Array [
+  Array [
+    "animal",
+    Object {
+      "Weight": 1.5,
+      "name": "Hi",
+    },
+  ],
+]
+`;
+
+exports[`mutationCreateOrUpdate: animal 2`] = `
+Array [
+  Array [
+    "animal",
+    "1",
+    Object {
+      "Weight": 5.7,
+    },
+  ],
+]
+`;
+
+exports[`mutationCreateOrUpdate: animal 3`] = `
+Object {
+  "createOrUpdateAnimal": Object {
+    "animal": Object {
+      "Weight": 1001.1,
+      "id": "QW5pbWFsOjE=",
+    },
+  },
+}
+`;

@@ -10,20 +10,8 @@ import {
     SelectionNode, SelectionSetNode, Source, Token,
     ValueNode,
 } from "graphql";
-/*
-    export type GraphQLInputType =
-        GraphQLScalarType |
-        GraphQLEnumType |
-        GraphQLInputObjectType |
-        GraphQLList<any> |
-        GraphQLNonNull<
-        GraphQLScalarType |
-        GraphQLEnumType |
-        GraphQLInputObjectType |
-        GraphQLList<any>
-        >;
-*/
-export function printGraphQLInputType(type: GraphQLInputType) {
+
+export function printGraphQLInputType(type: GraphQLInputType): any {
     if (type instanceof GraphQLScalarType) {
         return type;
     }
@@ -46,7 +34,7 @@ export function printGraphQLInputType(type: GraphQLInputType) {
         throw new Error("Unsupported enum type: " + type);
     }
 }
-export function printGraphQLInputObjectType(type: GraphQLInputObjectType) {
+export function printGraphQLInputObjectType(type: GraphQLInputObjectType): any {
     return {
         type: "GraphQLInputObjectType",
         name: type.name,
@@ -54,10 +42,10 @@ export function printGraphQLInputObjectType(type: GraphQLInputObjectType) {
         fields: printGraphQLInputFieldMap(type.getFields()),
     };
 }
-export function printGraphQLInputFieldMap(fields: GraphQLInputFieldMap) {
+export function printGraphQLInputFieldMap(fields: GraphQLInputFieldMap): any {
     return _(fields, printGraphQLInputField);
 }
-export function printGraphQLObjectType(type: GraphQLObjectType) {
+export function printGraphQLObjectType(type: GraphQLObjectType): any {
     const fields = type.getFields();
     return {
         type: "GraphQLObjectType",
@@ -69,7 +57,7 @@ export function printGraphQLObjectType(type: GraphQLObjectType) {
         }),
     };
 }
-export function printGraphQLInterfaceType(type: GraphQLInterfaceType) {
+export function printGraphQLInterfaceType(type: GraphQLInterfaceType): any {
     return {
         type: "GraphQLInterfaceType",
         name: type.name,
@@ -78,17 +66,7 @@ export function printGraphQLInterfaceType(type: GraphQLInterfaceType) {
         resolveType: typeof (type.resolveType),
     };
 }
-/*     export type GraphQLType =
-        GraphQLScalarType |
-        GraphQLObjectType |
-        GraphQLInterfaceType |
-        GraphQLUnionType |
-        GraphQLEnumType |
-        GraphQLInputObjectType |
-        GraphQLList<any> |
-        GraphQLNonNull<any>;
-*/
-export function printGraphQLType(type: GraphQLType) {
+export function printGraphQLType(type: GraphQLType): any {
     if (type instanceof GraphQLScalarType) {
         return type;
     }
@@ -132,7 +110,7 @@ export function printGraphQLArgumentConfig(arg: GraphQLArgumentConfig) {
 }
 export function printGraphQLFieldConfig(config: GraphQLFieldConfig<any, any>) {
     return {
-        args: printGraphQLFieldConfigArgumentMap(config.args),
+        args: printGraphQLFieldConfigArgumentMap(config.args as any),
         deprecationReason: config.deprecationReason,
         description: config.description,
         resolve: typeof (config.resolve),
@@ -179,24 +157,24 @@ export function printGraphQLSchema(schema: GraphQLSchema) {
 export function printFieldNode(fieldNode: FieldNode) {
     return {
         alias: fieldNode.alias ? printNameNode(fieldNode.alias) : null,
-        arguments: fieldNode.arguments.map(printArgumentNode),
-        directives: fieldNode.directives.map(printDirectiveNode),
+        arguments: (fieldNode.arguments as any).map(printArgumentNode),
+        directives: (fieldNode.directives as any).map(printDirectiveNode),
         kind: fieldNode.kind,
-        loc: printLocation(fieldNode.loc),
+        loc: printLocation(fieldNode.loc as any),
         name: printNameNode(fieldNode.name),
-        selectionSet: printSelectionSetNode(fieldNode.selectionSet),
+        selectionSet: printSelectionSetNode(fieldNode.selectionSet as any),
     };
 }
 export function printValueNode(node: ValueNode) {
     return {
         kind: node.kind,
-        loc: printLocation(node.loc),
+        loc: printLocation(node.loc as any),
     };
 }
 export function printArgumentNode(node: ArgumentNode) {
     return {
         kind: node.kind,
-        loc: printLocation(node.loc),
+        loc: printLocation(node.loc as any),
         name: printNameNode(node.name),
         value: node.value,
     };
@@ -204,12 +182,12 @@ export function printArgumentNode(node: ArgumentNode) {
 export function printDirectiveNode(node: DirectiveNode) {
     return {
         kind: node.kind,
-        loc: printLocation(node.loc),
+        loc: printLocation(node.loc as any),
         name: printNameNode(node.name),
-        arguments: node.arguments.map(printArgumentNode),
+        arguments: (node.arguments as any).map(printArgumentNode),
     };
 }
-export function printToken(token: Token) {
+export function printToken(token: Token): any {
     return {
         column: token.column,
         start: token.start,
@@ -239,36 +217,36 @@ export function printLocation(location: Location) {
 export function printNameNode(node: NameNode) {
     return {
         kind: node.kind,
-        loc: printLocation(node.loc),
+        loc: printLocation(node.loc as any),
         value: node.value,
     };
 }
 export function printSelectionNode(node: SelectionNode) {
     return {
         kind: node.kind,
-        directives: node.directives.map(printDirectiveNode),
-        loc: printLocation(node.loc),
+        directives: (node.directives as any).map(printDirectiveNode),
+        loc: printLocation(node.loc as any),
     };
 }
 export function printSelectionSetNode(node: SelectionSetNode) {
     return {
         kind: node.kind,
-        loc: printLocation(node.loc),
+        loc: printLocation(node.loc as any),
         selections: node.selections.map(printSelectionNode),
     };
 }
 export function printNamedTypeNode(node: NamedTypeNode) {
     return {
         kind: node.kind,
-        loc: printLocation(node.loc),
+        loc: printLocation(node.loc as any),
         name: printNameNode(node.name),
     };
 }
 export function printFragmentDefinitionNode(node: FragmentDefinitionNode) {
     return {
-        directives: node.directives.map(printDirectiveNode),
+        directives: (node.directives as any).map(printDirectiveNode),
         kind: node.kind,
-        loc: printLocation(node.loc),
+        loc: printLocation(node.loc as any),
         name: printNameNode(node.name),
         selectionSet: printSelectionSetNode(node.selectionSet),
         typeCondition: printNamedTypeNode(node.typeCondition),

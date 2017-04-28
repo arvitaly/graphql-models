@@ -1,5 +1,5 @@
 import Model from "./Model";
-import { ModelConfig, ModelOptions, ResolveFn } from "./typings";
+import { ModelConfig, ModelOptions } from "./typings";
 class Collection {
     protected models: Model[] = [];
     constructor(protected modelConfigs: ModelConfig[], opts?: ModelOptions) {

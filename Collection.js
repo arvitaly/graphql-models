@@ -21,4 +21,3 @@ class Collection {
     }
 }
 exports.default = Collection;
-//# sourceMappingURL=Collection.js.map
