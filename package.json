@@ -1,6 +1,6 @@
 {
   "name": "graphql-models",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Generate GraphQL-types from abstract models",
   "main": "index.js",
   "scripts": {
