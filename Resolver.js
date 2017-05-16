@@ -13,6 +13,7 @@ const _1 = require(".");
 const ArgumentTypes_1 = require("./ArgumentTypes");
 const AttributeTypes_1 = require("./AttributeTypes");
 const CreateDuplicateError_1 = require("./CreateDuplicateError");
+const getQueryConnectionFields_1 = require("./getQueryConnectionFields");
 const ResolveTypes_1 = require("./ResolveTypes");
 class Resolver {
     constructor(adapter, callbacks, publisher) {
@@ -52,8 +53,9 @@ class Resolver {
                     const isCriteriaEqual = model.id === subscribe.modelId && (!subscribe.findCriteria ||
                         this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria));
                     if (isCriteriaEqual) {
-                        const data = yield this.resolveOne(model.id, globalId, subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
-                            subscribe.opts.resolveInfo.getQueryConnectionFields(), subscribe.opts.resolveInfo);
+                        const data = yield this.resolveOne(model.id, globalId, subscribe.type === "one" ?
+                            getQueryConnectionFields_1.default(subscribe.opts.resolveInfo.getQueryOneFields()) :
+                            getQueryConnectionFields_1.default(subscribe.opts.resolveInfo.getQueryConnectionFields()), subscribe.opts.resolveInfo);
                         subscribe.ids.push(globalId);
                         // publish add
                         this.publisher.publishAdd(subscriptionId, model.id, globalId, data, subscribe.opts.context);
@@ -98,7 +100,7 @@ class Resolver {
     }
     resolveQueryOne(modelId, opts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.resolveOne(modelId, opts.args[_1.idArgName], opts.resolveInfo.getQueryOneFields(), opts.resolveInfo);
+            const result = yield this.resolveOne(modelId, opts.args[_1.idArgName], getQueryConnectionFields_1.default(opts.resolveInfo.getQueryOneFields()), opts.resolveInfo);
             if (!result) {
                 return null;
             }
@@ -148,7 +150,7 @@ class Resolver {
                 }
                 else {
                     const edges = row[attr.name].map((r) => {
-                        const node = this.resolveRow(attr.model, r, resolveInfo.getFieldsForConnection(field), resolveInfo);
+                        const node = this.resolveRow(attr.model, r, field.fields, resolveInfo);
                         return {
                             cursor: node.id,
                             node,
@@ -173,7 +175,7 @@ class Resolver {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.collection.get(modelId);
             const findCriteria = this.argsToFindCriteria(modelId, opts.args);
-            const fields = opts.resolveInfo.getQueryConnectionFields(model.connectionName);
+            const fields = getQueryConnectionFields_1.default(opts.resolveInfo.getQueryConnectionFields(model.connectionName));
             const rows = yield this.adapter.findMany(modelId, findCriteria, this.getPopulates(modelId, fields));
             let result;
             if (!rows || rows.length === 0) {
@@ -189,7 +191,7 @@ class Resolver {
             }
             else {
                 const edges = rows.map((row) => {
-                    const node = this.resolveRow(modelId, row, opts.resolveInfo.getQueryConnectionFields(model.connectionName), opts.resolveInfo);
+                    const node = this.resolveRow(modelId, row, getQueryConnectionFields_1.default(opts.resolveInfo.getQueryConnectionFields(model.connectionName)), opts.resolveInfo);
                     return {
                         cursor: node.id,
                         node,

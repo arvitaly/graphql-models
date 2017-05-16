@@ -6,6 +6,7 @@ import ArgumentTypes from "./ArgumentTypes";
 import AttributeTypes from "./AttributeTypes";
 import Collection from "./Collection";
 import CreateDuplicateError from "./CreateDuplicateError";
+import getQueryConnectionFields from "./getQueryConnectionFields";
 import Publisher from "./Publisher";
 import ResolveTypes from "./ResolveTypes";
 import {
@@ -63,8 +64,9 @@ class Resolver {
                         this.equalRowToFindCriteria(model.id, created, subscribe.findCriteria));
                     if (isCriteriaEqual) {
                         const data = await this.resolveOne(model.id, globalId,
-                            subscribe.type === "one" ? subscribe.opts.resolveInfo.getQueryOneFields() :
-                                subscribe.opts.resolveInfo.getQueryConnectionFields(),
+                            subscribe.type === "one" ?
+                                getQueryConnectionFields(subscribe.opts.resolveInfo.getQueryOneFields()) :
+                                getQueryConnectionFields(subscribe.opts.resolveInfo.getQueryConnectionFields()),
                             subscribe.opts.resolveInfo);
                         subscribe.ids.push(globalId);
                         // publish add
@@ -109,7 +111,7 @@ class Resolver {
     }
     public async resolveQueryOne(modelId: ModelID, opts: ResolveOpts) {
         const result = await this.resolveOne(modelId, opts.args[idArgName],
-            opts.resolveInfo.getQueryOneFields(),
+            getQueryConnectionFields(opts.resolveInfo.getQueryOneFields()),
             opts.resolveInfo);
         if (!result) {
             return null;
@@ -160,7 +162,7 @@ class Resolver {
                 } else {
                     const edges = row[attr.name].map((r: any) => {
                         const node = this.resolveRow((attr as ModelAttribute).model, r,
-                            resolveInfo.getFieldsForConnection(field), resolveInfo);
+                            field.fields, resolveInfo);
                         return {
                             cursor: node.id,
                             node,
@@ -184,7 +186,7 @@ class Resolver {
     public async resolveQueryConnection(modelId: ModelID, opts: ResolveOpts): Promise<Connection<any>> {
         const model = this.collection.get(modelId);
         const findCriteria: FindCriteria = this.argsToFindCriteria(modelId, opts.args);
-        const fields = opts.resolveInfo.getQueryConnectionFields(model.connectionName);
+        const fields = getQueryConnectionFields(opts.resolveInfo.getQueryConnectionFields(model.connectionName));
         const rows = await this.adapter.findMany(modelId, findCriteria, this.getPopulates(modelId, fields));
         let result: Connection<any>;
         if (!rows || rows.length === 0) {
@@ -200,7 +202,8 @@ class Resolver {
         } else {
             const edges = rows.map((row) => {
                 const node = this.resolveRow(modelId, row,
-                    opts.resolveInfo.getQueryConnectionFields(model.connectionName), opts.resolveInfo);
+                    getQueryConnectionFields(opts.resolveInfo.getQueryConnectionFields(model.connectionName)),
+                    opts.resolveInfo);
                 return {
                     cursor: node.id,
                     node,
